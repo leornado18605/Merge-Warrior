@@ -784,8 +784,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c6c04615d8803d4e8251746625a4a5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridManager: {fileID: 0}
-  unit: {fileID: 0}
+  unit: {fileID: 3471846879990924323}
 --- !u!114 &3471846879990924323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -798,10 +797,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4e12c8494b1f2a448bf1288e071c202, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unitType: 
-  level: 0
-  row: 0
-  col: 0
+  unitType: Knife
+  level: 2
+  row: 2
+  col: 3
+  mergeCooldownSeconds: 0.25
 --- !u!1 &1568787907209386
 GameObject:
   m_ObjectHideFlags: 0

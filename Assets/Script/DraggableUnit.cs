@@ -10,7 +10,7 @@ public class DraggableUnit : MonoBehaviour
     private int originalCol = -1;
 
     [SerializeField] private Unit unit;
-    private GridManager Grid => unit.Grid;
+    private GridManager Grid => unit != null ? unit.Grid : null;
 
     void OnMouseDown()
     {
@@ -18,7 +18,7 @@ public class DraggableUnit : MonoBehaviour
         originalRow = unit.row;
         originalCol = unit.col;
 
-        if (Grid.IsValidGridPosition(originalRow, originalCol))
+        if (Grid != null && Grid.IsValidGridPosition(originalRow, originalCol))
             Grid.SetCellOccupied(originalRow, originalCol, null);
 
         offset = transform.position - GetMouseWorldPosition();
@@ -36,27 +36,65 @@ public class DraggableUnit : MonoBehaviour
 
     void OnMouseUp()
     {
+        if (!isDragging)  return; 
         isDragging = false;
+
+        if (unit == null)   return; 
+        if (Grid == null) {  Revert(); return; }
+
         Vector2Int gridPos = Grid.WorldToGridPosition(transform.position);
         int row = gridPos.x, col = gridPos.y;
 
-        if (Grid.IsValidGridPosition(row, col) && Grid.IsEmptyCell(row, col))
+        if (!Grid.IsValidGridPosition(row, col))
         {
+            Revert();
+            return;
+        }
+
+        GameObject occupant = Grid.GetOccupant(row, col);
+
+        if (occupant == null)
+        {
+            // empty cell -> place normally
             Grid.SetCellOccupied(row, col, gameObject);
             unit.row = row; unit.col = col;
             transform.position = Grid.GridToWorldPosition(row, col);
+            return;
         }
-        else
+
+        if (GameManager.Instance == null)
         {
-            transform.position = originalPosition;
-            Grid.SetCellOccupied(originalRow, originalCol, gameObject);
+            Revert();
+            return;
+        }
+
+        bool merged = GameManager.Instance.TryMerge(GridManager.Board.Board2, row, col, gameObject);
+
+        if (merged)
+        {
+            return;
+        }
+        Revert(); 
+    }
+
+    private void Revert()
+    {
+        transform.position = originalPosition;
+        if (unit != null && unit.Grid != null && unit.Grid.IsValidGridPosition(originalRow, originalCol))
+        {
+            unit.Grid.SetCellOccupied(originalRow, originalCol, gameObject);
             unit.row = originalRow; unit.col = originalCol;
+        }
+        else if (unit != null)
+        {
+            unit.row = -1; unit.col = -1;
         }
     }
 
     Vector3 GetMouseWorldPosition()
     {
         Vector3 mousePos = Input.mousePosition;
+        if (Camera.main == null) return Vector3.zero; 
         mousePos.z = Camera.main.WorldToScreenPoint(transform.position).z;
         return Camera.main.ScreenToWorldPoint(mousePos);
     }

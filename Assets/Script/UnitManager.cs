@@ -22,7 +22,6 @@ public class UnitManager : MonoBehaviour
 
     public void PlaceKnife()
     {
-      
         for (int row = gridManager.Rows - 1; row >= 0; row--)
         {
             for (int col = 0; col < gridManager.Cols; col++)
@@ -38,7 +37,6 @@ public class UnitManager : MonoBehaviour
                 knife.GetComponent<Unit>().Initialize("Knife", 1, gridManager, row, col);
 
                 gridManager.SetCellOccupied(row, col, knife);
-
                 return;
             }
         }
@@ -62,8 +60,6 @@ public class UnitManager : MonoBehaviour
 
                 gun.GetComponent<Unit>().Initialize("Gun", 1, gridManager, row, col);
                 gridManager.SetCellOccupied(row, col, gun);
-
-           
                 return;
             }
         }
