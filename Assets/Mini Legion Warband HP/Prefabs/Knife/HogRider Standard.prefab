@@ -628,6 +628,7 @@ GameObject:
   - component: {fileID: 95948910325150096}
   - component: {fileID: -4200900619136044266}
   - component: {fileID: -6881717853915558713}
+  - component: {fileID: -6723421571060210767}
   m_Layer: 0
   m_Name: HogRider Standard
   m_TagString: Untagged
@@ -706,6 +707,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c6c04615d8803d4e8251746625a4a5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gridManager: {fileID: 0}
+  unit: {fileID: 0}
+--- !u!114 &-6723421571060210767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1380096154138096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4e12c8494b1f2a448bf1288e071c202, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitType: 
+  level: 0
+  row: 0
+  col: 0
 --- !u!1 &1385253925979950
 GameObject:
   m_ObjectHideFlags: 0

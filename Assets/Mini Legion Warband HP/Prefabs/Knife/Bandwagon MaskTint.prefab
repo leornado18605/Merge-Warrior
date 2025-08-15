@@ -371,6 +371,7 @@ GameObject:
   - component: {fileID: 95702640654543282}
   - component: {fileID: 5735353409266675946}
   - component: {fileID: 6139473720925351260}
+  - component: {fileID: 4314689075266042779}
   m_Layer: 0
   m_Name: Bandwagon MaskTint
   m_TagString: Untagged
@@ -449,6 +450,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c6c04615d8803d4e8251746625a4a5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gridManager: {fileID: 0}
+  unit: {fileID: 4314689075266042779}
+--- !u!114 &4314689075266042779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303046488496336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4e12c8494b1f2a448bf1288e071c202, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitType: 
+  level: 0
+  row: 0
+  col: 0
 --- !u!1 &1319781183156294
 GameObject:
   m_ObjectHideFlags: 0

@@ -457,6 +457,7 @@ GameObject:
   - component: {fileID: 95881975403303082}
   - component: {fileID: -1363544772535625549}
   - component: {fileID: 1167661201254655210}
+  - component: {fileID: -6224854073218680357}
   m_Layer: 0
   m_Name: Grunt MaskTint
   m_TagString: Untagged
@@ -535,6 +536,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c6c04615d8803d4e8251746625a4a5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gridManager: {fileID: 0}
+  unit: {fileID: 0}
+--- !u!114 &-6224854073218680357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1478305845358970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4e12c8494b1f2a448bf1288e071c202, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitType: 
+  level: 0
+  row: 0
+  col: 0
 --- !u!1 &1498137241849512
 GameObject:
   m_ObjectHideFlags: 0
