@@ -6,6 +6,7 @@ using ObjectPooling;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
+    public BotManager botManager;
     public GridManager gridManager;
     public float mergeLockSeconds = 0.25f;
 
@@ -16,7 +17,11 @@ public class GameManager : MonoBehaviour
     private Dictionary<string, GameObject[]> prefabMap;
 
     public event Action<Unit, int, int> OnUnitMerged;
-
+    private void Start()
+    {
+        botManager.SetGridManager(gridManager);
+        BotManager.Instance.SpawnBot(GridManager.Board.Board2, 3, 5, BotManager.Instance.botLevelPrefabs);
+    }
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -24,7 +29,7 @@ public class GameManager : MonoBehaviour
         BuildPrefabMap();
         EnsurePools();
     }
-
+    #region Merge Logic
     private void BuildPrefabMap()
     {
         prefabMap = new Dictionary<string, GameObject[]>();
@@ -111,6 +116,6 @@ public class GameManager : MonoBehaviour
         unit.Initialize(unit.unitType, level, gridManager, row, col);
         return newObj;
     }
-
+    #endregion 
 
 }
