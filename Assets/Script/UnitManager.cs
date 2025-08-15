@@ -37,6 +37,7 @@ public class UnitManager : MonoBehaviour
                 knife.GetComponent<Unit>().Initialize("Knife", 1, gridManager, row, col);
 
                 gridManager.SetCellOccupied(row, col, knife);
+
                 return;
             }
         }

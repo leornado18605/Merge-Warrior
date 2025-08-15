@@ -28,7 +28,7 @@ public class BotManager : MonoBehaviour
         if (gridManager == null || botPrefabs == null || botPrefabs.Length == 0)
             return;
 
-        Vector3 boardOrigin = (botBoard == GridManager.Board.Board1) ? gridManager.Board1Origin : gridManager.Board2Origin;
+        Vector3 boardOrigin = (botBoard == GridManager.Board.Board2) ? gridManager.Board2Origin : gridManager.Board1Origin;
 
         int startCol = (gridManager.Cols - spawnCols) / 2;
         int startRow = 0; 
@@ -40,7 +40,7 @@ public class BotManager : MonoBehaviour
                 int levelIndex = Random.Range(0, botPrefabs.Length);
                 GameObject prefab = botPrefabs[levelIndex];
 
-                Vector3 spawnPos = boardOrigin + new Vector3(c * gridManager.TileSize, 0f, r * gridManager.TileSize);
+                Vector3 spawnPos = gridManager.GridToWorldPosition(GridManager.Board.Board1, startRow + r, startCol + c);
 
                 GameObject bot = PoolManager.Spawn(prefab, spawnPos, Quaternion.identity, gridManager.transform);
 

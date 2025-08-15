@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         botManager.SetGridManager(gridManager);
-        BotManager.Instance.SpawnBot(GridManager.Board.Board2, 3, 5, BotManager.Instance.botLevelPrefabs);
+        BotManager.Instance.SpawnBot(GridManager.Board.Board1, 3, 5, BotManager.Instance.botLevelPrefabs);
     }
     private void Awake()
     {
@@ -59,10 +59,11 @@ public class GameManager : MonoBehaviour
 
         Unit sourceUnit = sourceObj.GetComponent<Unit>();
         Unit targetUnit = targetObj.GetComponent<Unit>();
+
         if (sourceUnit == null || targetUnit == null) return false;
 
         if (sourceUnit.unitType != targetUnit.unitType) return false;
-
+        if (sourceUnit.level != targetUnit.level) return false;
         int newLevel = targetUnit.level + 1;
 
         GameObject newPrefab = GetMergedPrefab(targetUnit, newLevel);
