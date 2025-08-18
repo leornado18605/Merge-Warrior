@@ -21,9 +21,6 @@ public class GameManager : MonoBehaviour
     {
         botManager.SetGridManager(gridManager);
         BotManager.Instance.SpawnBot(GridManager.Board.Board2, 3, 5, BotManager.Instance.botLevelPrefabs);
-        Debug.Log($"Board1Origin: {gridManager.Board1Origin}");
-        Debug.Log($"Board2Origin: {gridManager.Board2Origin}");
-        Debug.Log($"boardsSwapped: {gridManager.boardsSwapped}");
     }
     private void Awake()
     {
@@ -55,6 +52,7 @@ public class GameManager : MonoBehaviour
     // Try merge and replace with upgraded prefab
     public bool TryMerge(GridManager.Board board, int targetRow, int targetCol, GameObject sourceObj)
     {
+        Debug.Log("TryMerge called with targetRow: " + targetRow + ", targetCol: " + targetCol);
         if (sourceObj == null) return false;
 
         GameObject targetObj = gridManager.GetOccupant(board, targetRow, targetCol);
@@ -70,17 +68,28 @@ public class GameManager : MonoBehaviour
         int newLevel = targetUnit.level + 1;
 
         GameObject newPrefab = GetMergedPrefab(targetUnit, newLevel);
-        if (newPrefab == null) return false;
+        if (newPrefab == null)
+        {
+            Debug.Log($"[Merge] not find prefab level up for {targetUnit.unitType} level {newLevel}");
+            return false; 
+        }
+        Debug.Log($"[Merge] Merging {sourceUnit.unitType} L{sourceUnit.level} with {targetUnit.unitType} L{targetUnit.level} to create {newPrefab.name} L{newLevel} at {targetRow},{targetCol}");
 
         ReleaseObjectsAndClearGrid(board, targetRow, targetCol, sourceObj, targetObj);
-        GameObject newObj = SpawnAndInitializeUnit(newPrefab, board, targetRow, targetCol, newLevel);
-        if (newObj == null) return false;
+        GameObject newObj = SpawnAndInitializeUnit(newPrefab, board, targetRow, targetCol, newLevel, targetUnit.unitType);
+
+        if (newObj == null)
+        {
+            Debug.Log($"[Merge] new unit is false");
+            return false; 
+        }
 
         Unit newUnit = newObj.GetComponent<Unit>();
         newUnit?.MergeLockTemporary(mergeLockSeconds);
         gridManager.SetCellOccupied(board, targetRow, targetCol, newObj);
         OnUnitMerged?.Invoke(newUnit, targetRow, targetCol);
 
+        Debug.Log($"[Merge] is completed merge-> {newUnit.unitType}");
         return true;
     }
 
@@ -105,7 +114,7 @@ public class GameManager : MonoBehaviour
         PoolManager.Release(targetObj);
     }
 
-    private GameObject SpawnAndInitializeUnit(GameObject prefab, GridManager.Board board, int row, int col, int level)
+    private GameObject SpawnAndInitializeUnit(GameObject prefab, GridManager.Board board, int row, int col, int level, string unitType)
     {
         Vector3 spawnPos = gridManager.GridToWorldPosition(board, row, col);
         GameObject newObj = PoolManager.Spawn(prefab, spawnPos, Quaternion.identity, gridManager.transform);
@@ -113,11 +122,15 @@ public class GameManager : MonoBehaviour
         var unit = newObj.GetComponent<Unit>();
         if (unit == null)
         {
+            Debug.Log("[SpawnAndInitializeUnit] prefab has no component Unit ");
             PoolManager.Release(newObj);
             return null;
         }
 
-        unit.Initialize(unit.unitType, level, gridManager, board, row, col);
+        //unit.Initialize(unit.unitType, level, gridManager, board, row, col);
+
+        unit.Initialize(unitType, level, gridManager, board, row, col);
+        Debug.Log($"[SpawnAndInitializeUnit] Spawned {unitType} L{level} tại row:{row}, col:{col}, pos:{spawnPos}");
         return newObj;
     }
     #endregion 

@@ -30,6 +30,8 @@ public class Unit : MonoBehaviour
 
     public Vector3 GetOriginalPosition() => originalPosition;
     public GridManager Grid => gridManager;
+
+    public GridManager.Board Board => board;
     public bool IsMergeLocked() => mergeLock;
 
     public void MergeIncrement()

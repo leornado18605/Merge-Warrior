@@ -527,7 +527,7 @@ MonoBehaviour:
   cols: 5
   tileSize: 931
   boardGap: 880.8
-  boardsSwapped: 1
+  boardsSwapped: 0
   drawGizmos: 1
 --- !u!4 &892392522
 Transform:
@@ -868,6 +868,7 @@ MonoBehaviour:
   botLevelPrefabs:
   - {fileID: 1747630175}
   - {fileID: 1308446548}
+  modelYawOffset: 0
 --- !u!1001 &1116151929
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -16,10 +16,13 @@ public class DraggableUnit : MonoBehaviour
         originalPosition = transform.position;
         originalRow = unit.row;
         originalCol = unit.col;
+        var board = unit.Board;
 
         if (Grid.IsValidGridPosition(originalRow, originalCol))
             Grid.SetCellOccupied(originalRow, originalCol, null);
 
+        if (Grid.IsValidGridPosition(originalRow, originalCol))
+            Grid.SetCellOccupied(board, originalRow, originalCol, null);
         isDragging = true;
     }
 
@@ -41,8 +44,9 @@ public class DraggableUnit : MonoBehaviour
             Revert();
             return;
         }
+        var board = unit.Board;
+        Vector2Int gridPos = Grid.WorldToGridNearest(board, transform.position);
 
-        Vector2Int gridPos = Grid.WorldToGridPosition(transform.position);
         int row = gridPos.x;
         int col = gridPos.y;
 
@@ -52,18 +56,18 @@ public class DraggableUnit : MonoBehaviour
             return;
         }
 
-        Vector3 cellCenter = Grid.GridToWorldPosition(row, col);
+        Vector3 cellCenter = Grid.GridToWorldPosition(board, row, col);
         transform.position = cellCenter;
 
-        GameObject occupant = Grid.GetOccupant(row, col);
+        GameObject occupant = Grid.GetOccupant(board, row, col);
         if (occupant == null)
         {
-            Grid.SetCellOccupied(row, col, gameObject);
+            Grid.SetCellOccupied(board, row, col, gameObject);
             unit.row = row; unit.col = col;
             return;
         }
 
-        if (GameManager.Instance == null || !GameManager.Instance.TryMerge(GridManager.Board.Board2, row, col, gameObject))
+        if (GameManager.Instance == null || !GameManager.Instance.TryMerge(board, row, col, gameObject))
         {
             Revert();
         }
@@ -74,7 +78,7 @@ public class DraggableUnit : MonoBehaviour
         transform.position = originalPosition;
         if (unit != null && unit.Grid != null && unit.Grid.IsValidGridPosition(originalRow, originalCol))
         {
-            unit.Grid.SetCellOccupied(originalRow, originalCol, gameObject);
+            unit.Grid.SetCellOccupied(unit.Board, originalRow, originalCol, gameObject);
             unit.row = originalRow; unit.col = originalCol;
         }
         else if (unit != null)
@@ -82,13 +86,17 @@ public class DraggableUnit : MonoBehaviour
             unit.row = -1; unit.col = -1;
         }
     }
-
     private Vector3 GetMouseWorldPosition()
     {
-        Vector3 mousePos = Input.mousePosition;
-        if (Camera.main == null) return Vector3.zero;
+        if (Camera.main == null) return transform.position;
 
-        mousePos.z = Vector3.Distance(Camera.main.transform.position, transform.position);
-        return Camera.main.ScreenToWorldPoint(mousePos);
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Plane plane = new Plane(Vector3.up, new Vector3(0f, transform.position.y, 0f));
+
+        if (plane.Raycast(ray, out float enter))
+            return ray.GetPoint(enter);
+
+        return transform.position;
     }
+
 }

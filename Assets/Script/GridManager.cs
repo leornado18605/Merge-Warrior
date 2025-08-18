@@ -27,6 +27,9 @@ public sealed class GridManager : MonoBehaviour
     // Occupants tracked separately for each board
     private GameObject[,] occupantsB1;
     private GameObject[,] occupantsB2;
+    private Unit[,] occUnitB1;
+    private Unit[,] occUnitB2;
+
 
     // Origins: world position of tile [0,0] for each board
     private Vector3 board1Origin;
@@ -194,6 +197,21 @@ public sealed class GridManager : MonoBehaviour
         int row = Mathf.FloorToInt(local.z / tileSize);
         return new Vector2Int(row, col);
     }
+
+    public Vector2Int WorldToGridNearest(Board board, Vector3 worldPos)
+    {
+        Vector3 origin = (board == Board.Board1) ? board1Origin : board2Origin;
+        Vector3 local = worldPos - origin;
+
+        int col = Mathf.RoundToInt(local.x / tileSize);
+        int row = Mathf.RoundToInt(local.z / tileSize);
+
+        row = Mathf.Clamp(row, 0, rows - 1);
+        col = Mathf.Clamp(col, 0, cols - 1);
+
+        return new Vector2Int(row, col);
+    }
+
 
     #endregion
 

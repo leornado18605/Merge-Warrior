@@ -12,7 +12,6 @@ public class BotManager : MonoBehaviour
 
     [Header("Facing Settings")]
     [SerializeField] private float modelYawOffset = 0f;
-
     private GridManager gridManager;
 
     private void Awake()
