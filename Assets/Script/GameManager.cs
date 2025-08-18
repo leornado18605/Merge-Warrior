@@ -20,7 +20,10 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         botManager.SetGridManager(gridManager);
-        BotManager.Instance.SpawnBot(GridManager.Board.Board1, 3, 5, BotManager.Instance.botLevelPrefabs);
+        BotManager.Instance.SpawnBot(GridManager.Board.Board2, 3, 5, BotManager.Instance.botLevelPrefabs);
+        Debug.Log($"Board1Origin: {gridManager.Board1Origin}");
+        Debug.Log($"Board2Origin: {gridManager.Board2Origin}");
+        Debug.Log($"boardsSwapped: {gridManager.boardsSwapped}");
     }
     private void Awake()
     {
@@ -114,7 +117,7 @@ public class GameManager : MonoBehaviour
             return null;
         }
 
-        unit.Initialize(unit.unitType, level, gridManager, row, col);
+        unit.Initialize(unit.unitType, level, gridManager, board, row, col);
         return newObj;
     }
     #endregion 

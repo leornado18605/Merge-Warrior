@@ -4,6 +4,7 @@ using UnityEngine;
 public class UnitManager : MonoBehaviour
 {
     [SerializeField] private GridManager gridManager;
+
     [Header("Unit Prefabs")]
     [SerializeField] private GameObject knifePrefab;
     [SerializeField] private GameObject gunPrefab;
@@ -14,6 +15,7 @@ public class UnitManager : MonoBehaviour
 
     [SerializeField] private Unit knifeUnit;
     [SerializeField] private Unit gunUnit;
+
     private void Start()
     {
         PoolManager.CreatePool(knifePrefab, initialSize: poolInitial, maxSize: poolMax, autoExpand: true);
@@ -22,48 +24,61 @@ public class UnitManager : MonoBehaviour
 
     public void PlaceKnife()
     {
+        var board = GridManager.Board.Board1;
+        Debug.Log($"[PlaceKnife] Board1Origin: {gridManager.Board1Origin}, Board2Origin: {gridManager.Board2Origin}, boardsSwapped: {gridManager.boardsSwapped}");
+
         for (int row = gridManager.Rows - 1; row >= 0; row--)
         {
             for (int col = 0; col < gridManager.Cols; col++)
             {
-                if (!gridManager.IsEmptyCell(row, col))
+                if (!gridManager.IsEmptyCell(board, row, col))
                     continue;
 
-                Vector3 worldPos = gridManager.GridToWorldPosition(row, col);
+                Vector3 worldPos = gridManager.GridToWorldPosition(board, row, col);
+                Debug.Log($"[PlaceKnife] Trying to place at row: {row}, col: {col}, worldPos: {worldPos}");
 
                 GameObject knife = PoolManager.Spawn(knifePrefab, worldPos, Quaternion.identity, gridManager.transform);
                 knife.SetActive(true);
 
-                knife.GetComponent<Unit>().Initialize("Knife", 1, gridManager, row, col);
+                knife.GetComponent<Unit>().Initialize("Knife", 1, gridManager, board, row, col);
 
-                gridManager.SetCellOccupied(row, col, knife);
+                gridManager.SetCellOccupied(board, row, col, knife);
 
+                Debug.Log($"[PlaceKnife] Spawned Knife at row: {row}, col: {col}, worldPos: {worldPos}");
                 return;
             }
         }
+
+        Debug.LogWarning("[PlaceKnife] No empty cell found on Board1.");
     }
 
     public void PlaceGun()
     {
+        var board = GridManager.Board.Board1;
+        Debug.Log($"[PlaceGun] Board1Origin: {gridManager.Board1Origin}, Board2Origin: {gridManager.Board2Origin}, boardsSwapped: {gridManager.boardsSwapped}");
+
         for (int row = 0; row < gridManager.Rows; row++)
         {
             for (int col = gridManager.Cols - 1; col >= 0; col--)
             {
-                if (!gridManager.IsEmptyCell(row, col))
+                if (!gridManager.IsEmptyCell(board, row, col))
                     continue;
 
-                Vector3 worldPos = gridManager.GridToWorldPosition(row, col);
+                Vector3 worldPos = gridManager.GridToWorldPosition(board, row, col);
+                Debug.Log($"[PlaceGun] Trying to place at row: {row}, col: {col}, worldPos: {worldPos}");
 
                 GameObject gun = PoolManager.Spawn(gunPrefab, worldPos, Quaternion.identity, gridManager.transform);
-
                 gun.SetActive(true);
-                gun.transform.position = worldPos;
 
-                gun.GetComponent<Unit>().Initialize("Gun", 1, gridManager, row, col);
-                gridManager.SetCellOccupied(row, col, gun);
+                gun.GetComponent<Unit>().Initialize("Gun", 1, gridManager, board, row, col);
+
+                gridManager.SetCellOccupied(board, row, col, gun);
+
+                Debug.Log($"[PlaceGun] Spawned Gun at row: {row}, col: {col}, worldPos: {worldPos}");
                 return;
             }
         }
 
+        Debug.LogWarning("[PlaceGun] No empty cell found on Board1.");
     }
 }

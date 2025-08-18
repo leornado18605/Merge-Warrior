@@ -298,7 +298,7 @@ namespace ObjectPooling
             {
                 Object.Destroy(instance);
                 return;
-            }
+            }   
 
             _inactive.Enqueue(instance);
         }

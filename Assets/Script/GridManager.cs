@@ -15,7 +15,7 @@ public sealed class GridManager : MonoBehaviour
 
     [Header("Runtime")]
     [Tooltip("When true the two boards are swapped (board1 <-> board2 positions).")]
-    public bool boardsSwapped = false;
+    public bool boardsSwapped = true;
 
     [Header("Debug")]
     public bool drawGizmos = true;
@@ -108,7 +108,7 @@ public sealed class GridManager : MonoBehaviour
     #endregion
 
     #region Origins & Spawning
-
+    
     private void ComputeOrigins()
     {
         // By convention: non-swapped => Board2 at transform.position, Board1 below (-Z)
@@ -156,25 +156,28 @@ public sealed class GridManager : MonoBehaviour
     // Board2 (default playboard) helper
     public Vector3 GridToWorldPosition(int row, int col)
     {
+        Debug.Log($"[GridToWorldPosition - DEFAULT] Called for Board2 | Row: {row}, Col: {col}");
         return board2Origin + new Vector3(col * tileSize, 0f, row * tileSize);
     }
 
-    // Board1 helper
     public Vector3 GridToWorldPositionBoard1(int row, int col)
     {
+        Debug.Log($"[GridToWorldPosition - Board1] Row: {row}, Col: {col}");
         return board1Origin + new Vector3(col * tileSize, 0f, row * tileSize);
     }
 
-    // Board2 explicit
     public Vector3 GridToWorldPositionBoard2(int row, int col)
     {
+        Debug.Log($"[GridToWorldPosition - Board2] Row: {row}, Col: {col}");
         return board2Origin + new Vector3(col * tileSize, 0f, row * tileSize);
     }
 
     public Vector3 GridToWorldPosition(Board board, int row, int col)
     {
+        Debug.Log($"[GridToWorldPosition - Board enum] Board: {board}, Row: {row}, Col: {col}");
         return (board == Board.Board1) ? GridToWorldPositionBoard1(row, col) : GridToWorldPositionBoard2(row, col);
     }
+
 
     public Vector2Int WorldToGridPosition(Vector3 worldPos) // maps to Board2 origin
     {

@@ -10,18 +10,20 @@ public class Unit : MonoBehaviour
 
     private Vector3 originalPosition;
     private GridManager gridManager;
+    private GridManager.Board board;
 
     private bool mergeLock = false;
     [SerializeField] private float defaultMergeLockSeconds = 0.25f;
 
-    public void Initialize(string unitType, int level, GridManager gridManager, int row, int col)
+    public void Initialize(string unitType, int level, GridManager gridManager, GridManager.Board board, int row, int col)
     {
         this.unitType = unitType;
         this.level = level;
         this.gridManager = gridManager;
+        this.board = board;
         this.row = row;
         this.col = col;
-        originalPosition = gridManager.GridToWorldPosition(row, col);
+        originalPosition = gridManager.GridToWorldPosition(board, row, col);
         transform.position = originalPosition;
         gameObject.name = $"{unitType}_L{level}_R{row}C{col}";
     }
