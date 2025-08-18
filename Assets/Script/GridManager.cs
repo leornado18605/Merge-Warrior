@@ -20,6 +20,10 @@ public sealed class GridManager : MonoBehaviour
     [Header("Debug")]
     public bool drawGizmos = true;
 
+    [Header("Input Locks")]
+    public bool lockBoard1Input = false;  //Area Player
+    public bool lockBoard2Input = true;    //Area AI
+    
     // Visual tile arrays (persist tile GameObjects so we can move them)
     private GameObject[,] board1Tiles;
     private GameObject[,] board2Tiles;
@@ -58,6 +62,10 @@ public sealed class GridManager : MonoBehaviour
         board2Tiles = new GameObject[rows, cols];
         occupantsB1 = new GameObject[rows, cols];
         occupantsB2 = new GameObject[rows, cols];
+
+        //AI
+        occUnitB1 = new Unit[rows, cols];
+        occUnitB2 = new Unit[rows, cols];
     }
 
     private void PrecreatePools()
@@ -240,28 +248,47 @@ public sealed class GridManager : MonoBehaviour
 
     public GameObject GetOccupant(int row, int col) => GetOccupant(Board.Board2, row, col);
 
+    public Unit GetOccupantUnit(Board board, int row, int col)
+    {
+        //AI
+        if (!IsValidGridPosition(row, col)) return null;
+        return (board == Board.Board1) ? occUnitB1[row, col] : occUnitB2[row, col];
+    }
+
     public void SetCellOccupied(Board board, int row, int col, GameObject unitObject)
     {
         if (!IsValidGridPosition(row, col)) return;
         if (board == Board.Board1) occupantsB1[row, col] = unitObject;
         else occupantsB2[row, col] = unitObject;
+
+        //AI
+        Unit u = unitObject ? unitObject.GetComponent<Unit>() : null;
+
+        if (board == Board.Board1)
+        {
+            occupantsB1[row, col] = unitObject;
+            occUnitB1[row, col] = u;
+        }
+        else
+        {
+            occupantsB2[row, col] = unitObject;
+            occUnitB2[row, col] = u;
+        }
     }
 
-    // Backwards-compatible SetCellOccupied(row,col,GameObject) uses Board2
     public void SetCellOccupied(int row, int col, GameObject unitObject) => SetCellOccupied(Board.Board2, row, col, unitObject);
 
     // Boolean overload (compatibility with older code)
     public void SetCellOccupied(int row, int col, bool occupied)
     {
         if (!IsValidGridPosition(row, col)) return;
-        occupantsB2[row, col] = occupied ? new GameObject() : null; // placeholder flag object if needed
+        occupantsB2[row, col] = occupied ? new GameObject() : null;
         if (!occupied) DestroyIfPlaceholder(occupantsB2[row, col]);
     }
 
     private void DestroyIfPlaceholder(GameObject g)
     {
         if (g == null) return;
-        // if placeholder (unnamed or specific), remove safely; keep real GameObjects intact
         if (g.name == "Placeholder") Destroy(g);
     }
 
@@ -272,6 +299,10 @@ public sealed class GridManager : MonoBehaviour
             {
                 occupantsB1[r, c] = null;
                 occupantsB2[r, c] = null;
+
+                //AI
+                occUnitB1[r, c] = null;
+                occUnitB2[r, c] = null;
             }
     }
 
@@ -363,10 +394,21 @@ public sealed class GridManager : MonoBehaviour
         ClearBuffer(buffer);
 
         if (board == Board.Board1)
-            for (int r = 0; r < rows; r++) for (int c = 0; c < cols; c++) occupantsB1[r, c] = null;
+            for (int r = 0; r < rows; r++)
+                for (int c = 0; c < cols; c++)
+                {
+                    occupantsB1[r, c] = null;
+                    occUnitB1[r, c] = null;
+                }
         else
-            for (int r = 0; r < rows; r++) for (int c = 0; c < cols; c++) occupantsB2[r, c] = null;
+            for (int r = 0; r < rows; r++)
+                for (int c = 0; c < cols; c++)
+                {
+                    occupantsB2[r, c] = null;
+                    occUnitB2[r, c] = null;
+                }
     }
+
 
     public void ClearAll()
     {
@@ -407,4 +449,64 @@ public sealed class GridManager : MonoBehaviour
     }
 
     #endregion
+
+    #region FindNearestUnit
+    public Unit FindNearestUnit(Board board, int row, int col,
+                                System.Predicate<Unit> filter,
+                                int maxRadiusTiles = 8,
+                                bool priorityAdjacency = false)
+    {
+        if (!IsValidGridPosition(row, col)) return null;
+
+        if (priorityAdjacency)
+        {
+            int[] ro = { -1, 1, 0, 0 };
+            int[] co = { 0, 0, -1, 1 };
+            for (int i = 0; i < 4; i++)
+            {
+                int r = row + ro[i], c = col + co[i];
+                if (!IsValidGridPosition(r, c)) continue;
+                var u = GetOccupantUnit(board, r, c);
+                if (u != null && filter(u)) return u;
+            }
+        }
+
+        for (int d = 1; d <= maxRadiusTiles; d++)
+        {
+            for (int dr = -d; dr <= d; dr++)
+            {
+                int r = row + dr;
+                int dc = d - Mathf.Abs(dr);
+
+                int c1 = col + dc;
+                if (IsValidGridPosition(r, c1))
+                {
+                    var u1 = GetOccupantUnit(board, r, c1);
+                    if (u1 != null && filter(u1)) return u1;
+                }
+
+                if (dc != 0)
+                {
+                    int c2 = col - dc;
+                    if (IsValidGridPosition(r, c2))
+                    {
+                        var u2 = GetOccupantUnit(board, r, c2);
+                        if (u2 != null && filter(u2)) return u2;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    #endregion
+
+    #region Input Lock
+    public bool IsInputLocked(Board board)
+    {
+        if (board == Board.Board1) return lockBoard1Input;
+        else return lockBoard2Input;
+    }
+    #endregion
+
+
 }

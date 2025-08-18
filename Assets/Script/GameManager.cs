@@ -20,7 +20,6 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         botManager.SetGridManager(gridManager);
-        BotManager.Instance.SpawnBot(GridManager.Board.Board2, 3, 5, BotManager.Instance.botLevelPrefabs);
     }
     private void Awake()
     {
@@ -52,7 +51,6 @@ public class GameManager : MonoBehaviour
     // Try merge and replace with upgraded prefab
     public bool TryMerge(GridManager.Board board, int targetRow, int targetCol, GameObject sourceObj)
     {
-        Debug.Log("TryMerge called with targetRow: " + targetRow + ", targetCol: " + targetCol);
         if (sourceObj == null) return false;
 
         GameObject targetObj = gridManager.GetOccupant(board, targetRow, targetCol);
@@ -70,17 +68,14 @@ public class GameManager : MonoBehaviour
         GameObject newPrefab = GetMergedPrefab(targetUnit, newLevel);
         if (newPrefab == null)
         {
-            Debug.Log($"[Merge] not find prefab level up for {targetUnit.unitType} level {newLevel}");
             return false; 
         }
-        Debug.Log($"[Merge] Merging {sourceUnit.unitType} L{sourceUnit.level} with {targetUnit.unitType} L{targetUnit.level} to create {newPrefab.name} L{newLevel} at {targetRow},{targetCol}");
 
         ReleaseObjectsAndClearGrid(board, targetRow, targetCol, sourceObj, targetObj);
         GameObject newObj = SpawnAndInitializeUnit(newPrefab, board, targetRow, targetCol, newLevel, targetUnit.unitType);
 
         if (newObj == null)
         {
-            Debug.Log($"[Merge] new unit is false");
             return false; 
         }
 
@@ -89,7 +84,6 @@ public class GameManager : MonoBehaviour
         gridManager.SetCellOccupied(board, targetRow, targetCol, newObj);
         OnUnitMerged?.Invoke(newUnit, targetRow, targetCol);
 
-        Debug.Log($"[Merge] is completed merge-> {newUnit.unitType}");
         return true;
     }
 
@@ -122,15 +116,11 @@ public class GameManager : MonoBehaviour
         var unit = newObj.GetComponent<Unit>();
         if (unit == null)
         {
-            Debug.Log("[SpawnAndInitializeUnit] prefab has no component Unit ");
             PoolManager.Release(newObj);
             return null;
         }
 
-        //unit.Initialize(unit.unitType, level, gridManager, board, row, col);
-
         unit.Initialize(unitType, level, gridManager, board, row, col);
-        Debug.Log($"[SpawnAndInitializeUnit] Spawned {unitType} L{level} tại row:{row}, col:{col}, pos:{spawnPos}");
         return newObj;
     }
     #endregion 

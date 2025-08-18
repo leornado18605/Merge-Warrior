@@ -44,6 +44,17 @@ public class UnitManager : MonoBehaviour
 
                 gridManager.SetCellOccupied(board, row, col, knife);
 
+                // Đảm bảo có Team
+                var team = knife.GetComponent<UnitTeam>();
+                if (team == null) team = knife.AddComponent<UnitTeam>();
+                team.team = Team.Player;
+
+                // Đảm bảo có AI + inject grid & role
+                var ai = knife.GetComponent<UnitAI>();
+                if (ai == null) ai = knife.AddComponent<UnitAI>();
+                ai.Inject(gridManager, ranged: false); // Knife = melee
+
+
                 Debug.Log($"[PlaceKnife] Spawned Knife at row: {row}, col: {col}, worldPos: {worldPos}");
                 return;
             }
@@ -73,6 +84,15 @@ public class UnitManager : MonoBehaviour
                 gun.GetComponent<Unit>().Initialize("Gun", 1, gridManager, board, row, col);
 
                 gridManager.SetCellOccupied(board, row, col, gun);
+
+                var team = gun.GetComponent<UnitTeam>();
+                if (team == null) team = gun.AddComponent<UnitTeam>();
+                team.team = Team.Player;
+
+                var ai = gun.GetComponent<UnitAI>();
+                if (ai == null) ai = gun.AddComponent<UnitAI>();
+                ai.Inject(gridManager, ranged: true); // Gun = ranged
+
 
                 Debug.Log($"[PlaceGun] Spawned Gun at row: {row}, col: {col}, worldPos: {worldPos}");
                 return;

@@ -13,6 +13,8 @@ public class DraggableUnit : MonoBehaviour
     {
         if (unit == null || Grid == null) return;
 
+        if (Grid.IsInputLocked(unit.Board)) return;
+
         originalPosition = transform.position;
         originalRow = unit.row;
         originalCol = unit.col;
