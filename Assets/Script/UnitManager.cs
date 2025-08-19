@@ -46,6 +46,8 @@ public class UnitManager : MonoBehaviour
                 var team = knife.GetComponent<UnitTeam>();
                 if (team == null) team = knife.AddComponent<UnitTeam>();
                 team.team = Team.Player;
+
+                knife.tag = "Player";
                 knife.SetActive(true);
                 return;
             }
@@ -67,7 +69,7 @@ public class UnitManager : MonoBehaviour
                 Vector3 worldPos = gridManager.GridToWorldPosition(board, row, col);
 
                 GameObject gun = PoolManager.Spawn(gunPrefab, worldPos, Quaternion.identity, gridManager.transform);
-                gun.SetActive(true);
+                gun.SetActive(false);
 
                 gun.GetComponent<Unit>().Initialize("Gun", 1, gridManager, board, row, col);
 
@@ -77,6 +79,8 @@ public class UnitManager : MonoBehaviour
                 if (team == null) team = gun.AddComponent<UnitTeam>();
                 team.team = Team.Player;
 
+                gun.tag = "Player";
+                gun.SetActive(true);
                 return;
             }
         }

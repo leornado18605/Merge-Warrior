@@ -21,9 +21,6 @@ public class DraggableUnit : MonoBehaviour
         var board = unit.Board;
 
         if (Grid.IsValidGridPosition(originalRow, originalCol))
-            Grid.SetCellOccupied(originalRow, originalCol, null);
-
-        if (Grid.IsValidGridPosition(originalRow, originalCol))
             Grid.SetCellOccupied(board, originalRow, originalCol, null);
         isDragging = true;
     }

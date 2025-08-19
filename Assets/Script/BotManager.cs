@@ -39,7 +39,8 @@ public class BotManager : MonoBehaviour
 
     private void Start()
     {
-        if (autoSpawnOnStart) SpawnFromInspector();
+        if (gridManager == null) gridManager = FindObjectOfType<GridManager>();
+        if (autoSpawnOnStart && gridManager != null) SpawnFromInspector();
     }
 
     [ContextMenu("Spawn Now (from Inspector settings)")]
@@ -138,7 +139,6 @@ public class BotManager : MonoBehaviour
         var unit = bot.GetComponent<Unit>();
         if (unit != null)
         {
-            // giữ nguyên unitType của prefab; level = index + 1
             unit.Initialize(unit.unitType, levelIndex + 1, gridManager, board, cell.x, cell.y);
         }
     }
@@ -147,6 +147,8 @@ public class BotManager : MonoBehaviour
     {
         var team = bot.GetComponent<UnitTeam>() ?? bot.AddComponent<UnitTeam>();
         team.team = Team.Enemy;
+
+        bot.tag = "Enemy";
     }
 
     private void DisableDragIfNeeded(GameObject bot)

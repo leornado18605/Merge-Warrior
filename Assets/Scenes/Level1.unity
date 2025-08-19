@@ -155,17 +155,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd876cd6ce7a702428bd79f59e789402, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  u: {fileID: 0}
-  g: {fileID: 0}
-  anim: {fileID: 0}
-  ranged: 1
-  run: Run
-  atk: Attack
-  tick: 0.15
-  detectRadius: 2586
-  attackRange: 1.2
-  reachEps: 0.15
-  debugLogs: 1
 --- !u!114 &245847636
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -210,9 +199,55 @@ MonoBehaviour:
   m_GameObject: {fileID: 245847628}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3efb81b51fd812640856fde3d3e16955, type: 3}
+  m_Script: {fileID: 11500000, guid: 97665a52555aa604d9e033116356823b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  role: 1
+  knifeDetectTiles: 4
+  gunDetectTiles: 99
+  knifeStopDistance: 0.7
+  gunKeepDistance: 6
+  knifeSpeed: 101.01
+  knifeAccel: 80
+  knifeTurn: 720
+  gunSpeed: 6
+  gunAccel: 70
+  gunTurn: 540
+  useAutoBraking: 0
+  repathEpsilon: 0.15
+  minSetDestInterval: 0.08
+  avoidanceType: 1
+  agentRadius: 0.25
+  knifeHysteresis: 0.25
+  gunHysteresis: 1
+  manualRotate: 0
+  rotateLerp: 0.25
+  stopVelThreshold: 0.25
+  useSteeringTarget: 1
+  headingLerp: 0.2
+  minTurnRate: 240
+  maxTurnRate: 720
+  turnInPlaceAngle: 60
+  turnInPlaceSpeed: 2.5
+  thinkInterval: 0.2
+  enableSlowdownNearTarget: 1
+  slowDownRadius: 3
+  minChaseSpeed: 4
+  enableCurveSlowdown: 1
+  curveSlowdownAngle: 60
+  curveSlowdownFactor: 0.5
+  stateCooldown: 0.2
+  disableAvoidanceWhenClose: 1
+  disableAvoidanceDist: 1.2
+  avoidHys: 0.3
+  animator: {fileID: 0}
+  runBool: Running
+  drawGizmos: 1
+  gizmosOnlyWhenSelected: 1
+  gizmoYOffset: 0.05
+  colorStop: {r: 0.2, g: 1, b: 0.2, a: 0.9}
+  colorDetect: {r: 1, g: 0.85, b: 0.2, a: 0.9}
+  colorPath: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &245847642
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -225,20 +260,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26907c8330474644999c848386f3ab5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ai: {fileID: 245847635}
-  u: {fileID: 245847629}
-  g: {fileID: 0}
-  team: {fileID: 245847636}
-  agent: {fileID: 245847640}
-  showAlways: 1
-  drawDetection: 1
-  drawChosen: 1
-  drawLine: 1
-  drawAgentPath: 1
-  detectColorMelee: {r: 1, g: 0, b: 0, a: 0.25}
-  detectColorRanged: {r: 0, g: 0, b: 1, a: 0.25}
-  targetColor: {r: 1, g: 1, b: 0.2, a: 0.9}
-  pathColor: {r: 1, g: 0.5, b: 0, a: 0.9}
 --- !u!1 &261906233
 GameObject:
   m_ObjectHideFlags: 0
@@ -361,17 +382,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd876cd6ce7a702428bd79f59e789402, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  u: {fileID: 0}
-  g: {fileID: 0}
-  anim: {fileID: 0}
-  ranged: 0
-  run: Run
-  atk: Attack
-  tick: 0.15
-  detectRadius: 2586
-  attackRange: 1.2
-  reachEps: 0.15
-  debugLogs: 1
 --- !u!114 &456467298
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -395,7 +405,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 3.5
+  m_Speed: 1316.4
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -416,9 +426,55 @@ MonoBehaviour:
   m_GameObject: {fileID: 456467291}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3efb81b51fd812640856fde3d3e16955, type: 3}
+  m_Script: {fileID: 11500000, guid: 97665a52555aa604d9e033116356823b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  role: 0
+  knifeDetectTiles: 4
+  gunDetectTiles: 99
+  knifeStopDistance: 0.7
+  gunKeepDistance: 6
+  knifeSpeed: 163.8
+  knifeAccel: 499.8
+  knifeTurn: 720
+  gunSpeed: 6
+  gunAccel: 70
+  gunTurn: 540
+  useAutoBraking: 0
+  repathEpsilon: 0.43
+  minSetDestInterval: 0.08
+  avoidanceType: 1
+  agentRadius: 0.25
+  knifeHysteresis: 0.25
+  gunHysteresis: 1
+  manualRotate: 0
+  rotateLerp: 0.25
+  stopVelThreshold: 0.25
+  useSteeringTarget: 1
+  headingLerp: 0.2
+  minTurnRate: 240
+  maxTurnRate: 720
+  turnInPlaceAngle: 60
+  turnInPlaceSpeed: 2.5
+  thinkInterval: 0.11
+  enableSlowdownNearTarget: 1
+  slowDownRadius: 7.72
+  minChaseSpeed: 4
+  enableCurveSlowdown: 0
+  curveSlowdownAngle: 10
+  curveSlowdownFactor: 0.2
+  stateCooldown: 0.2
+  disableAvoidanceWhenClose: 1
+  disableAvoidanceDist: 1.2
+  avoidHys: 0.3
+  animator: {fileID: 0}
+  runBool: Running
+  drawGizmos: 1
+  gizmosOnlyWhenSelected: 1
+  gizmoYOffset: 0.05
+  colorStop: {r: 0.2, g: 1, b: 0.2, a: 0.9}
+  colorDetect: {r: 1, g: 0.85, b: 0.2, a: 0.9}
+  colorPath: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &456467304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -431,20 +487,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26907c8330474644999c848386f3ab5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ai: {fileID: 456467297}
-  u: {fileID: 456467293}
-  g: {fileID: 0}
-  team: {fileID: 456467298}
-  agent: {fileID: 456467302}
-  showAlways: 1
-  drawDetection: 1
-  drawChosen: 1
-  drawLine: 1
-  drawAgentPath: 1
-  detectColorMelee: {r: 1, g: 0, b: 0, a: 0.25}
-  detectColorRanged: {r: 0, g: 0, b: 1, a: 0.25}
-  targetColor: {r: 1, g: 1, b: 0.2, a: 0.9}
-  pathColor: {r: 1, g: 0.5, b: 0, a: 0.9}
 --- !u!1 &456667991
 GameObject:
   m_ObjectHideFlags: 0
@@ -511,17 +553,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd876cd6ce7a702428bd79f59e789402, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  u: {fileID: 0}
-  g: {fileID: 0}
-  anim: {fileID: 0}
-  ranged: 0
-  run: Run
-  atk: Attack
-  tick: 0.15
-  detectRadius: 2586
-  attackRange: 1.2
-  reachEps: 0.15
-  debugLogs: 1
 --- !u!114 &459472666
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -545,7 +576,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 3.5
+  m_Speed: 1316.4
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -578,9 +609,55 @@ MonoBehaviour:
   m_GameObject: {fileID: 459472659}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3efb81b51fd812640856fde3d3e16955, type: 3}
+  m_Script: {fileID: 11500000, guid: 97665a52555aa604d9e033116356823b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  role: 0
+  knifeDetectTiles: 4
+  gunDetectTiles: 99
+  knifeStopDistance: 0.7
+  gunKeepDistance: 6
+  knifeSpeed: 163.8
+  knifeAccel: 499.8
+  knifeTurn: 720
+  gunSpeed: 6
+  gunAccel: 70
+  gunTurn: 540
+  useAutoBraking: 0
+  repathEpsilon: 0.43
+  minSetDestInterval: 0.08
+  avoidanceType: 1
+  agentRadius: 0.25
+  knifeHysteresis: 0.25
+  gunHysteresis: 1
+  manualRotate: 0
+  rotateLerp: 0.25
+  stopVelThreshold: 0.25
+  useSteeringTarget: 1
+  headingLerp: 0.2
+  minTurnRate: 240
+  maxTurnRate: 720
+  turnInPlaceAngle: 60
+  turnInPlaceSpeed: 2.5
+  thinkInterval: 0.11
+  enableSlowdownNearTarget: 1
+  slowDownRadius: 7.72
+  minChaseSpeed: 4
+  enableCurveSlowdown: 0
+  curveSlowdownAngle: 10
+  curveSlowdownFactor: 0.2
+  stateCooldown: 0.2
+  disableAvoidanceWhenClose: 1
+  disableAvoidanceDist: 1.2
+  avoidHys: 0.3
+  animator: {fileID: 0}
+  runBool: Running
+  drawGizmos: 1
+  gizmosOnlyWhenSelected: 1
+  gizmoYOffset: 0.05
+  colorStop: {r: 0.2, g: 1, b: 0.2, a: 0.9}
+  colorDetect: {r: 1, g: 0.85, b: 0.2, a: 0.9}
+  colorPath: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &459472673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -593,20 +670,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26907c8330474644999c848386f3ab5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ai: {fileID: 459472665}
-  u: {fileID: 459472661}
-  g: {fileID: 0}
-  team: {fileID: 459472666}
-  agent: {fileID: 459472670}
-  showAlways: 1
-  drawDetection: 1
-  drawChosen: 1
-  drawLine: 1
-  drawAgentPath: 1
-  detectColorMelee: {r: 1, g: 0, b: 0, a: 0.25}
-  detectColorRanged: {r: 0, g: 0, b: 1, a: 0.25}
-  targetColor: {r: 1, g: 1, b: 0.2, a: 0.9}
-  pathColor: {r: 1, g: 0.5, b: 0, a: 0.9}
 --- !u!1 &515034309 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1013868485910650, guid: ccabe62de76e6c74f8dacd0e14a950b1, type: 3}
@@ -640,17 +703,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd876cd6ce7a702428bd79f59e789402, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  u: {fileID: 0}
-  g: {fileID: 0}
-  anim: {fileID: 0}
-  ranged: 1
-  run: Run
-  atk: Attack
-  tick: 0.15
-  detectRadius: 2586
-  attackRange: 1.2
-  reachEps: 0.15
-  debugLogs: 1
 --- !u!114 &515034316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -695,9 +747,55 @@ MonoBehaviour:
   m_GameObject: {fileID: 515034309}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3efb81b51fd812640856fde3d3e16955, type: 3}
+  m_Script: {fileID: 11500000, guid: 97665a52555aa604d9e033116356823b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  role: 1
+  knifeDetectTiles: 4
+  gunDetectTiles: 99
+  knifeStopDistance: 0.7
+  gunKeepDistance: 6
+  knifeSpeed: 101.01
+  knifeAccel: 80
+  knifeTurn: 720
+  gunSpeed: 6
+  gunAccel: 70
+  gunTurn: 540
+  useAutoBraking: 0
+  repathEpsilon: 0.15
+  minSetDestInterval: 0.08
+  avoidanceType: 1
+  agentRadius: 0.25
+  knifeHysteresis: 0.25
+  gunHysteresis: 1
+  manualRotate: 0
+  rotateLerp: 0.25
+  stopVelThreshold: 0.25
+  useSteeringTarget: 1
+  headingLerp: 0.2
+  minTurnRate: 240
+  maxTurnRate: 720
+  turnInPlaceAngle: 60
+  turnInPlaceSpeed: 2.5
+  thinkInterval: 0.2
+  enableSlowdownNearTarget: 1
+  slowDownRadius: 3
+  minChaseSpeed: 4
+  enableCurveSlowdown: 1
+  curveSlowdownAngle: 60
+  curveSlowdownFactor: 0.5
+  stateCooldown: 0.2
+  disableAvoidanceWhenClose: 1
+  disableAvoidanceDist: 1.2
+  avoidHys: 0.3
+  animator: {fileID: 0}
+  runBool: Running
+  drawGizmos: 1
+  gizmosOnlyWhenSelected: 1
+  gizmoYOffset: 0.05
+  colorStop: {r: 0.2, g: 1, b: 0.2, a: 0.9}
+  colorDetect: {r: 1, g: 0.85, b: 0.2, a: 0.9}
+  colorPath: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &515034322
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -710,20 +808,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26907c8330474644999c848386f3ab5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ai: {fileID: 515034315}
-  u: {fileID: 515034311}
-  g: {fileID: 0}
-  team: {fileID: 515034316}
-  agent: {fileID: 515034320}
-  showAlways: 1
-  drawDetection: 1
-  drawChosen: 1
-  drawLine: 1
-  drawAgentPath: 1
-  detectColorMelee: {r: 1, g: 0, b: 0, a: 0.25}
-  detectColorRanged: {r: 0, g: 0, b: 1, a: 0.25}
-  targetColor: {r: 1, g: 1, b: 0.2, a: 0.9}
-  pathColor: {r: 1, g: 0.5, b: 0, a: 0.9}
 --- !u!1 &571080057
 GameObject:
   m_ObjectHideFlags: 0
@@ -1137,20 +1221,24 @@ PrefabInstance:
       value: Player_Millia
       objectReference: {fileID: 0}
     - target: {fileID: 1356740152336344, guid: fa8e04c3445c9ea4f9ab79a137c55ed4, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1356740152336344, guid: fa8e04c3445c9ea4f9ab79a137c55ed4, type: 3}
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 4161853850784620, guid: fa8e04c3445c9ea4f9ab79a137c55ed4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2111
+      value: -864
       objectReference: {fileID: 0}
     - target: {fileID: 4161853850784620, guid: fa8e04c3445c9ea4f9ab79a137c55ed4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2389
+      value: -8066.4365
       objectReference: {fileID: 0}
     - target: {fileID: 4161853850784620, guid: fa8e04c3445c9ea4f9ab79a137c55ed4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 4429
+      value: -9308.818
       objectReference: {fileID: 0}
     - target: {fileID: 4161853850784620, guid: fa8e04c3445c9ea4f9ab79a137c55ed4, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1557,12 +1645,117 @@ Transform:
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
   m_LocalRotation: {x: 0.49545875, y: 0, z: 0, w: 0.8686315}
-  m_LocalPosition: {x: -8, y: 14298.1, z: 2716}
+  m_LocalPosition: {x: -8, y: 12818, z: 2716}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 59, y: 0, z: 0}
+--- !u!1 &1004645171
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1004645172}
+  - component: {fileID: 1004645175}
+  - component: {fileID: 1004645174}
+  - component: {fileID: 1004645173}
+  m_Layer: 3
+  m_Name: Cube
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1004645172
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1004645171}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -15, y: 4582.027, z: 7560.1655}
+  m_LocalScale: {x: 4424.3047, y: 563.48, z: 6230.5376}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1004645173
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1004645171}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1004645174
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1004645171}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1004645175
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1004645171}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &1026110499
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1664,20 +1857,24 @@ PrefabInstance:
       value: AI_Millia
       objectReference: {fileID: 0}
     - target: {fileID: 1380096154138096, guid: 7b7bf2e1f6ce93a4d85da5f7adbd6cfb, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1380096154138096, guid: 7b7bf2e1f6ce93a4d85da5f7adbd6cfb, type: 3}
       propertyPath: m_TagString
       value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 4161789836270714, guid: 7b7bf2e1f6ce93a4d85da5f7adbd6cfb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -873
+      value: -864
       objectReference: {fileID: 0}
     - target: {fileID: 4161789836270714, guid: 7b7bf2e1f6ce93a4d85da5f7adbd6cfb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2389
+      value: -8066.4365
       objectReference: {fileID: 0}
     - target: {fileID: 4161789836270714, guid: 7b7bf2e1f6ce93a4d85da5f7adbd6cfb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 4429
+      value: -9308.818
       objectReference: {fileID: 0}
     - target: {fileID: 4161789836270714, guid: 7b7bf2e1f6ce93a4d85da5f7adbd6cfb, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1808,13 +2005,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   botLevelPrefabs:
-  - {fileID: 1308446548}
   - {fileID: 245847628}
+  - {fileID: 1308446548}
   autoSpawnOnStart: 1
   defaultBoard: 1
   spawnRows: 3
   spawnCols: 5
-  spawnLimit: 6
+  spawnLimit: 2
   disableDragForBots: 1
   modelYawOffset: 0
   rangedNameKeyword: Knife
@@ -2096,17 +2293,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1499860195161020, guid: e7812492f5665834fa1945d0c1dabce7, type: 3}
   m_PrefabInstance: {fileID: 1829890391}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1308446549 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3471846879990924323, guid: e7812492f5665834fa1945d0c1dabce7, type: 3}
-  m_PrefabInstance: {fileID: 1829890391}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1308446548}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c4e12c8494b1f2a448bf1288e071c202, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1308446553 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4955135004128114, guid: e7812492f5665834fa1945d0c1dabce7, type: 3}
@@ -2124,17 +2310,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd876cd6ce7a702428bd79f59e789402, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  u: {fileID: 1308446549}
-  g: {fileID: 892392521}
-  anim: {fileID: 0}
-  ranged: 0
-  run: Run
-  atk: Attack
-  tick: 0.15
-  detectRadius: 2586
-  attackRange: 1.2
-  reachEps: 0.15
-  debugLogs: 1
 --- !u!114 &1308446555
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2158,7 +2333,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 3.5
+  m_Speed: 1316.4
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -2179,9 +2354,55 @@ MonoBehaviour:
   m_GameObject: {fileID: 1308446548}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3efb81b51fd812640856fde3d3e16955, type: 3}
+  m_Script: {fileID: 11500000, guid: 97665a52555aa604d9e033116356823b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  role: 0
+  knifeDetectTiles: 4
+  gunDetectTiles: 99
+  knifeStopDistance: 0.7
+  gunKeepDistance: 6
+  knifeSpeed: 163.8
+  knifeAccel: 499.8
+  knifeTurn: 720
+  gunSpeed: 6
+  gunAccel: 70
+  gunTurn: 540
+  useAutoBraking: 0
+  repathEpsilon: 0.43
+  minSetDestInterval: 0.08
+  avoidanceType: 1
+  agentRadius: 0.25
+  knifeHysteresis: 0.25
+  gunHysteresis: 1
+  manualRotate: 0
+  rotateLerp: 0.25
+  stopVelThreshold: 0.25
+  useSteeringTarget: 1
+  headingLerp: 0.2
+  minTurnRate: 240
+  maxTurnRate: 720
+  turnInPlaceAngle: 60
+  turnInPlaceSpeed: 2.5
+  thinkInterval: 0.11
+  enableSlowdownNearTarget: 1
+  slowDownRadius: 7.72
+  minChaseSpeed: 4
+  enableCurveSlowdown: 0
+  curveSlowdownAngle: 10
+  curveSlowdownFactor: 0.2
+  stateCooldown: 0.2
+  disableAvoidanceWhenClose: 1
+  disableAvoidanceDist: 1.2
+  avoidHys: 0.3
+  animator: {fileID: 0}
+  runBool: Running
+  drawGizmos: 1
+  gizmosOnlyWhenSelected: 1
+  gizmoYOffset: 0.05
+  colorStop: {r: 0.2, g: 1, b: 0.2, a: 0.9}
+  colorDetect: {r: 1, g: 0.85, b: 0.2, a: 0.9}
+  colorPath: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1308446561
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2194,20 +2415,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26907c8330474644999c848386f3ab5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ai: {fileID: 1308446554}
-  u: {fileID: 1308446549}
-  g: {fileID: 892392521}
-  team: {fileID: 1308446555}
-  agent: {fileID: 1308446559}
-  showAlways: 1
-  drawDetection: 1
-  drawChosen: 1
-  drawLine: 1
-  drawAgentPath: 1
-  detectColorMelee: {r: 1, g: 0, b: 0, a: 0.25}
-  detectColorRanged: {r: 0, g: 0, b: 1, a: 0.25}
-  targetColor: {r: 1, g: 1, b: 0.2, a: 0.9}
-  pathColor: {r: 1, g: 0.5, b: 0, a: 0.9}
 --- !u!1 &1390580075
 GameObject:
   m_ObjectHideFlags: 0
@@ -2594,17 +2801,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd876cd6ce7a702428bd79f59e789402, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  u: {fileID: 0}
-  g: {fileID: 0}
-  anim: {fileID: 0}
-  ranged: 1
-  run: Run
-  atk: Attack
-  tick: 0.15
-  detectRadius: 2586
-  attackRange: 1.2
-  reachEps: 0.15
-  debugLogs: 1
 --- !u!114 &1567124721
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2649,9 +2845,55 @@ MonoBehaviour:
   m_GameObject: {fileID: 1567124714}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3efb81b51fd812640856fde3d3e16955, type: 3}
+  m_Script: {fileID: 11500000, guid: 97665a52555aa604d9e033116356823b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  role: 1
+  knifeDetectTiles: 4
+  gunDetectTiles: 99
+  knifeStopDistance: 0.7
+  gunKeepDistance: 6
+  knifeSpeed: 101.01
+  knifeAccel: 80
+  knifeTurn: 720
+  gunSpeed: 6
+  gunAccel: 70
+  gunTurn: 540
+  useAutoBraking: 0
+  repathEpsilon: 0.15
+  minSetDestInterval: 0.08
+  avoidanceType: 1
+  agentRadius: 0.25
+  knifeHysteresis: 0.25
+  gunHysteresis: 1
+  manualRotate: 0
+  rotateLerp: 0.25
+  stopVelThreshold: 0.25
+  useSteeringTarget: 1
+  headingLerp: 0.2
+  minTurnRate: 240
+  maxTurnRate: 720
+  turnInPlaceAngle: 60
+  turnInPlaceSpeed: 2.5
+  thinkInterval: 0.2
+  enableSlowdownNearTarget: 1
+  slowDownRadius: 3
+  minChaseSpeed: 4
+  enableCurveSlowdown: 1
+  curveSlowdownAngle: 60
+  curveSlowdownFactor: 0.5
+  stateCooldown: 0.2
+  disableAvoidanceWhenClose: 1
+  disableAvoidanceDist: 1.2
+  avoidHys: 0.3
+  animator: {fileID: 0}
+  runBool: Running
+  drawGizmos: 1
+  gizmosOnlyWhenSelected: 1
+  gizmoYOffset: 0.05
+  colorStop: {r: 0.2, g: 1, b: 0.2, a: 0.9}
+  colorDetect: {r: 1, g: 0.85, b: 0.2, a: 0.9}
+  colorPath: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1567124727
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2664,20 +2906,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26907c8330474644999c848386f3ab5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ai: {fileID: 1567124720}
-  u: {fileID: 1567124715}
-  g: {fileID: 0}
-  team: {fileID: 1567124721}
-  agent: {fileID: 1567124725}
-  showAlways: 1
-  drawDetection: 1
-  drawChosen: 1
-  drawLine: 1
-  drawAgentPath: 1
-  detectColorMelee: {r: 1, g: 0, b: 0, a: 0.25}
-  detectColorRanged: {r: 0, g: 0, b: 1, a: 0.25}
-  targetColor: {r: 1, g: 1, b: 0.2, a: 0.9}
-  pathColor: {r: 1, g: 0.5, b: 0, a: 0.9}
 --- !u!1 &1747630175 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 287792982782746344, guid: b549a21593654c54b8bb897ccf915a4b, type: 3}
@@ -2699,29 +2927,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5672966386279907001, guid: b549a21593654c54b8bb897ccf915a4b, type: 3}
   m_PrefabInstance: {fileID: 1878851773}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1747630184
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1747630175}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd876cd6ce7a702428bd79f59e789402, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  u: {fileID: 1747630176}
-  g: {fileID: 892392521}
-  anim: {fileID: 0}
-  ranged: 0
-  run: Run
-  atk: Attack
-  tick: 0.15
-  detectRadius: 2586
-  attackRange: 1.2
-  reachEps: 0.15
-  debugLogs: 1
 --- !u!114 &1747630185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2745,7 +2950,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 3.5
+  m_Speed: 1316.4
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -2766,9 +2971,55 @@ MonoBehaviour:
   m_GameObject: {fileID: 1747630175}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3efb81b51fd812640856fde3d3e16955, type: 3}
+  m_Script: {fileID: 11500000, guid: 97665a52555aa604d9e033116356823b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  role: 0
+  knifeDetectTiles: 4
+  gunDetectTiles: 99
+  knifeStopDistance: 0.7
+  gunKeepDistance: 6
+  knifeSpeed: 163.8
+  knifeAccel: 499.8
+  knifeTurn: 720
+  gunSpeed: 6
+  gunAccel: 70
+  gunTurn: 540
+  useAutoBraking: 0
+  repathEpsilon: 0.43
+  minSetDestInterval: 0.08
+  avoidanceType: 1
+  agentRadius: 0.25
+  knifeHysteresis: 0.25
+  gunHysteresis: 1
+  manualRotate: 0
+  rotateLerp: 0.25
+  stopVelThreshold: 0.25
+  useSteeringTarget: 1
+  headingLerp: 0.2
+  minTurnRate: 240
+  maxTurnRate: 720
+  turnInPlaceAngle: 60
+  turnInPlaceSpeed: 2.5
+  thinkInterval: 0.11
+  enableSlowdownNearTarget: 1
+  slowDownRadius: 7.72
+  minChaseSpeed: 4
+  enableCurveSlowdown: 0
+  curveSlowdownAngle: 10
+  curveSlowdownFactor: 0.2
+  stateCooldown: 0.2
+  disableAvoidanceWhenClose: 1
+  disableAvoidanceDist: 1.2
+  avoidHys: 0.3
+  animator: {fileID: 0}
+  runBool: Running
+  drawGizmos: 1
+  gizmosOnlyWhenSelected: 1
+  gizmoYOffset: 0.05
+  colorStop: {r: 0.2, g: 1, b: 0.2, a: 0.9}
+  colorDetect: {r: 1, g: 0.85, b: 0.2, a: 0.9}
+  colorPath: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1747630191
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2781,20 +3032,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26907c8330474644999c848386f3ab5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ai: {fileID: 1747630184}
-  u: {fileID: 1747630176}
-  g: {fileID: 892392521}
-  team: {fileID: 1747630185}
-  agent: {fileID: 1747630189}
-  showAlways: 1
-  drawDetection: 1
-  drawChosen: 1
-  drawLine: 1
-  drawAgentPath: 1
-  detectColorMelee: {r: 1, g: 0, b: 0, a: 0.25}
-  detectColorRanged: {r: 0, g: 0, b: 1, a: 0.25}
-  targetColor: {r: 1, g: 1, b: 0.2, a: 0.9}
-  pathColor: {r: 1, g: 0.5, b: 0, a: 0.9}
 --- !u!1 &1814510088
 GameObject:
   m_ObjectHideFlags: 0
@@ -2825,12 +3062,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_AgentTypeID: 0
-  m_CollectObjects: 1
+  m_CollectObjects: 0
   m_Size: {x: 4582, y: -248, z: 6409.3}
   m_Center: {x: -734.48, y: 15.92, z: 0}
   m_LayerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 8
   m_UseGeometry: 0
   m_DefaultArea: 0
   m_GenerateLinks: 0
@@ -2841,7 +3078,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: fb02f0e1f33cf2749a235c60ec68f47b, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 13be9e9d49d651040b6cfd23b05c728d, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &1814510090
 Transform:
@@ -2852,8 +3089,8 @@ Transform:
   m_GameObject: {fileID: 1814510088}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 677, y: 4965, z: 7614}
-  m_LocalScale: {x: 608, y: 1, z: 1}
+  m_LocalPosition: {x: 439, y: 3563.18, z: 7614}
+  m_LocalScale: {x: 608, y: -24.59, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -2871,12 +3108,16 @@ PrefabInstance:
       value: AI_Peon
       objectReference: {fileID: 0}
     - target: {fileID: 1499860195161020, guid: e7812492f5665834fa1945d0c1dabce7, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1499860195161020, guid: e7812492f5665834fa1945d0c1dabce7, type: 3}
       propertyPath: m_TagString
       value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 4955135004128114, guid: e7812492f5665834fa1945d0c1dabce7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1309.3253
+      value: -864
       objectReference: {fileID: 0}
     - target: {fileID: 4955135004128114, guid: e7812492f5665834fa1945d0c1dabce7, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2951,6 +3192,10 @@ PrefabInstance:
       value: Player_Peon
       objectReference: {fileID: 0}
     - target: {fileID: 287792982782746344, guid: b549a21593654c54b8bb897ccf915a4b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 287792982782746344, guid: b549a21593654c54b8bb897ccf915a4b, type: 3}
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
@@ -2960,15 +3205,15 @@ PrefabInstance:
       objectReference: {fileID: 892392521}
     - target: {fileID: 5672966386279907001, guid: b549a21593654c54b8bb897ccf915a4b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3627.6748
+      value: -864
       objectReference: {fileID: 0}
     - target: {fileID: 5672966386279907001, guid: b549a21593654c54b8bb897ccf915a4b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -3203.4365
+      value: -8066.4365
       objectReference: {fileID: 0}
     - target: {fileID: 5672966386279907001, guid: b549a21593654c54b8bb897ccf915a4b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -2613.6182
+      value: -9308.818
       objectReference: {fileID: 0}
     - target: {fileID: 5672966386279907001, guid: b549a21593654c54b8bb897ccf915a4b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3009,9 +3254,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1178386621}
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 287792982782746344, guid: b549a21593654c54b8bb897ccf915a4b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1747630184}
     - targetCorrespondingSourceObject: {fileID: 287792982782746344, guid: b549a21593654c54b8bb897ccf915a4b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1747630185}
@@ -3058,17 +3300,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd876cd6ce7a702428bd79f59e789402, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  u: {fileID: 0}
-  g: {fileID: 0}
-  anim: {fileID: 0}
-  ranged: 1
-  run: Run
-  atk: Attack
-  tick: 0.15
-  detectRadius: 2586
-  attackRange: 1.2
-  reachEps: 0.15
-  debugLogs: 1
 --- !u!114 &1981795625
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3113,9 +3344,55 @@ MonoBehaviour:
   m_GameObject: {fileID: 1981795618}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3efb81b51fd812640856fde3d3e16955, type: 3}
+  m_Script: {fileID: 11500000, guid: 97665a52555aa604d9e033116356823b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  role: 1
+  knifeDetectTiles: 4
+  gunDetectTiles: 99
+  knifeStopDistance: 0.7
+  gunKeepDistance: 6
+  knifeSpeed: 101.01
+  knifeAccel: 80
+  knifeTurn: 720
+  gunSpeed: 6
+  gunAccel: 70
+  gunTurn: 540
+  useAutoBraking: 0
+  repathEpsilon: 0.15
+  minSetDestInterval: 0.08
+  avoidanceType: 1
+  agentRadius: 0.25
+  knifeHysteresis: 0.25
+  gunHysteresis: 1
+  manualRotate: 0
+  rotateLerp: 0.25
+  stopVelThreshold: 0.25
+  useSteeringTarget: 1
+  headingLerp: 0.2
+  minTurnRate: 240
+  maxTurnRate: 720
+  turnInPlaceAngle: 60
+  turnInPlaceSpeed: 2.5
+  thinkInterval: 0.2
+  enableSlowdownNearTarget: 1
+  slowDownRadius: 3
+  minChaseSpeed: 4
+  enableCurveSlowdown: 1
+  curveSlowdownAngle: 60
+  curveSlowdownFactor: 0.5
+  stateCooldown: 0.2
+  disableAvoidanceWhenClose: 1
+  disableAvoidanceDist: 1.2
+  avoidHys: 0.3
+  animator: {fileID: 0}
+  runBool: Running
+  drawGizmos: 1
+  gizmosOnlyWhenSelected: 1
+  gizmoYOffset: 0.05
+  colorStop: {r: 0.2, g: 1, b: 0.2, a: 0.9}
+  colorDetect: {r: 1, g: 0.85, b: 0.2, a: 0.9}
+  colorPath: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1981795631
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3128,20 +3405,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26907c8330474644999c848386f3ab5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ai: {fileID: 1981795624}
-  u: {fileID: 1981795620}
-  g: {fileID: 0}
-  team: {fileID: 1981795625}
-  agent: {fileID: 1981795629}
-  showAlways: 1
-  drawDetection: 1
-  drawChosen: 1
-  drawLine: 1
-  drawAgentPath: 1
-  detectColorMelee: {r: 1, g: 0, b: 0, a: 0.25}
-  detectColorRanged: {r: 0, g: 0, b: 1, a: 0.25}
-  targetColor: {r: 1, g: 1, b: 0.2, a: 0.9}
-  pathColor: {r: 1, g: 0.5, b: 0, a: 0.9}
 --- !u!1 &2057101077
 GameObject:
   m_ObjectHideFlags: 0
@@ -3209,3 +3472,4 @@ SceneRoots:
   - {fileID: 1109887453}
   - {fileID: 707285490}
   - {fileID: 1814510090}
+  - {fileID: 1004645172}

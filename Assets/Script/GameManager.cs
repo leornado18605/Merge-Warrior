@@ -100,7 +100,7 @@ public class GameManager : MonoBehaviour
     {
         var sourceUnit = sourceObj.GetComponent<Unit>();
         if (sourceUnit?.Grid != null && sourceUnit.Grid.IsValidGridPosition(sourceUnit.row, sourceUnit.col))
-            sourceUnit.Grid.SetCellOccupied(sourceUnit.row, sourceUnit.col, null);
+            sourceUnit.Grid.SetCellOccupied(sourceUnit.Board, sourceUnit.row, sourceUnit.col, null);
 
         gridManager.SetCellOccupied(board, row, col, null);
 
