@@ -81,8 +81,8 @@ public class BotManager : MonoBehaviour
 
     private bool ValidateInputs(GameObject[] prefabs, int limit)
     {
-        if (gridManager == null) {return false; }
-        if (prefabs == null || prefabs.Length == 0) {return false; }
+        if (gridManager == null) { return false; }
+        if (prefabs == null || prefabs.Length == 0) { return false; }
         if (limit <= 0) { return false; }
         return true;
     }
@@ -124,7 +124,6 @@ public class BotManager : MonoBehaviour
     {
         SetupUnit(bot, board, cell, levelIndex);
         SetupTeam(bot);
-        SetupAI(bot);
         DisableDragIfNeeded(bot);
         SetupNavMesh(bot, gridManager.GridToWorldPosition(board, cell.x, cell.y));
     }
@@ -148,13 +147,6 @@ public class BotManager : MonoBehaviour
     {
         var team = bot.GetComponent<UnitTeam>() ?? bot.AddComponent<UnitTeam>();
         team.team = Team.Enemy;
-    }
-
-    private void SetupAI(GameObject bot)
-    {
-        bool isRanged = bot.CompareTag("Ranged") || bot.name.Contains(rangedNameKeyword);
-        var ai = bot.GetComponent<UnitAI>() ?? bot.AddComponent<UnitAI>();
-        ai.Inject(gridManager, ranged: isRanged);
     }
 
     private void DisableDragIfNeeded(GameObject bot)

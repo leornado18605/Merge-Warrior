@@ -58,21 +58,28 @@ public class DraggableUnit : MonoBehaviour
             return;
         }
 
-        Vector3 cellCenter = Grid.GridToWorldPosition(board, row, col);
-        transform.position = cellCenter;
-
         GameObject occupant = Grid.GetOccupant(board, row, col);
+
         if (occupant == null)
         {
+            Vector3 cellCenter = Grid.GridToWorldPosition(board, row, col);
+            transform.position = cellCenter;
             Grid.SetCellOccupied(board, row, col, gameObject);
             unit.row = row; unit.col = col;
             return;
         }
 
-        if (GameManager.Instance == null || !GameManager.Instance.TryMerge(board, row, col, gameObject))
+        if (GameManager.Instance != null && GameManager.Instance.TryMerge(board, row, col, gameObject))
         {
-            Revert();
+            return;
         }
+
+        if (GameManager.Instance != null && GameManager.Instance.TrySwap(board, row, col, gameObject))
+        {
+            return;
+        }
+
+        Revert();
     }
 
     private void Revert()

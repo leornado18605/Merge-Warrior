@@ -121,8 +121,49 @@ public class GameManager : MonoBehaviour
         }
 
         unit.Initialize(unitType, level, gridManager, board, row, col);
+
+        var team = newObj.GetComponent<UnitTeam>() ?? newObj.AddComponent<UnitTeam>();
+        team.team = (board == GridManager.Board.Board1) ? Team.Player : Team.Enemy;
+
+
         return newObj;
     }
     #endregion 
+    public bool TrySwap(GridManager.Board board, int targetRow, int targetCol, GameObject sourceObj)
+    {
+        if (sourceObj == null || gridManager == null) return false;
+
+        GameObject targetObj = gridManager.GetOccupant(board, targetRow, targetCol);
+        if (targetObj == null) return false; 
+
+        var sourceUnit = sourceObj.GetComponent<Unit>();
+        var targetUnit = targetObj.GetComponent<Unit>();
+        if (sourceUnit == null || targetUnit == null) return false;
+
+        if (sourceUnit.Board != board || targetUnit.Board != board) return false;
+
+        int srcRow = sourceUnit.row;
+        int srcCol = sourceUnit.col;
+
+        Vector3 srcNewPos = gridManager.GridToWorldPosition(board, targetRow, targetCol);
+        srcNewPos.y = sourceObj.transform.position.y;
+
+        Vector3 tgtNewPos = gridManager.GridToWorldPosition(board, srcRow, srcCol);
+        tgtNewPos.y = targetObj.transform.position.y;
+
+        gridManager.SetCellOccupied(board, srcRow, srcCol, null);
+        gridManager.SetCellOccupied(board, targetRow, targetCol, null);
+
+        sourceObj.transform.position = srcNewPos;
+        targetObj.transform.position = tgtNewPos;
+
+        gridManager.SetCellOccupied(board, targetRow, targetCol, sourceObj);
+        gridManager.SetCellOccupied(board, srcRow, srcCol, targetObj);
+
+        sourceUnit.row = targetRow; sourceUnit.col = targetCol;
+        targetUnit.row = srcRow; targetUnit.col = srcCol;
+
+        return true;
+    }
 
 }

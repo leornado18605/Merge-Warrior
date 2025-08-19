@@ -1,4 +1,4 @@
-
+﻿
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,8 +13,8 @@ namespace ObjectPooling
     [DisallowMultipleComponent]
     internal class PooledObject : MonoBehaviour
     {
-        internal int prefabId;              
-        internal Pool owner;                
+        internal int prefabId;
+        internal Pool owner;
         public void Release()
         {
             if (owner != null)
@@ -37,7 +37,7 @@ namespace ObjectPooling
         [Header("Defaults for new pools created at runtime")]
         [SerializeField] private bool defaultAutoExpand = true;
         [SerializeField] private int defaultInitialSize = 8;
-        [SerializeField] private int defaultMaxSize = -1; 
+        [SerializeField] private int defaultMaxSize = -1;
 
         private void Awake()
         {
@@ -298,7 +298,7 @@ namespace ObjectPooling
             {
                 Object.Destroy(instance);
                 return;
-            }   
+            }
 
             _inactive.Enqueue(instance);
         }

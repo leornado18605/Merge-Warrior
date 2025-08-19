@@ -23,7 +23,7 @@ public sealed class GridManager : MonoBehaviour
     [Header("Input Locks")]
     public bool lockBoard1Input = false;  //Area Player
     public bool lockBoard2Input = true;    //Area AI
-    
+
     // Visual tile arrays (persist tile GameObjects so we can move them)
     private GameObject[,] board1Tiles;
     private GameObject[,] board2Tiles;
@@ -119,7 +119,7 @@ public sealed class GridManager : MonoBehaviour
     #endregion
 
     #region Origins & Spawning
-    
+
     private void ComputeOrigins()
     {
         // By convention: non-swapped => Board2 at transform.position, Board1 below (-Z)
