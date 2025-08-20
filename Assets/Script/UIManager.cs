@@ -13,7 +13,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button placeGunButton;
 
     [Header("Optional: Hide as a group when fight")]
-    [SerializeField] private GameObject buttonsPanel; 
+    [SerializeField] private GameObject buttonsPanel;
 
     private void Awake()
     {
@@ -22,7 +22,6 @@ public class UIManager : MonoBehaviour
         if (placeKnifeButton) placeKnifeButton.onClick.RemoveAllListeners();
         if (placeGunButton) placeGunButton.onClick.RemoveAllListeners();
 
-        // gắn mới
         if (startFightButton) startFightButton.onClick.AddListener(OnStartFightClicked);
         if (placeKnifeButton) placeKnifeButton.onClick.AddListener(OnPlaceKnifeClicked);
         if (placeGunButton) placeGunButton.onClick.AddListener(OnPlaceGunClicked);
@@ -39,12 +38,21 @@ public class UIManager : MonoBehaviour
     private void OnPlaceKnifeClicked()
     {
         if (unitManager) unitManager.PlaceKnife();
-
+        RefreshButtons();
     }
 
     private void OnPlaceGunClicked()
     {
         if (unitManager) unitManager.PlaceGun();
+        RefreshButtons();
+    }
 
+    private void RefreshButtons()
+    {
+        if (!unitManager) return;
+
+        bool full = unitManager.IsBoardFull();
+        if (placeKnifeButton) placeKnifeButton.interactable = !full;
+        if (placeGunButton) placeGunButton.interactable = !full;
     }
 }

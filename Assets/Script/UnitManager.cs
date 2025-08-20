@@ -21,6 +21,7 @@ public class UnitManager : MonoBehaviour
     {
         PoolManager.CreatePool(knifePrefab, initialSize: poolInitial, maxSize: poolMax, autoExpand: true);
         PoolManager.CreatePool(gunPrefab, initialSize: poolInitial, maxSize: poolMax, autoExpand: true);
+        PlaceKnife();
     }
 
     public void PlaceKnife()
@@ -34,7 +35,7 @@ public class UnitManager : MonoBehaviour
                 if (!gridManager.IsEmptyCell(board, row, col))
                     continue;
 
-                Vector3 worldPos = gridManager.GridToWorldPosition(board, row, col);
+                Vector3 worldPos = gridManager.GridToWorldPosition(board, row, col, true);
 
                 GameObject knife = PoolManager.Spawn(knifePrefab, worldPos, Quaternion.identity, gridManager.transform);
                 knife.SetActive(false);
@@ -66,7 +67,7 @@ public class UnitManager : MonoBehaviour
                 if (!gridManager.IsEmptyCell(board, row, col))
                     continue;
 
-                Vector3 worldPos = gridManager.GridToWorldPosition(board, row, col);
+                Vector3 worldPos = gridManager.GridToWorldPosition(board, row, col, true);
 
                 GameObject gun = PoolManager.Spawn(gunPrefab, worldPos, Quaternion.identity, gridManager.transform);
                 gun.SetActive(false);
@@ -84,5 +85,19 @@ public class UnitManager : MonoBehaviour
                 return;
             }
         }
+    }
+
+    public bool IsBoardFull()
+    {
+        var board = GridManager.Board.Board1; // Player board
+        for (int r = 0; r < gridManager.Rows; r++)
+        {
+            for (int c = 0; c < gridManager.Cols; c++)
+            {
+                if (gridManager.IsEmptyCell(board, r, c))
+                    return false;
+            }
+        }
+        return true;
     }
 }

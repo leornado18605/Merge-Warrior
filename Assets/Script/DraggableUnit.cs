@@ -1,17 +1,32 @@
 ﻿using UnityEngine;
-using UnityEngine.AI; // NEW
+using UnityEngine.AI;
+using UnityEngine.EventSystems; // For IsPointerOverGameObject
 
+[DisallowMultipleComponent]
 public class DraggableUnit : MonoBehaviour
 {
+    [Header("Refs")]
+    [SerializeField] private Unit unit;
+
+    private GridManager Grid => unit != null ? unit.Grid : null;
+
+    // Drag state
     private bool isDragging = false;
     private Vector3 originalPosition;
     private int originalRow = -1, originalCol = -1;
 
-    [SerializeField] private Unit unit;
-    private GridManager Grid => unit != null ? unit.Grid : null;
+    private NavMeshAgent agent;
 
-    void OnMouseDown()
+    private void Awake()
     {
+        if (!unit) unit = GetComponent<Unit>();
+        agent = GetComponent<NavMeshAgent>();
+    }
+
+    private void OnMouseDown()
+    {
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+
         if (unit == null || Grid == null) return;
         if (Grid.IsInputLocked(unit.Board)) return;
 
@@ -26,14 +41,15 @@ public class DraggableUnit : MonoBehaviour
         isDragging = true;
     }
 
-    void OnMouseDrag()
+    private void OnMouseDrag()
     {
         if (!isDragging) return;
+
         Vector3 mousePos = GetMouseWorldPosition();
         transform.position = new Vector3(mousePos.x, originalPosition.y, mousePos.z);
     }
 
-    void OnMouseUp()
+    private void OnMouseUp()
     {
         if (!isDragging) return;
         isDragging = false;
@@ -41,6 +57,7 @@ public class DraggableUnit : MonoBehaviour
         if (unit == null || Grid == null) { Revert(); return; }
 
         var board = unit.Board;
+
         Vector2Int gridPos = Grid.WorldToGridNearest(board, transform.position);
         int row = gridPos.x;
         int col = gridPos.y;
@@ -51,24 +68,47 @@ public class DraggableUnit : MonoBehaviour
 
         if (occupant == null)
         {
-            Vector3 cellCenter = Grid.GridToWorldPosition(board, row, col);
-            transform.position = cellCenter;
-            Grid.SetCellOccupied(board, row, col, gameObject);
-            unit.row = row; unit.col = col;
-
-            var agent = GetComponent<NavMeshAgent>();
-            if (agent != null)
-            {
-                agent.Warp(transform.position);
-                agent.ResetPath();
-            }
+            PlaceIntoEmptyCell(board, row, col);
             return;
         }
 
-        if (GameManager.Instance != null && GameManager.Instance.TryMerge(board, row, col, gameObject)) return;
-        if (GameManager.Instance != null && GameManager.Instance.TrySwap(board, row, col, gameObject)) return;
+        if (GameManager.Instance != null && GameManager.Instance.TryMerge(board, row, col, gameObject))
+        {
+            return;
+        }
+
+        if (GameManager.Instance != null && GameManager.Instance.TrySwap(board, row, col, gameObject))
+        {
+            SyncToCurrentGridCell();
+            return;
+        }
 
         Revert();
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    private void PlaceIntoEmptyCell(GridManager.Board board, int row, int col)
+    {
+        Vector3 cellCenter = Grid.GridToWorldPosition(board, row, col, true);
+
+        transform.position = cellCenter;
+        Grid.SetCellOccupied(board, row, col, gameObject);
+        unit.row = row; unit.col = col;
+
+        unit.UpdateOriginalPosition(cellCenter, row, col);
+        SyncAgent(cellCenter);
+    }
+
+    private void SyncToCurrentGridCell()
+    {
+        if (unit == null || Grid == null) return;
+
+        Vector3 cellCenter = Grid.GridToWorldPosition(unit.Board, unit.row, unit.col, true);
+        transform.position = cellCenter;
+
+        unit.UpdateOriginalPosition(cellCenter, unit.row, unit.col);
+        SyncAgent(cellCenter);
     }
 
     private void Revert()
@@ -85,12 +125,15 @@ public class DraggableUnit : MonoBehaviour
             unit.row = -1; unit.col = -1;
         }
 
-        var agent = GetComponent<NavMeshAgent>();
-        if (agent != null)
-        {
-            agent.Warp(transform.position);
-            agent.ResetPath();
-        }
+        SyncAgent(transform.position);
+    }
+
+    private void SyncAgent(Vector3 worldPos)
+    {
+        if (agent == null) return;
+
+        agent.Warp(worldPos);
+        agent.ResetPath();
     }
 
     private Vector3 GetMouseWorldPosition()

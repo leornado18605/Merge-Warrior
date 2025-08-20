@@ -110,7 +110,7 @@ public class GameManager : MonoBehaviour
 
     private GameObject SpawnAndInitializeUnit(GameObject prefab, GridManager.Board board, int row, int col, int level, string unitType)
     {
-        Vector3 spawnPos = gridManager.GridToWorldPosition(board, row, col);
+        Vector3 spawnPos = gridManager.GridToWorldPosition(board, row, col, true);
         GameObject newObj = PoolManager.Spawn(prefab, spawnPos, Quaternion.identity, gridManager.transform);
 
         var unit = newObj.GetComponent<Unit>();
@@ -145,10 +145,10 @@ public class GameManager : MonoBehaviour
         int srcRow = sourceUnit.row;
         int srcCol = sourceUnit.col;
 
-        Vector3 srcNewPos = gridManager.GridToWorldPosition(board, targetRow, targetCol);
+        Vector3 srcNewPos = gridManager.GridToWorldPosition(board, targetRow, targetCol, true);
         srcNewPos.y = sourceObj.transform.position.y;
 
-        Vector3 tgtNewPos = gridManager.GridToWorldPosition(board, srcRow, srcCol);
+        Vector3 tgtNewPos = gridManager.GridToWorldPosition(board, srcRow, srcCol, true);
         tgtNewPos.y = targetObj.transform.position.y;
 
         gridManager.SetCellOccupied(board, srcRow, srcCol, null);

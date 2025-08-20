@@ -108,7 +108,7 @@ public class BotManager : MonoBehaviour
                             int levelIndex,
                             out GameObject bot)
     {
-        Vector3 spawnPos = gridManager.GridToWorldPosition(board, cell.x, cell.y);
+        Vector3 spawnPos = gridManager.GridToWorldPosition(board, cell.x, cell.y, true);
         Quaternion rot = GetRotationFacingCamera(spawnPos, modelYawOffset);
 
         bot = PoolManager.Spawn(prefab, spawnPos, rot, gridManager.transform);
@@ -126,7 +126,7 @@ public class BotManager : MonoBehaviour
         SetupUnit(bot, board, cell, levelIndex);
         SetupTeam(bot);
         DisableDragIfNeeded(bot);
-        SetupNavMesh(bot, gridManager.GridToWorldPosition(board, cell.x, cell.y));
+        SetupNavMesh(bot, gridManager.GridToWorldPosition(board, cell.x, cell.y, true));
     }
 
     // ───────────────────────────── Helpers: per-system ─────────────────────────
@@ -164,7 +164,7 @@ public class BotManager : MonoBehaviour
         if (agent != null)
         {
             agent.Warp(spawnPos);
-            agent.updateRotation = true;
+            agent.updateRotation = false;
         }
     }
 

@@ -24,6 +24,9 @@ public sealed class GridManager : MonoBehaviour
     public bool lockBoard1Input = false;  //Area Player
     public bool lockBoard2Input = true;    //Area AI
 
+    [Header("Offsets")]
+    public float unitYOffset = 0.5f;
+
     // Visual tile arrays (persist tile GameObjects so we can move them)
     private GameObject[,] board1Tiles;
     private GameObject[,] board2Tiles;
@@ -183,10 +186,15 @@ public sealed class GridManager : MonoBehaviour
         return board2Origin + new Vector3(col * tileSize, 0f, row * tileSize);
     }
 
-    public Vector3 GridToWorldPosition(Board board, int row, int col)
+    public Vector3 GridToWorldPosition(Board board, int row, int col, bool forUnit)
     {
-        Debug.Log($"[GridToWorldPosition - Board enum] Board: {board}, Row: {row}, Col: {col}");
-        return (board == Board.Board1) ? GridToWorldPositionBoard1(row, col) : GridToWorldPositionBoard2(row, col);
+        Vector3 origin = (board == Board.Board1) ? board1Origin : board2Origin;
+        Vector3 pos = origin + new Vector3(col * tileSize, 0f, row * tileSize);
+
+        if (forUnit)
+            pos.y += unitYOffset;
+
+        return pos;
     }
 
 

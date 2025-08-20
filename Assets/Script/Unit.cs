@@ -23,7 +23,7 @@ public class Unit : MonoBehaviour
         this.board = board;
         this.row = row;
         this.col = col;
-        originalPosition = gridManager.GridToWorldPosition(board, row, col);
+        originalPosition = gridManager.GridToWorldPosition(board, row, col, true);
         transform.position = originalPosition;
         gameObject.name = $"{unitType}_L{level}_R{row}C{col}";
     }
@@ -32,6 +32,15 @@ public class Unit : MonoBehaviour
     public GridManager Grid => gridManager;
 
     public GridManager.Board Board => board;
+
+    public void UpdateOriginalPosition(Vector3 newPos, int newRow, int newCol)
+    {
+        originalPosition = newPos;
+        row = newRow;
+        col = newCol;
+        transform.position = newPos;
+    }
+
     public bool IsMergeLocked() => mergeLock;
 
     public void MergeIncrement()
