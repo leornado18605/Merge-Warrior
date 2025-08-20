@@ -57,7 +57,6 @@ public class DraggableUnit : MonoBehaviour
         if (unit == null || Grid == null) { Revert(); return; }
 
         var board = unit.Board;
-
         Vector2Int gridPos = Grid.WorldToGridNearest(board, transform.position);
         int row = gridPos.x;
         int col = gridPos.y;
@@ -72,14 +71,14 @@ public class DraggableUnit : MonoBehaviour
             return;
         }
 
-        if (GameManager.Instance != null && GameManager.Instance.TryMerge(board, row, col, gameObject))
-        {
-            return;
-        }
-
         if (GameManager.Instance != null && GameManager.Instance.TrySwap(board, row, col, gameObject))
         {
             SyncToCurrentGridCell();
+            return;
+        }
+
+        if (GameManager.Instance != null && GameManager.Instance.TryMerge(board, row, col, gameObject))
+        {
             return;
         }
 

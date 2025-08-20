@@ -31,6 +31,7 @@ public class UnitTargeting : MonoBehaviour
     [Header("Animation")]
     public Animator animator;
     public string runBool = "Running";
+    public string attackTrigger = "Attack";
 
     [Header("Think Loop")]
     public float thinkInterval = 0.1f;
@@ -121,13 +122,38 @@ public class UnitTargeting : MonoBehaviour
 
             if (target != null)
             {
-                Vector3 aim = target.transform.position;
-                UpdateDestinationSmooth(aim);
+                float dist = Vector3.Distance(transform.position, target.transform.position);
 
-                if (agent.hasPath)
-                    SmoothRotate();
-
-                SetRunAnim(agent.velocity.magnitude > 0.1f);
+                if (role == Role.Knife)
+                {
+                    if (dist > knifeStopDistance + 0.05f)
+                    {
+                        UpdateDestinationSmooth(target.transform.position);
+                        if (agent.hasPath) SmoothRotate();
+                        SetRunAnim(agent.velocity.magnitude > 0.1f);
+                    }
+                    else
+                    {
+                        StopAndAnim(false);
+                        LookAtTarget(target.transform.position);
+                        TriggerAttack();
+                    }
+                }
+                else if (role == Role.Gun)
+                {
+                    if (dist <= gunStopDistance)
+                    {
+                        StopAndAnim(false);
+                        LookAtTarget(target.transform.position);
+                        TriggerAttack();
+                    }
+                    else
+                    {
+                        UpdateDestinationSmooth(target.transform.position);
+                        if (agent.hasPath) SmoothRotate();
+                        SetRunAnim(agent.velocity.magnitude > 0.1f);
+                    }
+                }
             }
             else
             {
@@ -135,6 +161,29 @@ public class UnitTargeting : MonoBehaviour
             }
 
             yield return wait;
+        }
+    }
+
+    void LookAtTarget(Vector3 targetPos)
+    {
+        Vector3 dir = (targetPos - transform.position).normalized;
+        dir.y = 0f;
+        if (dir.sqrMagnitude > 1e-4f)
+        {
+            Quaternion rot = Quaternion.LookRotation(dir);
+            transform.rotation = Quaternion.RotateTowards(
+                transform.rotation,
+                rot,
+                agent.angularSpeed * Time.deltaTime
+            );
+        }
+    }
+
+    void TriggerAttack()
+    {
+        if (animator && !string.IsNullOrEmpty(attackTrigger))
+        {
+            animator.SetTrigger(attackTrigger);
         }
     }
 
