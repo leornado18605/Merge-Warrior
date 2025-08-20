@@ -71,16 +71,16 @@ public class DraggableUnit : MonoBehaviour
             return;
         }
 
+        if (GameManager.Instance != null && GameManager.Instance.TryMerge(board, row, col, gameObject))
+        {
+            return;
+        }
         if (GameManager.Instance != null && GameManager.Instance.TrySwap(board, row, col, gameObject))
         {
             SyncToCurrentGridCell();
             return;
         }
 
-        if (GameManager.Instance != null && GameManager.Instance.TryMerge(board, row, col, gameObject))
-        {
-            return;
-        }
 
         Revert();
     }

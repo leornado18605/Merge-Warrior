@@ -90,8 +90,8 @@ public class UnitTargeting : MonoBehaviour
 
         agent.speed = baseSpeed;
         agent.stoppingDistance = StopDistance;
-        agent.updateRotation = false;   
-        agent.updatePosition = false;   
+        agent.updateRotation = false;
+        agent.updatePosition = false;
         if (agentRadius > 0f) agent.radius = agentRadius;
 
         smoothedDir = transform.forward;
@@ -206,7 +206,7 @@ public class UnitTargeting : MonoBehaviour
         }
         else
         {
-            return; 
+            return;
         }
 
         NavMeshPath path = new NavMeshPath();

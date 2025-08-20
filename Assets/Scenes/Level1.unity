@@ -216,6 +216,7 @@ MonoBehaviour:
   agentRadius: 0.25
   animator: {fileID: 0}
   runBool: Running
+  attackTrigger: Attack
   thinkInterval: 0.2
 --- !u!114 &245847642
 MonoBehaviour:
@@ -391,7 +392,7 @@ MonoBehaviour:
   gunDetectTiles: 99
   knifeStopDistance: 0.03
   gunStopDistance: 6
-  knifeSpeed: 3026
+  knifeSpeed: 2007
   gunSpeed: 6
   knifeTurn: 720
   gunTurn: 540
@@ -400,6 +401,7 @@ MonoBehaviour:
   agentRadius: 0.25
   animator: {fileID: 456467307}
   runBool: Running
+  attackTrigger: Attack
   thinkInterval: 0
 --- !u!114 &456467304
 MonoBehaviour:
@@ -548,7 +550,7 @@ MonoBehaviour:
   gunDetectTiles: 99
   knifeStopDistance: 0.03
   gunStopDistance: 6
-  knifeSpeed: 3026
+  knifeSpeed: 2007
   gunSpeed: 6
   knifeTurn: 720
   gunTurn: 540
@@ -557,6 +559,7 @@ MonoBehaviour:
   agentRadius: 0.25
   animator: {fileID: 459472676}
   runBool: Running
+  attackTrigger: Attack
   thinkInterval: 0
 --- !u!114 &459472673
 MonoBehaviour:
@@ -669,6 +672,7 @@ MonoBehaviour:
   agentRadius: 0.25
   animator: {fileID: 0}
   runBool: Running
+  attackTrigger: Attack
   thinkInterval: 0.2
 --- !u!114 &515034322
 MonoBehaviour:
@@ -717,7 +721,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 246, y: -872}
+  m_AnchoredPosition: {x: 246, y: -1053}
   m_SizeDelta: {x: 150, y: 130}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &571080059
@@ -863,7 +867,7 @@ Light:
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
-  m_Color: {r: 0.8962264, g: 0.7905393, b: 0.7905393, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
@@ -1130,6 +1134,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4807065266750838, guid: fa8e04c3445c9ea4f9ab79a137c55ed4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.84
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1268,7 +1276,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 501, y: 974}
+  m_AnchoredPosition: {x: 471, y: 1059}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &894726705
@@ -1293,8 +1301,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 50c12c23294124aa48490c44ac65a9e4, type: 2}
+  m_sharedMaterial: {fileID: 7746803525459343344, guid: 50c12c23294124aa48490c44ac65a9e4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1398,7 +1406,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridManager: {fileID: 892392521}
-  knifePrefab: {fileID: 456467291}
+  knifePrefab: {fileID: 1747630175}
   gunPrefab: {fileID: 1737803250786393572, guid: 39783929f6218c84a9d6a7a39f34eacb, type: 3}
   poolInitial: 8
   poolMax: 32
@@ -1504,8 +1512,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.5591929, y: 0, z: 0, w: 0.8290376}
-  m_LocalPosition: {x: -25.64, y: 13542, z: 2467}
+  m_LocalRotation: {x: 0.62932044, y: 0, z: 0, w: 0.777146}
+  m_LocalPosition: {x: -25.64, y: 13864.74, z: 4203.31}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1539,8 +1547,8 @@ Transform:
   m_GameObject: {fileID: 1004645171}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 304.4653, y: 4783, z: 7256.0396}
-  m_LocalScale: {x: 7092.981, y: 563.48, z: 7662.2173}
+  m_LocalPosition: {x: -67.2886, y: 4783, z: 7352.711}
+  m_LocalScale: {x: 4654.7134, y: 563.48, z: 6943.5996}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1921,7 +1929,7 @@ MonoBehaviour:
   defaultBoard: 1
   spawnRows: 3
   spawnCols: 5
-  spawnLimit: 7
+  spawnLimit: 1
   disableDragForBots: 1
   modelYawOffset: 0
   rangedNameKeyword: Knife
@@ -2297,7 +2305,7 @@ MonoBehaviour:
   gunDetectTiles: 99
   knifeStopDistance: 0.03
   gunStopDistance: 6
-  knifeSpeed: 3026
+  knifeSpeed: 2007
   gunSpeed: 6
   knifeTurn: 720
   gunTurn: 540
@@ -2306,6 +2314,7 @@ MonoBehaviour:
   agentRadius: 0.25
   animator: {fileID: 1308446565}
   runBool: Running
+  attackTrigger: Attack
   thinkInterval: 0
 --- !u!114 &1308446561
 MonoBehaviour:
@@ -2500,7 +2509,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -239, y: -872}
+  m_AnchoredPosition: {x: -239, y: -1053}
   m_SizeDelta: {x: 150, y: 130}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1450697944
@@ -2759,6 +2768,7 @@ MonoBehaviour:
   agentRadius: 0.25
   animator: {fileID: 0}
   runBool: Running
+  attackTrigger: Attack
   thinkInterval: 0.2
 --- !u!114 &1567124727
 MonoBehaviour:
@@ -2808,7 +2818,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 11.218, y: -676.4}
+  m_AnchoredPosition: {x: 11.218, y: -742.4}
   m_SizeDelta: {x: 363.3, y: 187.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1570413995
@@ -2966,7 +2976,7 @@ MonoBehaviour:
   gunDetectTiles: 99
   knifeStopDistance: 0.03
   gunStopDistance: 6
-  knifeSpeed: 3026
+  knifeSpeed: 2007
   gunSpeed: 6
   knifeTurn: 720
   gunTurn: 540
@@ -2975,6 +2985,7 @@ MonoBehaviour:
   agentRadius: 0.25
   animator: {fileID: 1747630194}
   runBool: Running
+  attackTrigger: Attack
   thinkInterval: 0
 --- !u!114 &1747630191
 MonoBehaviour:
@@ -3319,6 +3330,7 @@ MonoBehaviour:
   agentRadius: 0.25
   animator: {fileID: 0}
   runBool: Running
+  attackTrigger: Attack
   thinkInterval: 0.2
 --- !u!114 &1981795631
 MonoBehaviour:
@@ -3581,10 +3593,10 @@ SceneRoots:
   - {fileID: 904087435}
   - {fileID: 434615163}
   - {fileID: 2057101079}
-  - {fileID: 1248025202}
   - {fileID: 1109887453}
+  - {fileID: 2076438370}
+  - {fileID: 1039677584}
+  - {fileID: 1248025202}
   - {fileID: 707285490}
   - {fileID: 1814510090}
   - {fileID: 1004645172}
-  - {fileID: 2076438370}
-  - {fileID: 1039677584}
