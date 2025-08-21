@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using ObjectPooling;
 
 public class GameManager : MonoBehaviour
@@ -10,7 +12,16 @@ public class GameManager : MonoBehaviour
     [Header("Refs")]
     public BotManager botManager;
     public GridManager gridManager;
+
+    [Header("Merge")]
     public float mergeLockSeconds = 0.25f;
+
+    [Header("Anim Keys")]
+    [SerializeField] private string runKey = "Running";
+    [SerializeField] private string dieKey = "Die";
+
+    [Header("Run Loop")]
+    [SerializeField] private float runTick = 0.1f;
 
     [Serializable]
     public class UnitUpgradeEntry
@@ -21,10 +32,16 @@ public class GameManager : MonoBehaviour
 
     public UnitUpgradeEntry[] upgradeEntries;
 
-    private Dictionary<string, GameObject[]> prefabMap;
     public event Action<Unit, int, int> OnUnitMerged;
+    public event Action<Unit, Unit, int> OnAttack;
+    public event Action<Unit> OnUnitDead;
 
-    // ───────── LIFECYCLE ─────────
+    private Dictionary<string, GameObject[]> prefabMap;
+    private readonly Dictionary<UnitCore, Unit> unitMap = new();
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    #region Lifecycle
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -42,25 +59,275 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         if (botManager != null)
-        {
             botManager.SetGridManager(gridManager);
+
+        StartCoroutine(RunLoop());
+    }
+
+    #endregion
+    // ─────────────────────────────────────────────────────────────────────────────
+    #region Register Units / Death
+
+    public void HookUnit(Unit u)
+    {
+        if (u == null || u.core == null) return;
+        if (unitMap.ContainsKey(u.core)) return;
+
+        unitMap.Add(u.core, u);
+        u.core.onDead += OnDeadCore;
+    }
+
+    public void UnhookUnit(Unit u)
+    {
+        if (u == null || u.core == null) return;
+        if (!unitMap.ContainsKey(u.core)) return;
+
+        u.core.onDead -= OnDeadCore;
+        unitMap.Remove(u.core);
+    }
+
+    private void OnDeadCore(UnitCore c)
+    {
+        if (!unitMap.TryGetValue(c, out var u)) return;
+
+        PlayDieAnim(u);
+        ClearCell(u);
+        OnUnitDead?.Invoke(u);
+        Debug.Log("OnDeadCore is called");
+        StartCoroutine(DelayRelease(u.gameObject, 1.5f));
+    }
+
+    #endregion
+    // ─────────────────────────────────────────────────────────────────────────────
+    #region Attack
+
+    public bool CanAttack(Unit a, Unit b)
+    {
+        if (a == null || b == null) return false;
+        if (a.core == null || b.core == null) return false;
+        if (!a.core.Alive() || !b.core.Alive()) return false;
+        if (a.core.team == b.core.team) return false;
+        return true;
+    }
+
+    public void Attack(Unit a, Unit b)
+    {
+        if (!CanAttack(a, b)) return;
+
+        int val = Mathf.Max(1, a.core.dmg);
+        var d = new DamageData(val, a.core.team, a.transform.position);
+
+        b.core.Hit(d);
+        OnAttack?.Invoke(a, b, val);
+    }
+
+    public void AttackInRange(Unit a, Unit b, float range)
+    {
+        if (!CanAttack(a, b)) return;
+
+        float d = Vector3.Distance(a.transform.position, b.transform.position);
+        if (d > range) return;
+
+        Attack(a, b);
+    }
+
+    #endregion
+    // ─────────────────────────────────────────────────────────────────────────────
+    #region Running (set Running bool theo Agent)
+
+    private IEnumerator RunLoop()
+    {
+        var wait = new WaitForSeconds(runTick);
+
+        while (true)
+        {
+            ApplyRunState(GridManager.Board.Board1);
+            ApplyRunState(GridManager.Board.Board2);
+            yield return wait;
         }
     }
 
-    // ───────── PREFABS ─────────
+    private void ApplyRunState(GridManager.Board b)
+    {
+        if (gridManager == null) return;
+
+        for (int r = 0; r < gridManager.Rows; r++)
+        {
+            for (int c = 0; c < gridManager.Cols; c++)
+            {
+                var go = gridManager.GetOccupant(b, r, c);
+                if (!go) continue;
+
+                var agent = go.GetComponent<NavMeshAgent>();
+                var anim = go.GetComponent<Animator>();
+
+                if (!agent || !anim) continue;
+
+                bool moving =
+                    agent.enabled &&
+                    agent.hasPath &&
+                    agent.remainingDistance >
+                    agent.stoppingDistance + 0.05f;
+
+                anim.SetBool(runKey, moving);
+            }
+        }
+    }
+
+    #endregion
+    // ─────────────────────────────────────────────────────────────────────────────
+    #region Merge
+
+    public bool TryMerge(GridManager.Board board, int targetRow, int targetCol, GameObject sourceObj)
+    {
+        var targetObj = gridManager.GetOccupant(board, targetRow, targetCol);
+
+        if (!ValidMerge(targetObj, sourceObj, out var targetUnit, out var sourceUnit))
+            return false;
+
+        int newLv = targetUnit.level + 1;
+
+        if (!prefabMap.TryGetValue(targetUnit.unitType, out var arr))
+            return false;
+
+        if (newLv - 1 >= arr.Length || arr[newLv - 1] == null)
+            return false;
+
+        var pos = gridManager.GridToWorldPosition(board, targetRow, targetCol, true);
+
+        CleanupSource(sourceUnit, sourceObj);
+        PoolManager.Release(targetObj);
+
+        CreateMergedUnit(arr[newLv - 1], targetUnit.unitType, newLv, board, targetRow, targetCol, pos);
+        return true;
+    }
+
+    private bool ValidMerge(GameObject a, GameObject b, out Unit ua, out Unit ub)
+    {
+        ua = null;
+        ub = null;
+
+        if (a == null || b == null) return false;
+
+        ua = a.GetComponent<Unit>();
+        ub = b.GetComponent<Unit>();
+
+        if (ua == null || ub == null) return false;
+        if (ua.unitType != ub.unitType) return false;
+        if (ua.level != ub.level) return false;
+
+        return true;
+    }
+
+    private void CleanupSource(Unit u, GameObject go)
+    {
+        if (u != null && u.Grid != null && u.Grid.IsValidGridPosition(u.row, u.col))
+            u.Grid.SetCellOccupied(u.Board, u.row, u.col, null);
+
+        PoolManager.Release(go);
+        UnhookUnit(u);
+    }
+
+    private void CreateMergedUnit(
+        GameObject prefab,
+        string type,
+        int lv,
+        GridManager.Board b,
+        int row,
+        int col,
+        Vector3 pos)
+    {
+        var obj = PoolManager.Spawn(prefab, pos, Quaternion.identity);
+        var u = obj.GetComponent<Unit>();
+        if (u == null) return;
+
+        u.Initialize(type, lv, gridManager, b, row, col);
+        gridManager.SetCellOccupied(b, row, col, obj);
+
+        u.MergeLockTemporary(mergeLockSeconds);
+
+        HookUnit(u);
+        OnUnitMerged?.Invoke(u, row, col);
+    }
+
+    #endregion
+    // ─────────────────────────────────────────────────────────────────────────────
+    #region Swap
+
+    public bool TrySwap(GridManager.Board board, int targetRow, int targetCol, GameObject sourceObj)
+    {
+        var targetObj = gridManager.GetOccupant(board, targetRow, targetCol);
+
+        if (!ValidSwap(targetObj, sourceObj, out var su, out var tu))
+            return false;
+
+        DoSwap(board, sourceObj, targetObj, su, tu, targetRow, targetCol);
+        return true;
+    }
+
+    private bool ValidSwap(GameObject a, GameObject b, out Unit ua, out Unit ub)
+    {
+        ua = null;
+        ub = null;
+
+        if (a == null || b == null) return false;
+
+        ua = b.GetComponent<Unit>();
+        ub = a.GetComponent<Unit>();
+
+        if (ua == null || ub == null) return false;
+        if (ua.Board != ub.Board) return false;
+
+        return true;
+    }
+
+    private void DoSwap(
+        GridManager.Board b,
+        GameObject src,
+        GameObject tgt,
+        Unit su,
+        Unit tu,
+        int tr,
+        int tc)
+    {
+        int sr = su.row;
+        int sc = su.col;
+
+        var posA = gridManager.GridToWorldPosition(b, tr, tc, true);
+        var posB = gridManager.GridToWorldPosition(b, sr, sc, true);
+
+        posA.y = src.transform.position.y;
+        posB.y = tgt.transform.position.y;
+
+        gridManager.SetCellOccupied(b, sr, sc, null);
+        gridManager.SetCellOccupied(b, tr, tc, null);
+
+        src.transform.position = posA;
+        tgt.transform.position = posB;
+
+        gridManager.SetCellOccupied(b, tr, tc, src);
+        gridManager.SetCellOccupied(b, sr, sc, tgt);
+
+        su.row = tr; su.col = tc;
+        tu.row = sr; tu.col = sc;
+    }
+
+    #endregion
+    // ─────────────────────────────────────────────────────────────────────────────
+    #region Prefab Map / Pools
+
     private void BuildPrefabMap()
     {
         prefabMap = new Dictionary<string, GameObject[]>();
-
         if (upgradeEntries == null) return;
 
         for (int i = 0; i < upgradeEntries.Length; i++)
         {
-            UnitUpgradeEntry e = upgradeEntries[i];
-            if (e != null && !string.IsNullOrEmpty(e.unitType))
-            {
-                prefabMap[e.unitType] = e.levelPrefabs;
-            }
+            var e = upgradeEntries[i];
+            if (e == null) continue;
+            if (string.IsNullOrEmpty(e.unitType)) continue;
+
+            prefabMap[e.unitType] = e.levelPrefabs;
         }
     }
 
@@ -68,149 +335,45 @@ public class GameManager : MonoBehaviour
     {
         if (prefabMap == null) return;
 
-        List<string> keys = new List<string>(prefabMap.Keys);
-
-        for (int i = 0; i < keys.Count; i++)
+        foreach (var kv in prefabMap)
         {
-            GameObject[] arr = prefabMap[keys[i]];
+            var arr = kv.Value;
             if (arr == null) continue;
 
             for (int j = 0; j < arr.Length; j++)
-            {
                 if (arr[j] != null)
-                {
                     PoolManager.CreatePool(arr[j], 8, 64, true);
-                }
-            }
         }
     }
 
-    // ───────── MERGE ─────────
-    public bool TryMerge(GridManager.Board board, int targetRow, int targetCol, GameObject sourceObj)
+    #endregion
+    // ─────────────────────────────────────────────────────────────────────────────
+    #region Utils
+
+    private void PlayDieAnim(Unit u)
     {
-        GameObject targetObj = gridManager.GetOccupant(board, targetRow, targetCol);
-
-        if (!IsValidMergeCandidate(targetObj, sourceObj, out Unit targetUnit, out Unit sourceUnit))
-            return false;
-
-        int newLevel = targetUnit.level + 1;
-
-        if (!prefabMap.TryGetValue(targetUnit.unitType, out GameObject[] prefabs))
-            return false;
-
-        if (newLevel - 1 >= prefabs.Length || prefabs[newLevel - 1] == null)
-            return false;
-
-        Vector3 spawnPos = gridManager.GridToWorldPosition(board, targetRow, targetCol, true);
-
-        CleanupSource(sourceUnit, sourceObj);
-        PoolManager.Release(targetObj);
-
-        GameObject newPrefab = prefabs[newLevel - 1];
-        CreateMergedUnit(newPrefab, targetUnit.unitType, newLevel, board, targetRow, targetCol, spawnPos);
-
-        return true;
-    }
-
-    private bool IsValidMergeCandidate(GameObject targetObj, GameObject sourceObj,
-        out Unit targetUnit, out Unit sourceUnit)
-    {
-        targetUnit = null;
-        sourceUnit = null;
-
-        if (targetObj == null || sourceObj == null) return false;
-
-        targetUnit = targetObj.GetComponent<Unit>();
-        sourceUnit = sourceObj.GetComponent<Unit>();
-
-        if (targetUnit == null || sourceUnit == null) return false;
-        if (targetUnit.unitType != sourceUnit.unitType) return false;
-        if (targetUnit.level != sourceUnit.level) return false;
-
-        return true;
-    }
-
-    private void CleanupSource(Unit sourceUnit, GameObject sourceObj)
-    {
-        if (sourceUnit.Grid != null &&
-            sourceUnit.Grid.IsValidGridPosition(sourceUnit.row, sourceUnit.col))
+        var anim = u.GetComponent<Animator>();
+        if (anim && !string.IsNullOrEmpty(dieKey))
         {
-            sourceUnit.Grid.SetCellOccupied(sourceUnit.Board, sourceUnit.row, sourceUnit.col, null);
-        }
-
-        PoolManager.Release(sourceObj);
-    }
-
-    private void CreateMergedUnit(GameObject prefab, string unitType, int newLevel,
-        GridManager.Board board, int row, int col, Vector3 spawnPos)
-    {
-        GameObject newObj = PoolManager.Spawn(prefab, spawnPos, Quaternion.identity);
-        Unit newUnit = newObj.GetComponent<Unit>();
-
-        if (newUnit != null)
-        {
-            newUnit.Initialize(unitType, newLevel, gridManager, board, row, col);
-            gridManager.SetCellOccupied(board, row, col, newObj);
-            newUnit.MergeLockTemporary();
-
-            if (OnUnitMerged != null)
-                OnUnitMerged(newUnit, row, col);
+            anim.SetTrigger(dieKey);
+            Debug.Log("anbim die");
         }
     }
 
-    // ───────── SWAP ─────────
-    public bool TrySwap(GridManager.Board board, int targetRow, int targetCol, GameObject sourceObj)
+    private void ClearCell(Unit u)
     {
-        GameObject targetObj = gridManager.GetOccupant(board, targetRow, targetCol);
+        var g = u.Grid;
+        if (g == null) return;
+        if (!g.IsValidGridPosition(u.row, u.col)) return;
 
-        if (!IsValidSwapCandidate(targetObj, sourceObj, out Unit sourceUnit, out Unit targetUnit))
-            return false;
-
-        DoSwap(board, sourceObj, targetObj, sourceUnit, targetUnit, targetRow, targetCol);
-        return true;
+        g.SetCellOccupied(u.Board, u.row, u.col, null);
     }
 
-    private bool IsValidSwapCandidate(GameObject targetObj, GameObject sourceObj,
-        out Unit sourceUnit, out Unit targetUnit)
+    private IEnumerator DelayRelease(GameObject go, float sec)
     {
-        sourceUnit = null;
-        targetUnit = null;
-
-        if (sourceObj == null || targetObj == null) return false;
-
-        sourceUnit = sourceObj.GetComponent<Unit>();
-        targetUnit = targetObj.GetComponent<Unit>();
-
-        if (sourceUnit == null || targetUnit == null) return false;
-        if (sourceUnit.Board != targetUnit.Board) return false;
-
-        return true;
+        yield return new WaitForSeconds(sec);
+        PoolManager.Release(go);
     }
 
-    private void DoSwap(GridManager.Board board, GameObject sourceObj, GameObject targetObj,
-        Unit sourceUnit, Unit targetUnit, int targetRow, int targetCol)
-    {
-        int srcRow = sourceUnit.row;
-        int srcCol = sourceUnit.col;
-
-        Vector3 srcNewPos = gridManager.GridToWorldPosition(board, targetRow, targetCol, true);
-        srcNewPos.y = sourceObj.transform.position.y;
-
-        Vector3 tgtNewPos = gridManager.GridToWorldPosition(board, srcRow, srcCol, true);
-        tgtNewPos.y = targetObj.transform.position.y;
-
-        gridManager.SetCellOccupied(board, srcRow, srcCol, null);
-        gridManager.SetCellOccupied(board, targetRow, targetCol, null);
-
-        sourceObj.transform.position = srcNewPos;
-        targetObj.transform.position = tgtNewPos;
-
-        gridManager.SetCellOccupied(board, targetRow, targetCol, sourceObj);
-        gridManager.SetCellOccupied(board, srcRow, srcCol, targetObj);
-
-        sourceUnit.row = targetRow;
-        sourceUnit.col = targetCol;
-        targetUnit.row = srcRow;
-        targetUnit.col = srcCol;
-    }
+    #endregion
 }

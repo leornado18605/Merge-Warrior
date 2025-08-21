@@ -203,7 +203,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   role: 1
-  knifeDetectTiles: 4
+  knifeDetectTiles: 6
   gunDetectTiles: 99
   knifeStopDistance: 0.7
   gunStopDistance: 6
@@ -217,7 +217,14 @@ MonoBehaviour:
   animator: {fileID: 0}
   runBool: Running
   attackTrigger: Attack
-  thinkInterval: 0.2
+  thinkInterval: 0.1
+  attackGap: 0.6
+  drawGizmos: 1
+  gizAttack: {r: 1, g: 0.3, b: 0, a: 0.8}
+  gizStop: {r: 0, g: 1, b: 0.2, a: 0.8}
+  gizDetect: {r: 0, g: 0.6, b: 1, a: 0.6}
+  gizPath: {r: 0.2, g: 1, b: 0.2, a: 0.9}
+  gizTarget: {r: 1, g: 1, b: 0, a: 0.9}
 --- !u!114 &245847642
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -230,6 +237,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26907c8330474644999c848386f3ab5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &245847646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 245847628}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4b218983ce2d3d48bc014f46218f25f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unit: {fileID: 0}
+  typeName: 
+  level: 1
+  team: 0
+  hpMax: 100
+  hp: 100
+  dmg: 10
+  atkGap: 0.6
+  range: 3
+  move: 6
+  armor: 0
+  useTable: 1
+  table: []
 --- !u!1 &261906233
 GameObject:
   m_ObjectHideFlags: 0
@@ -362,7 +394,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 456467291}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 1.58
   m_Speed: 1316.4
   m_Acceleration: 8
   avoidancePriority: 50
@@ -388,21 +420,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   role: 0
-  knifeDetectTiles: 20
+  knifeDetectTiles: 6
   gunDetectTiles: 99
-  knifeStopDistance: 0.03
+  knifeStopDistance: 64.79
   gunStopDistance: 6
   knifeSpeed: 2007
   gunSpeed: 6
   knifeTurn: 720
   gunTurn: 540
-  repathEpsilon: 0
-  minSetDestInterval: 0
+  repathEpsilon: 0.4
+  minSetDestInterval: 0.08
   agentRadius: 0.25
   animator: {fileID: 456467307}
   runBool: Running
   attackTrigger: Attack
-  thinkInterval: 0
+  thinkInterval: 0.1
+  attackGap: 0.6
+  drawGizmos: 1
+  gizAttack: {r: 1, g: 0.3, b: 0, a: 0.8}
+  gizStop: {r: 0, g: 1, b: 0.2, a: 0.8}
+  gizDetect: {r: 0, g: 0.6, b: 1, a: 0.6}
+  gizPath: {r: 0.2, g: 1, b: 0.2, a: 0.9}
+  gizTarget: {r: 1, g: 1, b: 0, a: 0.9}
 --- !u!114 &456467304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -420,6 +459,31 @@ Animator:
   m_CorrespondingSourceObject: {fileID: 95248674633603050, guid: fa8e04c3445c9ea4f9ab79a137c55ed4, type: 3}
   m_PrefabInstance: {fileID: 730806358}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &456467310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 456467291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4b218983ce2d3d48bc014f46218f25f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unit: {fileID: 0}
+  typeName: 
+  level: 1
+  team: 0
+  hpMax: 100
+  hp: 100
+  dmg: 10
+  atkGap: 0.6
+  range: 3
+  move: 6
+  armor: 0
+  useTable: 1
+  table: []
 --- !u!1 &456667991
 GameObject:
   m_ObjectHideFlags: 0
@@ -508,7 +572,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 459472659}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 1.58
   m_Speed: 1316.4
   m_Acceleration: 8
   avoidancePriority: 50
@@ -546,21 +610,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   role: 0
-  knifeDetectTiles: 20
+  knifeDetectTiles: 6
   gunDetectTiles: 99
-  knifeStopDistance: 0.03
+  knifeStopDistance: 64.79
   gunStopDistance: 6
   knifeSpeed: 2007
   gunSpeed: 6
   knifeTurn: 720
   gunTurn: 540
-  repathEpsilon: 0
-  minSetDestInterval: 0
+  repathEpsilon: 0.4
+  minSetDestInterval: 0.08
   agentRadius: 0.25
   animator: {fileID: 459472676}
   runBool: Running
   attackTrigger: Attack
-  thinkInterval: 0
+  thinkInterval: 0.1
+  attackGap: 0.6
+  drawGizmos: 1
+  gizAttack: {r: 1, g: 0.3, b: 0, a: 0.8}
+  gizStop: {r: 0, g: 1, b: 0.2, a: 0.8}
+  gizDetect: {r: 0, g: 0.6, b: 1, a: 0.6}
+  gizPath: {r: 0.2, g: 1, b: 0.2, a: 0.9}
+  gizTarget: {r: 1, g: 1, b: 0, a: 0.9}
 --- !u!114 &459472673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -578,6 +649,31 @@ Animator:
   m_CorrespondingSourceObject: {fileID: 95948910325150096, guid: 7b7bf2e1f6ce93a4d85da5f7adbd6cfb, type: 3}
   m_PrefabInstance: {fileID: 1047611840}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &459472679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 459472659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4b218983ce2d3d48bc014f46218f25f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unit: {fileID: 0}
+  typeName: 
+  level: 1
+  team: 0
+  hpMax: 100
+  hp: 100
+  dmg: 10
+  atkGap: 0.6
+  range: 3
+  move: 6
+  armor: 0
+  useTable: 1
+  table: []
 --- !u!1 &515034309 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1013868485910650, guid: ccabe62de76e6c74f8dacd0e14a950b1, type: 3}
@@ -597,18 +693,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c4e12c8494b1f2a448bf1288e071c202, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &515034315
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 515034309}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd876cd6ce7a702428bd79f59e789402, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &515034316
@@ -659,7 +743,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   role: 1
-  knifeDetectTiles: 4
+  knifeDetectTiles: 6
   gunDetectTiles: 99
   knifeStopDistance: 0.7
   gunStopDistance: 6
@@ -673,7 +757,14 @@ MonoBehaviour:
   animator: {fileID: 0}
   runBool: Running
   attackTrigger: Attack
-  thinkInterval: 0.2
+  thinkInterval: 0.1
+  attackGap: 0.6
+  drawGizmos: 1
+  gizAttack: {r: 1, g: 0.3, b: 0, a: 0.8}
+  gizStop: {r: 0, g: 1, b: 0.2, a: 0.8}
+  gizDetect: {r: 0, g: 0.6, b: 1, a: 0.6}
+  gizPath: {r: 0.2, g: 1, b: 0.2, a: 0.9}
+  gizTarget: {r: 1, g: 1, b: 0, a: 0.9}
 --- !u!114 &515034322
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -686,6 +777,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26907c8330474644999c848386f3ab5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &515034326
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 515034309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4b218983ce2d3d48bc014f46218f25f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unit: {fileID: 0}
+  typeName: 
+  level: 1
+  team: 0
+  hpMax: 100
+  hp: 100
+  dmg: 10
+  atkGap: 0.6
+  range: 3
+  move: 6
+  armor: 0
+  useTable: 1
+  table: []
 --- !u!1 &571080057
 GameObject:
   m_ObjectHideFlags: 0
@@ -1069,6 +1185,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1737803250786393572, guid: 39783929f6218c84a9d6a7a39f34eacb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1567124727}
+    - targetCorrespondingSourceObject: {fileID: 1737803250786393572, guid: 39783929f6218c84a9d6a7a39f34eacb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1567124731}
   m_SourcePrefab: {fileID: 100100000, guid: 39783929f6218c84a9d6a7a39f34eacb, type: 3}
 --- !u!1001 &730806358
 PrefabInstance:
@@ -1154,6 +1273,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1356740152336344, guid: fa8e04c3445c9ea4f9ab79a137c55ed4, type: 3}
       insertIndex: -1
       addedObject: {fileID: 456467304}
+    - targetCorrespondingSourceObject: {fileID: 1356740152336344, guid: fa8e04c3445c9ea4f9ab79a137c55ed4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 456467310}
   m_SourcePrefab: {fileID: 100100000, guid: fa8e04c3445c9ea4f9ab79a137c55ed4, type: 3}
 --- !u!1 &753570698
 GameObject:
@@ -1694,9 +1816,6 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1013868485910650, guid: ccabe62de76e6c74f8dacd0e14a950b1, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 515034315}
-    - targetCorrespondingSourceObject: {fileID: 1013868485910650, guid: ccabe62de76e6c74f8dacd0e14a950b1, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 515034316}
     - targetCorrespondingSourceObject: {fileID: 1013868485910650, guid: ccabe62de76e6c74f8dacd0e14a950b1, type: 3}
       insertIndex: -1
@@ -1707,6 +1826,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1013868485910650, guid: ccabe62de76e6c74f8dacd0e14a950b1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 515034322}
+    - targetCorrespondingSourceObject: {fileID: 1013868485910650, guid: ccabe62de76e6c74f8dacd0e14a950b1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 515034326}
   m_SourcePrefab: {fileID: 100100000, guid: ccabe62de76e6c74f8dacd0e14a950b1, type: 3}
 --- !u!1 &1039677582
 GameObject:
@@ -1844,6 +1966,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1380096154138096, guid: 7b7bf2e1f6ce93a4d85da5f7adbd6cfb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 459472673}
+    - targetCorrespondingSourceObject: {fileID: 1380096154138096, guid: 7b7bf2e1f6ce93a4d85da5f7adbd6cfb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 459472679}
   m_SourcePrefab: {fileID: 100100000, guid: 7b7bf2e1f6ce93a4d85da5f7adbd6cfb, type: 3}
 --- !u!1 &1079297814
 GameObject:
@@ -1924,7 +2049,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   botLevelPrefabs:
   - {fileID: 1308446548}
-  - {fileID: 459472659}
   autoSpawnOnStart: 1
   defaultBoard: 1
   spawnRows: 3
@@ -2275,7 +2399,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 1308446548}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 1.58
   m_Speed: 1316.4
   m_Acceleration: 8
   avoidancePriority: 50
@@ -2301,21 +2425,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   role: 0
-  knifeDetectTiles: 20
+  knifeDetectTiles: 6
   gunDetectTiles: 99
-  knifeStopDistance: 0.03
+  knifeStopDistance: 600.3
   gunStopDistance: 6
   knifeSpeed: 2007
   gunSpeed: 6
   knifeTurn: 720
   gunTurn: 540
-  repathEpsilon: 0
-  minSetDestInterval: 0
+  repathEpsilon: 0.4
+  minSetDestInterval: 0.08
   agentRadius: 0.25
   animator: {fileID: 1308446565}
   runBool: Running
   attackTrigger: Attack
-  thinkInterval: 0
+  thinkInterval: 0.1
+  attackGap: 0.6
+  drawGizmos: 1
+  gizAttack: {r: 1, g: 0.3, b: 0, a: 0.8}
+  gizStop: {r: 0.8396226, g: 0.027723404, b: 0.73490256, a: 0.8}
+  gizDetect: {r: 0, g: 0.6, b: 1, a: 0.6}
+  gizPath: {r: 0.2, g: 1, b: 0.2, a: 0.9}
+  gizTarget: {r: 1, g: 1, b: 0, a: 0.9}
 --- !u!114 &1308446561
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2333,6 +2464,42 @@ Animator:
   m_CorrespondingSourceObject: {fileID: 95870132982163462, guid: e7812492f5665834fa1945d0c1dabce7, type: 3}
   m_PrefabInstance: {fileID: 1829890391}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1308446566 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3471846879990924323, guid: e7812492f5665834fa1945d0c1dabce7, type: 3}
+  m_PrefabInstance: {fileID: 1829890391}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1308446548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4e12c8494b1f2a448bf1288e071c202, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1308446569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1308446548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4b218983ce2d3d48bc014f46218f25f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unit: {fileID: 1308446566}
+  typeName: Peon
+  level: 1
+  team: 1
+  hpMax: 20
+  hp: 20
+  dmg: 3
+  atkGap: 0.54
+  range: 3
+  move: 6
+  armor: 0
+  useTable: 0
+  table: []
 --- !u!1 &1390580075
 GameObject:
   m_ObjectHideFlags: 0
@@ -2473,6 +2640,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1325391217176174, guid: 0f608abc8e090b449b1c9742ffc04674, type: 3}
       insertIndex: -1
       addedObject: {fileID: 245847642}
+    - targetCorrespondingSourceObject: {fileID: 1325391217176174, guid: 0f608abc8e090b449b1c9742ffc04674, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 245847646}
   m_SourcePrefab: {fileID: 100100000, guid: 0f608abc8e090b449b1c9742ffc04674, type: 3}
 --- !u!1 &1450697942
 GameObject:
@@ -2673,6 +2843,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1434741602359590, guid: 0009ef58799e11645bb3c52c604bedac, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1981795631}
+    - targetCorrespondingSourceObject: {fileID: 1434741602359590, guid: 0009ef58799e11645bb3c52c604bedac, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1981795635}
   m_SourcePrefab: {fileID: 100100000, guid: 0009ef58799e11645bb3c52c604bedac, type: 3}
 --- !u!1 &1567124714 stripped
 GameObject:
@@ -2755,7 +2928,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   role: 1
-  knifeDetectTiles: 4
+  knifeDetectTiles: 6
   gunDetectTiles: 99
   knifeStopDistance: 0.7
   gunStopDistance: 6
@@ -2769,7 +2942,14 @@ MonoBehaviour:
   animator: {fileID: 0}
   runBool: Running
   attackTrigger: Attack
-  thinkInterval: 0.2
+  thinkInterval: 0.1
+  attackGap: 0.6
+  drawGizmos: 1
+  gizAttack: {r: 1, g: 0.3, b: 0, a: 0.8}
+  gizStop: {r: 0, g: 1, b: 0.2, a: 0.8}
+  gizDetect: {r: 0, g: 0.6, b: 1, a: 0.6}
+  gizPath: {r: 0.2, g: 1, b: 0.2, a: 0.9}
+  gizTarget: {r: 1, g: 1, b: 0, a: 0.9}
 --- !u!114 &1567124727
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2782,6 +2962,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26907c8330474644999c848386f3ab5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1567124731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1567124714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4b218983ce2d3d48bc014f46218f25f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unit: {fileID: 0}
+  typeName: 
+  level: 1
+  team: 0
+  hpMax: 100
+  hp: 100
+  dmg: 10
+  atkGap: 0.6
+  range: 3
+  move: 6
+  armor: 0
+  useTable: 1
+  table: []
 --- !u!1 &1570413993
 GameObject:
   m_ObjectHideFlags: 0
@@ -2946,7 +3151,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 1747630175}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 1.58
   m_Speed: 1316.4
   m_Acceleration: 8
   avoidancePriority: 50
@@ -2972,22 +3177,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   role: 0
-  knifeDetectTiles: 20
+  knifeDetectTiles: 6
   gunDetectTiles: 99
-  knifeStopDistance: 0.03
+  knifeStopDistance: 600.3
   gunStopDistance: 6
   knifeSpeed: 2007
   gunSpeed: 6
   knifeTurn: 720
   gunTurn: 540
-  repathEpsilon: 0
-  minSetDestInterval: 0
+  repathEpsilon: 0.4
+  minSetDestInterval: 0.08
   agentRadius: 0.25
   animator: {fileID: 1747630194}
   runBool: Running
   attackTrigger: Attack
-  thinkInterval: 0
---- !u!114 &1747630191
+  thinkInterval: 0.1
+  attackGap: 0.6
+  drawGizmos: 1
+  gizAttack: {r: 1, g: 0.3, b: 0, a: 0.8}
+  gizStop: {r: 0, g: 1, b: 0.2, a: 0.8}
+  gizDetect: {r: 0, g: 0.6, b: 1, a: 0.6}
+  gizPath: {r: 0.2, g: 1, b: 0.2, a: 0.9}
+  gizTarget: {r: 1, g: 1, b: 0, a: 0.9}
+--- !u!95 &1747630194 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 6083923207428227415, guid: b549a21593654c54b8bb897ccf915a4b, type: 3}
+  m_PrefabInstance: {fileID: 1878851773}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1747630197
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2996,14 +3213,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 1747630175}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26907c8330474644999c848386f3ab5e, type: 3}
+  m_Script: {fileID: 11500000, guid: c4b218983ce2d3d48bc014f46218f25f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!95 &1747630194 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 6083923207428227415, guid: b549a21593654c54b8bb897ccf915a4b, type: 3}
-  m_PrefabInstance: {fileID: 1878851773}
-  m_PrefabAsset: {fileID: 0}
+  unit: {fileID: 1747630176}
+  typeName: Peon
+  level: 1
+  team: 0
+  hpMax: 20
+  hp: 20
+  dmg: 3
+  atkGap: 0.54
+  range: 3
+  move: 6
+  armor: 0
+  useTable: 0
+  table: []
 --- !u!1 &1814510088
 GameObject:
   m_ObjectHideFlags: 0
@@ -3147,6 +3372,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1499860195161020, guid: e7812492f5665834fa1945d0c1dabce7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1308446561}
+    - targetCorrespondingSourceObject: {fileID: 1499860195161020, guid: e7812492f5665834fa1945d0c1dabce7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1308446569}
   m_SourcePrefab: {fileID: 100100000, guid: e7812492f5665834fa1945d0c1dabce7, type: 3}
 --- !u!1001 &1878851773
 PrefabInstance:
@@ -3174,11 +3402,11 @@ PrefabInstance:
       objectReference: {fileID: 892392521}
     - target: {fileID: 5672966386279907001, guid: b549a21593654c54b8bb897ccf915a4b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -864
+      value: -355
       objectReference: {fileID: 0}
     - target: {fileID: 5672966386279907001, guid: b549a21593654c54b8bb897ccf915a4b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -8066.4365
+      value: -8049
       objectReference: {fileID: 0}
     - target: {fileID: 5672966386279907001, guid: b549a21593654c54b8bb897ccf915a4b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3234,7 +3462,7 @@ PrefabInstance:
       addedObject: {fileID: 1747630189}
     - targetCorrespondingSourceObject: {fileID: 287792982782746344, guid: b549a21593654c54b8bb897ccf915a4b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1747630191}
+      addedObject: {fileID: 1747630197}
   m_SourcePrefab: {fileID: 100100000, guid: b549a21593654c54b8bb897ccf915a4b, type: 3}
 --- !u!1 &1981795618 stripped
 GameObject:
@@ -3317,7 +3545,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   role: 1
-  knifeDetectTiles: 4
+  knifeDetectTiles: 6
   gunDetectTiles: 99
   knifeStopDistance: 0.7
   gunStopDistance: 6
@@ -3331,7 +3559,14 @@ MonoBehaviour:
   animator: {fileID: 0}
   runBool: Running
   attackTrigger: Attack
-  thinkInterval: 0.2
+  thinkInterval: 0.1
+  attackGap: 0.6
+  drawGizmos: 1
+  gizAttack: {r: 1, g: 0.3, b: 0, a: 0.8}
+  gizStop: {r: 0, g: 1, b: 0.2, a: 0.8}
+  gizDetect: {r: 0, g: 0.6, b: 1, a: 0.6}
+  gizPath: {r: 0.2, g: 1, b: 0.2, a: 0.9}
+  gizTarget: {r: 1, g: 1, b: 0, a: 0.9}
 --- !u!114 &1981795631
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3344,6 +3579,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26907c8330474644999c848386f3ab5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1981795635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1981795618}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4b218983ce2d3d48bc014f46218f25f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unit: {fileID: 0}
+  typeName: 
+  level: 1
+  team: 0
+  hpMax: 100
+  hp: 100
+  dmg: 10
+  atkGap: 0.6
+  range: 3
+  move: 6
+  armor: 0
+  useTable: 1
+  table: []
 --- !u!1 &2033103097
 GameObject:
   m_ObjectHideFlags: 0

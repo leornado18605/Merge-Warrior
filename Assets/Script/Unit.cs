@@ -15,6 +15,8 @@ public class Unit : MonoBehaviour
     private bool mergeLock = false;
     [SerializeField] private float defaultMergeLockSeconds = 0.25f;
 
+    [SerializeField] public UnitCore core;
+        
     public void Initialize(string unitType, int level, GridManager gridManager, GridManager.Board board, int row, int col)
     {
         this.unitType = unitType;

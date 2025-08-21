@@ -26,6 +26,7 @@ public class UnitManager : MonoBehaviour
 
     public void PlaceKnife()
     {
+
         var board = GridManager.Board.Board1;
 
         for (int row = gridManager.Rows - 1; row >= 0; row--)
@@ -38,12 +39,13 @@ public class UnitManager : MonoBehaviour
                 Vector3 worldPos = gridManager.GridToWorldPosition(board, row, col, true);
 
                 GameObject knife = PoolManager.Spawn(knifePrefab, worldPos, Quaternion.identity, gridManager.transform);
+                var u = knife.GetComponent<Unit>();
                 knife.SetActive(false);
                 
                 knife.GetComponent<Unit>().Initialize("Knife", 1, gridManager, board, row, col);
 
                 gridManager.SetCellOccupied(board, row, col, knife);
-
+                GameManager.Instance.HookUnit(u);
                 var team = knife.GetComponent<UnitTeam>();
                 if (team == null) team = knife.AddComponent<UnitTeam>();
                 team.team = Team.Player;
@@ -70,12 +72,13 @@ public class UnitManager : MonoBehaviour
                 Vector3 worldPos = gridManager.GridToWorldPosition(board, row, col, true);
 
                 GameObject gun = PoolManager.Spawn(gunPrefab, worldPos, Quaternion.identity, gridManager.transform);
+                var u = gun.GetComponent<Unit>();
                 gun.SetActive(false);
 
                 gun.GetComponent<Unit>().Initialize("Gun", 1, gridManager, board, row, col);
 
                 gridManager.SetCellOccupied(board, row, col, gun);
-
+                GameManager.Instance.HookUnit(u);
                 var team = gun.GetComponent<UnitTeam>();
                 if (team == null) team = gun.AddComponent<UnitTeam>();
                 team.team = Team.Player;
