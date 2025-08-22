@@ -156,9 +156,9 @@ public class BotManager : MonoBehaviour
         team.team = Team.Enemy;
 
         bot.tag = "Enemy";
-        
+
         var core = bot.GetComponent<UnitCore>();
-        if(core)
+        if (core)
             core.team = Team.Enemy;
     }
 

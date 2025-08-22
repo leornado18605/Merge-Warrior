@@ -762,7 +762,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -803,6 +803,7 @@ MonoBehaviour:
   agent: {fileID: 173204895374376490}
   anim: {fileID: 7675462057095777333}
   drag: {fileID: 3172114519239734152}
+  gun: {fileID: 287298892389417415}
 --- !u!114 &4367546410120509625
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -872,7 +873,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8463618596152674631}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bc597fda212e77c4b94fa7732fb3ce1a, type: 3}
   m_Name: 
@@ -889,7 +890,7 @@ MonoBehaviour:
   projectilePrefab: {fileID: 872808010744420583, guid: 77f1e7176fcc23b4885d851bb41aa89c, type: 3}
   firePoint: {fileID: 8441797563155329434}
   projectileSpeed: 2243
-  projectileLife: 2.5
+  projectileLife: 3.04
 --- !u!1 &8587113674407432762
 GameObject:
   m_ObjectHideFlags: 0

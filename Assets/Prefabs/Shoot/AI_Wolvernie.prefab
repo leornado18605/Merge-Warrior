@@ -368,9 +368,9 @@ GameObject:
   - component: {fileID: 2186310684082314402}
   - component: {fileID: 2512795415608996291}
   - component: {fileID: 6397041278680328080}
-  - component: {fileID: 4518397901076510799}
   - component: {fileID: 8789019260998539835}
   - component: {fileID: 422036811025382282}
+  - component: {fileID: 8532888112423784287}
   m_Layer: 7
   m_Name: AI_Wolvernie
   m_TagString: Enemy
@@ -386,7 +386,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4830574070971071307}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -1783, y: -8066.4365, z: -9308.818}
   m_LocalScale: {x: 300, y: 300, z: 300}
   m_ConstrainProportionsScale: 0
@@ -467,11 +467,12 @@ MonoBehaviour:
   row: 0
   col: 0
   defaultMergeLockSeconds: 0.25
-  core: {fileID: 0}
+  core: {fileID: 422036811025382282}
   targeting: {fileID: 0}
-  agent: {fileID: 0}
-  anim: {fileID: 0}
-  drag: {fileID: 0}
+  agent: {fileID: 8789019260998539835}
+  anim: {fileID: 2707530723347826691}
+  drag: {fileID: 2186310684082314402}
+  gun: {fileID: 8532888112423784287}
 --- !u!114 &6397041278680328080
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -485,41 +486,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   team: 1
---- !u!114 &4518397901076510799
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4830574070971071307}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97665a52555aa604d9e033116356823b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  role: 1
-  knifeDetectTiles: 6
-  gunDetectTiles: 99
-  knifeStopDistance: 0.7
-  gunStopDistance: 6
-  knifeSpeed: 101.01
-  gunSpeed: 6
-  knifeTurn: 720
-  gunTurn: 540
-  minSetDestInterval: 0.08
-  agentRadius: 0.25
-  animator: {fileID: 0}
-  runBool: Running
-  attackTrigger: Attack
-  thinkInterval: 0.1
-  attackGap: 0.6
-  selfCore: {fileID: 0}
-  drawGizmos: 1
-  gizAttack: {r: 1, g: 0.3, b: 0, a: 0.8}
-  gizStop: {r: 0, g: 1, b: 0.2, a: 0.8}
-  gizDetect: {r: 0, g: 0.6, b: 1, a: 0.6}
-  gizPath: {r: 0.2, g: 1, b: 0.2, a: 0.9}
-  gizTarget: {r: 1, g: 1, b: 0, a: 0.9}
 --- !u!195 &8789019260998539835
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -554,12 +520,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4b218983ce2d3d48bc014f46218f25f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unit: {fileID: 0}
-  typeName: 
+  unit: {fileID: 2512795415608996291}
+  typeName: Gun
   level: 1
-  team: 0
-  hpMax: 100
-  hp: 100
+  team: 1
+  hpMax: 24
+  hp: 24
   dmg: 10
   atkGap: 0.6
   range: 3
@@ -567,8 +533,33 @@ MonoBehaviour:
   armor: 0
   useTable: 1
   table: []
-  animator: {fileID: 0}
+  animator: {fileID: 2707530723347826691}
   dieTrigger: Die
+--- !u!114 &8532888112423784287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4830574070971071307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc597fda212e77c4b94fa7732fb3ce1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  self: {fileID: 2512795415608996291}
+  core: {fileID: 422036811025382282}
+  agent: {fileID: 8789019260998539835}
+  anim: {fileID: 2707530723347826691}
+  think: 0.1
+  attackGap: 1.89
+  fireDelay: 0.81
+  stopDist: 6
+  turnSpeed: 540
+  projectilePrefab: {fileID: 2609906664744802527, guid: c518638a7d46e3b478ef2c1e06ce167a, type: 3}
+  firePoint: {fileID: 609532992220090799}
+  projectileSpeed: 2258.3
+  projectileLife: 3
 --- !u!1 &4993227482166693046
 GameObject:
   m_ObjectHideFlags: 0

@@ -1131,6 +1131,7 @@ MonoBehaviour:
   agent: {fileID: 5433370909141634876}
   anim: {fileID: 6474447679947078632}
   drag: {fileID: 2457825504803916630}
+  gun: {fileID: 0}
 --- !u!114 &1233744641705634937
 MonoBehaviour:
   m_ObjectHideFlags: 0
