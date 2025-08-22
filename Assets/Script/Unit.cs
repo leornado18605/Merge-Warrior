@@ -23,6 +23,7 @@ public class Unit : MonoBehaviour
     [SerializeField] public Animator anim;
     [SerializeField] public DraggableUnit drag;
 
+
     public void Initialize(string unitType, int level, GridManager gridManager, GridManager.Board board, int row, int col)
     {
         this.unitType = unitType;

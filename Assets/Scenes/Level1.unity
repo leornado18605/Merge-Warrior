@@ -934,7 +934,7 @@ MonoBehaviour:
   defaultBoard: 1
   spawnRows: 3
   spawnCols: 5
-  spawnLimit: 4
+  spawnLimit: 21
   disableDragForBots: 1
   modelYawOffset: 0
   rangedNameKeyword: Knife
