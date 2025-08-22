@@ -702,6 +702,7 @@ GameObject:
   - component: {fileID: 173204895374376490}
   - component: {fileID: 8258061608690403127}
   - component: {fileID: 287298892389417415}
+  - component: {fileID: 9152939171673047095}
   m_Layer: 6
   m_Name: Player_Rflieman
   m_TagString: Player
@@ -781,6 +782,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unit: {fileID: 2900766751047485907}
+  tileLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  hoverColor: {r: 0.9, g: 0.8, b: 0.1, a: 1}
+  raycastMaxDist: 200
 --- !u!114 &2900766751047485907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -826,7 +832,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 8463618596152674631}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 0.12
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -891,6 +897,25 @@ MonoBehaviour:
   firePoint: {fileID: 8441797563155329434}
   projectileSpeed: 2243
   projectileLife: 3.04
+--- !u!114 &9152939171673047095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8463618596152674631}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c462c96cc723bf40905e961e4a9e55d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unit: {fileID: 2900766751047485907}
+  agent: {fileID: 173204895374376490}
+  allyRadius: 0.8
+  unitLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  normalAvoidance: 4
 --- !u!1 &8587113674407432762
 GameObject:
   m_ObjectHideFlags: 0

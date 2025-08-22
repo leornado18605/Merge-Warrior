@@ -41,7 +41,6 @@ public sealed class GridManager : MonoBehaviour
     // Origins: world position of tile [0,0] for each board
     private Vector3 board1Origin;
     private Vector3 board2Origin;
-
     // Public read-only accessors used by other scripts
     public int Rows => rows;
     public int Cols => cols;
@@ -515,6 +514,5 @@ public sealed class GridManager : MonoBehaviour
         else return lockBoard2Input;
     }
     #endregion
-
 
 }

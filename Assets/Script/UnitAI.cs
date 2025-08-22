@@ -51,6 +51,11 @@ public class UnitTargeting : MonoBehaviour
     public Color gizPath = new(0.2f, 1f, 0.2f, 0.9f);
     public Color gizTarget = new(1f, 1f, 0f, 0.9f);
 
+    [Header("Agent Avoidance")]
+    public bool disableAgentAvoidance = true;                  
+    public ObstacleAvoidanceType avoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
+    [Range(0, 99)] public int avoidancePriority = 50;            
+    [Min(0.2f)] public float minSafeRadius = 0.25f;
     #endregion
     // ─────────────────────────────────────────────────────────────────────────────
     #region Links & State
@@ -173,10 +178,20 @@ public class UnitTargeting : MonoBehaviour
             agent.avoidancePriority = 50;
         }
 
-        agent.stoppingDistance = StopDistance;
         agent.updateRotation = false;
         agent.updatePosition = true;
-        if (agentRadius > 0f) agent.radius = agentRadius;
+
+        agent.stoppingDistance = StopDistance;
+
+        if (agentRadius > 0f) agent.radius = Mathf.Max(agentRadius, minSafeRadius);
+
+        if (disableAgentAvoidance)
+        {
+            agent.obstacleAvoidanceType = avoidanceType; // NoObstacleAvoidance
+            agent.avoidancePriority = avoidancePriority;
+        }
+
+        agent.autoBraking = true;
     }
 
     void SnapToNav()

@@ -14503,7 +14503,7 @@ GameObject:
   - component: {fileID: 325876770553940710}
   - component: {fileID: 258277853330898341}
   - component: {fileID: 8968413005422095630}
-  - component: {fileID: 3793578019275530879}
+  - component: {fileID: -8403976682695471409}
   m_Layer: 0
   m_Name: AI2_Fire
   m_TagString: Untagged
@@ -19387,7 +19387,7 @@ CapsuleCollider:
   m_Height: 6.4551425
   m_Direction: 1
   m_Center: {x: -3.1240113, y: -2.693599, z: 0}
---- !u!114 &3793578019275530879
+--- !u!114 &-8403976682695471409
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

@@ -4914,6 +4914,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   turnSpeed: 720
+  autoFace: 1
+  rotOffsetEuler: {x: 0, y: 0, z: 0}
 --- !u!1 &895257329608629190
 GameObject:
   m_ObjectHideFlags: 0

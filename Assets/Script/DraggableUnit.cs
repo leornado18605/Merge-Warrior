@@ -1,14 +1,18 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.EventSystems; // For IsPointerOverGameObject
+using UnityEngine.EventSystems;
 
 [DisallowMultipleComponent]
 public class DraggableUnit : MonoBehaviour
 {
     [Header("Refs")]
     [SerializeField] private Unit unit;
-
     private GridManager Grid => unit != null ? unit.Grid : null;
+
+    [Header("Highlight (raycast)")]
+    [SerializeField] private LayerMask tileLayer;  
+    [SerializeField] private Color hoverColor = new Color(0.9f, 0.8f, 0.1f, 1f);
+    [SerializeField] private float raycastMaxDist = 200f;
 
     // Drag state
     private bool isDragging = false;
@@ -16,6 +20,9 @@ public class DraggableUnit : MonoBehaviour
     private int originalRow = -1, originalCol = -1;
 
     private NavMeshAgent agent;
+
+    // runtime highlight cache
+    private TileHighlight currentHL = null;
 
     private void Awake()
     {
@@ -26,7 +33,6 @@ public class DraggableUnit : MonoBehaviour
     private void OnMouseDown()
     {
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
-
         if (unit == null || Grid == null) return;
         if (Grid.IsInputLocked(unit.Board)) return;
 
@@ -39,8 +45,9 @@ public class DraggableUnit : MonoBehaviour
             Grid.SetCellOccupied(board, originalRow, originalCol, null);
 
         isDragging = true;
-
         if (agent) agent.updatePosition = false;
+
+        ClearHighlight();
     }
 
     private void OnMouseDrag()
@@ -49,12 +56,33 @@ public class DraggableUnit : MonoBehaviour
 
         Vector3 mousePos = GetMouseWorldPosition();
         transform.position = new Vector3(mousePos.x, originalPosition.y, mousePos.z);
+
+        Ray ray = Camera.main ? Camera.main.ScreenPointToRay(Input.mousePosition) : default;
+        if (Camera.main && Physics.Raycast(ray, out var hit, raycastMaxDist, tileLayer, QueryTriggerInteraction.Ignore))
+        {
+            var hl = hit.collider.GetComponentInParent<TileHighlight>();
+            if (hl != currentHL)
+            {
+                ClearHighlight();
+                if (hl != null)
+                {
+                    currentHL = hl;
+                    currentHL.SetHighlight(true, hoverColor);
+                }
+            }
+        }
+        else
+        {
+            ClearHighlight();
+        }
     }
 
     private void OnMouseUp()
     {
         if (!isDragging) return;
         isDragging = false;
+
+        ClearHighlight();
 
         if (unit == null || Grid == null) { Revert(); return; }
 
@@ -82,6 +110,7 @@ public class DraggableUnit : MonoBehaviour
             SyncToCurrentGridCell();
             return;
         }
+
         if (agent)
         {
             agent.updatePosition = true;
@@ -137,7 +166,6 @@ public class DraggableUnit : MonoBehaviour
     private void SyncAgent(Vector3 worldPos)
     {
         if (agent == null) return;
-
         agent.Warp(worldPos);
         agent.ResetPath();
     }
@@ -152,5 +180,15 @@ public class DraggableUnit : MonoBehaviour
             return ray.GetPoint(enter);
 
         return transform.position;
+    }
+
+    // ───────────────────────── highlight helpers ─────────────────────────
+    private void ClearHighlight()
+    {
+        if (currentHL != null)
+        {
+            currentHL.Clear();
+            currentHL = null;
+        }
     }
 }

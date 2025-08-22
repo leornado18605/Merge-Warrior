@@ -1108,6 +1108,7 @@ GameObject:
   - component: {fileID: 7153016811257447298}
   - component: {fileID: 844758072209990189}
   - component: {fileID: 7515516639167700424}
+  - component: {fileID: -4071881948952390192}
   m_Layer: 6
   m_Name: Player_Millia
   m_TagString: Player
@@ -1187,6 +1188,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unit: {fileID: 8111530134449424566}
+  tileLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  hoverColor: {r: 0.9, g: 0.8, b: 0.1, a: 1}
+  raycastMaxDist: 200
 --- !u!114 &8111530134449424566
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1209,6 +1215,7 @@ MonoBehaviour:
   agent: {fileID: 844758072209990189}
   anim: {fileID: 7680368924380731546}
   drag: {fileID: 1840297659114596891}
+  gun: {fileID: 0}
 --- !u!114 &8149314743692623967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1266,7 +1273,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 6194276688369694687}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 1.58
+  m_Radius: 0.01
   m_Speed: 1316.4
   m_Acceleration: 8
   avoidancePriority: 50
@@ -1306,6 +1313,25 @@ MonoBehaviour:
   table: []
   animator: {fileID: 7680368924380731546}
   dieTrigger: Die
+--- !u!114 &-4071881948952390192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6194276688369694687}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c462c96cc723bf40905e961e4a9e55d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unit: {fileID: 8111530134449424566}
+  agent: {fileID: 844758072209990189}
+  allyRadius: 0.8
+  unitLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  normalAvoidance: 4
 --- !u!1 &6327812600223803392
 GameObject:
   m_ObjectHideFlags: 0

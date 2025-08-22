@@ -178,6 +178,7 @@ GameObject:
   - component: {fileID: 8198030022831108984}
   - component: {fileID: 2246015773284395403}
   - component: {fileID: 1813911944006950378}
+  - component: {fileID: 3244173299680929965}
   m_Layer: 6
   m_Name: Player_Wolvernie
   m_TagString: Player
@@ -257,6 +258,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unit: {fileID: 8706450686235537275}
+  tileLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  hoverColor: {r: 0.9, g: 0.8, b: 0.1, a: 1}
+  raycastMaxDist: 200
 --- !u!114 &8706450686235537275
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -302,7 +308,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 1271512522970441901}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 0.12
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -367,6 +373,25 @@ MonoBehaviour:
   firePoint: {fileID: 3372992723348171211}
   projectileSpeed: 2242
   projectileLife: 2.5
+--- !u!114 &3244173299680929965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1271512522970441901}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c462c96cc723bf40905e961e4a9e55d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unit: {fileID: 8706450686235537275}
+  agent: {fileID: 8198030022831108984}
+  allyRadius: 0.8
+  unitLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  normalAvoidance: 4
 --- !u!1 &1383649037753395227
 GameObject:
   m_ObjectHideFlags: 0
