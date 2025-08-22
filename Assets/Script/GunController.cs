@@ -27,6 +27,8 @@ public class GunController : MonoBehaviour
     [SerializeField] Transform firePoint;
     [SerializeField] float projectileSpeed = 16f;
     [SerializeField] float projectileLife = 2.5f;
+
+    const string LG = "[ENEMY GUN]";
     #endregion
 
     #region State
@@ -49,6 +51,8 @@ public class GunController : MonoBehaviour
         agent.updateRotation = false;
         agent.updatePosition = true;
         loopCo = StartCoroutine(Loop());
+
+
     }
 
     void OnDisable()
@@ -74,8 +78,19 @@ public class GunController : MonoBehaviour
     void Tick()
     {
         if (!Ready()) return;
-        if (!Valid(target)) SetTarget(Reacquire());
-        if (!Valid(target)) { StopMove(); return; }
+
+        if (!Valid(target))
+        {
+            SetTarget(Reacquire());
+            if (!Valid(target))
+            {
+                Debug.Log($"[GunController] {name} cannot find valid target | team={core.team} | tag={self.tag}");
+                StopMove();
+                return;
+            }
+        }
+
+        Debug.Log($"[GunController] {name} has target {target.name} | team={core.team}");
         StopMove();
         TryShoot();
     }
@@ -149,6 +164,7 @@ public class GunController : MonoBehaviour
         anim?.SetTrigger("Attack");
         lastAtk = Time.time;
         StartCoroutine(FireAfterDelay());
+        Debug.Log($"[GunController] {name} TryShoot() | team={core.team} | target={(target ? target.name : "null")}");
     }
 
     IEnumerator FireAfterDelay()
@@ -159,16 +175,41 @@ public class GunController : MonoBehaviour
 
         var go = PoolManager.Spawn(projectilePrefab, firePoint.position, firePoint.rotation, null);
         var proj = go ? go.GetComponent<RangedProjectile>() : null;
-        if (proj) proj.Launch(core.team, core.dmg, target.transform, projectileLife, projectileSpeed);
+        if (proj)
+        {
+            proj.Launch(core.team, core.dmg, target.transform, projectileLife, projectileSpeed);
+        }
     }
     #endregion
 
     #region Validation
     bool Ready()
     {
-        if (!self || !core || !agent || !grid) return false;
+        if (!self) return false; 
+        if (!core) return false; 
+        if (!agent) return false; 
+
+        if (!grid)
+        {
+            grid = self.Grid;
+            if (!grid) 
+                return false;
+        }
+
         if (self.IsMergeLocked()) return false;
-        return agent.isOnNavMesh;
+
+        if (!agent.isOnNavMesh)
+        {
+            SnapToNav();
+            if (!agent.isOnNavMesh) return false;
+        }
+        return true;
     }
     #endregion
+    void SnapToNav()
+    {
+        if (NavMesh.SamplePosition(transform.position, out var hit, 5f, NavMesh.AllAreas))
+            agent.Warp(hit.position);
+    }
+
 }

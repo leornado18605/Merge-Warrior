@@ -66,6 +66,7 @@ public class CombatManager : MonoBehaviour
                 u.anim.SetBool(u.targeting.runBool, true);
             }
         });
+        GameManager.Instance?.SetGunsEnabled(true);
     }
 
     [ContextMenu("End Combat")]
@@ -104,6 +105,7 @@ public class CombatManager : MonoBehaviour
                 u.anim.SetBool(u.targeting.runBool, false);
             }
         });
+        GameManager.Instance?.SetGunsEnabled(false);
     }
 
     void LockInput(bool locked)

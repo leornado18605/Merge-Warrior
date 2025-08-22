@@ -47,6 +47,8 @@ public class GameManager : MonoBehaviour
 
     private Dictionary<string, GameObject[]> prefabMap;
     private readonly Dictionary<UnitCore, Unit> unitMap = new();
+    readonly System.Collections.Generic.List<GunController> guns = new();
+
 
     // ─────────────────────────────────────────────────────────────────────────────
     #region Lifecycle
@@ -84,6 +86,8 @@ public class GameManager : MonoBehaviour
 
         unitMap.Add(u.core, u);
         u.core.onDead += OnDeadCore;
+        if (u.gun)
+            RegisterGun(u.gun);
     }
 
     public void UnhookUnit(Unit u)
@@ -91,6 +95,8 @@ public class GameManager : MonoBehaviour
         if (u == null || u.core == null) return;
         if (!unitMap.ContainsKey(u.core)) return;
 
+
+        if (u.gun) UnregisterGun(u.gun);
         u.core.onDead -= OnDeadCore;
         unitMap.Remove(u.core);
     }
@@ -491,5 +497,21 @@ public class GameManager : MonoBehaviour
                 if (anim && !string.IsNullOrEmpty(winTrigger))
                     anim.SetTrigger(winTrigger);
             }
+    }
+
+    public void RegisterGun(GunController g)
+    {
+        if (g && !guns.Contains(g)) guns.Add(g);
+    }
+
+    public void UnregisterGun(GunController g)
+    {
+        guns.Remove(g);
+    }
+
+    public void SetGunsEnabled(bool on)
+    {
+        for (int i = 0; i < guns.Count; i++)
+            if (guns[i]) guns[i].enabled = on;
     }
 }

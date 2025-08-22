@@ -929,12 +929,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   botLevelPrefabs:
-  - {fileID: 5808349704129935754, guid: 4c5dfa1639f04b94baa9725e854e97c6, type: 3}
+  - {fileID: 7368252900174841059, guid: a87374a2224198045b85cd2e82239b1c, type: 3}
   autoSpawnOnStart: 1
   defaultBoard: 1
   spawnRows: 3
   spawnCols: 5
-  spawnLimit: 21
+  spawnLimit: 5
   disableDragForBots: 1
   modelYawOffset: 0
   rangedNameKeyword: Knife

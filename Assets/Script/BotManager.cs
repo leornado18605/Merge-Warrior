@@ -130,6 +130,10 @@ public class BotManager : MonoBehaviour
 
         var u = bot.GetComponent<Unit>();
         if (u) GameManager.Instance?.HookUnit(u);
+
+        if (u && u.core) u.core.team = Team.Enemy;
+
+        bot.tag = "Enemy";
     }
 
     // ───────────────────────────── Helpers: per-system ─────────────────────────
@@ -152,6 +156,10 @@ public class BotManager : MonoBehaviour
         team.team = Team.Enemy;
 
         bot.tag = "Enemy";
+        
+        var core = bot.GetComponent<UnitCore>();
+        if(core)
+            core.team = Team.Enemy;
     }
 
     private void DisableDragIfNeeded(GameObject bot)

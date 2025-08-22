@@ -46,6 +46,10 @@ public class UnitManager : MonoBehaviour
 
                 gridManager.SetCellOccupied(board, row, col, knife);
                 GameManager.Instance.HookUnit(u);
+
+                var core = u ? u.core : null;
+                if (core) core.team = Team.Player;
+
                 var team = knife.GetComponent<UnitTeam>();
                 if (team == null) team = knife.AddComponent<UnitTeam>();
                 team.team = Team.Player;
@@ -79,6 +83,10 @@ public class UnitManager : MonoBehaviour
 
                 gridManager.SetCellOccupied(board, row, col, gun);
                 GameManager.Instance.HookUnit(u);
+
+                var core = u ? u.core : null;
+                if (core) core.team = Team.Player;
+
                 var team = gun.GetComponent<UnitTeam>();
                 if (team == null) team = gun.AddComponent<UnitTeam>();
                 team.team = Team.Player;

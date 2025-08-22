@@ -857,7 +857,7 @@ MonoBehaviour:
   hpMax: 10
   hp: 10
   dmg: 4
-  atkGap: 1.62
+  atkGap: 2.11
   range: 3
   move: 6
   armor: 0
@@ -882,8 +882,8 @@ MonoBehaviour:
   agent: {fileID: 173204895374376490}
   anim: {fileID: 7675462057095777333}
   think: 0.1
-  attackGap: 1.62
-  fireDelay: 1.61
+  attackGap: 3.07
+  fireDelay: 2.67
   stopDist: 6
   turnSpeed: 540
   projectilePrefab: {fileID: 872808010744420583, guid: 77f1e7176fcc23b4885d851bb41aa89c, type: 3}

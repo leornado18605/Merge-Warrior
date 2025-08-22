@@ -834,6 +834,7 @@ MonoBehaviour:
   agent: {fileID: 8566847527773672754}
   anim: {fileID: 6018145626324105152}
   drag: {fileID: 8218980550595831477}
+  gun: {fileID: 4359972618681718951}
 --- !u!114 &64646323459247002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -888,7 +889,7 @@ MonoBehaviour:
   hpMax: 10
   hp: 10
   dmg: 4
-  atkGap: 1.62
+  atkGap: 2.27
   range: 3
   move: 6
   armor: 0
@@ -903,7 +904,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7368252900174841059}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bc597fda212e77c4b94fa7732fb3ce1a, type: 3}
   m_Name: 
@@ -912,10 +913,10 @@ MonoBehaviour:
   core: {fileID: 1341271358838150365}
   agent: {fileID: 8566847527773672754}
   anim: {fileID: 6018145626324105152}
-  think: 0.1
-  attackGap: 1.63
-  fireDelay: 1.6
-  stopDist: 6
+  think: 0.12
+  attackGap: 2.84
+  fireDelay: 2.07
+  stopDist: 6.6
   turnSpeed: 540
   projectilePrefab: {fileID: 2609906664744802527, guid: 976b67241a48ca94aadf0523d856247f, type: 3}
   firePoint: {fileID: 1112483954788543515}
