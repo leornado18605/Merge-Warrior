@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Unit : MonoBehaviour
 {
@@ -16,7 +17,12 @@ public class Unit : MonoBehaviour
     [SerializeField] private float defaultMergeLockSeconds = 0.25f;
 
     [SerializeField] public UnitCore core;
-        
+
+    [SerializeField] public UnitTargeting targeting;
+    [SerializeField] public NavMeshAgent agent;
+    [SerializeField] public Animator anim;
+    [SerializeField] public DraggableUnit drag;
+
     public void Initialize(string unitType, int level, GridManager gridManager, GridManager.Board board, int row, int col)
     {
         this.unitType = unitType;

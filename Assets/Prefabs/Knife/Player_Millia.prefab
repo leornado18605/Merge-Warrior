@@ -1199,12 +1199,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4e12c8494b1f2a448bf1288e071c202, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unitType: 
-  level: 0
+  unitType: Knife
+  level: 1
   row: 0
   col: 0
   defaultMergeLockSeconds: 0.25
-  core: {fileID: 0}
+  core: {fileID: 7515516639167700424}
+  targeting: {fileID: 7153016811257447298}
+  agent: {fileID: 844758072209990189}
+  anim: {fileID: 7680368924380731546}
+  drag: {fileID: 1840297659114596891}
 --- !u!114 &8149314743692623967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1233,7 +1237,7 @@ MonoBehaviour:
   role: 0
   knifeDetectTiles: 6
   gunDetectTiles: 99
-  knifeStopDistance: 64.79
+  knifeStopDistance: 778
   gunStopDistance: 6
   knifeSpeed: 2007
   gunSpeed: 6
@@ -1246,7 +1250,7 @@ MonoBehaviour:
   attackTrigger: Attack
   thinkInterval: 0.1
   attackGap: 0.6
-  selfCore: {fileID: 0}
+  selfCore: {fileID: 7515516639167700424}
   drawGizmos: 1
   gizAttack: {r: 1, g: 0.3, b: 0, a: 0.8}
   gizStop: {r: 0, g: 1, b: 0.2, a: 0.8}
@@ -1287,19 +1291,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4b218983ce2d3d48bc014f46218f25f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unit: {fileID: 0}
+  unit: {fileID: 8111530134449424566}
   typeName: 
   level: 1
   team: 0
-  hpMax: 100
-  hp: 100
-  dmg: 10
+  hpMax: 47
+  hp: 47
+  dmg: 7
   atkGap: 0.6
   range: 3
   move: 6
   armor: 0
   useTable: 1
   table: []
+  animator: {fileID: 7680368924380731546}
+  dieTrigger: Die
 --- !u!1 &6327812600223803392
 GameObject:
   m_ObjectHideFlags: 0

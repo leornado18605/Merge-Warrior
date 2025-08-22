@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.AI;
 
 public class CombatManager : MonoBehaviour
 {
@@ -8,18 +7,18 @@ public class CombatManager : MonoBehaviour
     public static CombatManager Instance { get; private set; }
 
     [Header("Refs")]
-    [SerializeField] private GridManager grid;
-    [SerializeField] private GameManager game;   
+    [SerializeField] private GridManager grid;     
+    [SerializeField] private GameManager game;     
     [SerializeField] private BotManager bot;       
 
     [Header("Options")]
-    public bool spawnBotsOnFight = false;          
-    public bool disableDragDuringCombat = true;   
-    public bool lockOnlyBoard1 = true;            
+    public bool spawnBotsOnFight = false;
+    public bool disableDragDuringCombat = true;
+    public bool lockOnlyBoard1 = true;
 
     [Header("Nav/AI Defaults")]
-    public bool stopAgentsInPrep = true;           
-    public bool disableTargetingInPrep = true;     
+    public bool stopAgentsInPrep = true;
+    public bool disableTargetingInPrep = true;
 
     public State CurrentState { get; private set; } = State.Prep;
 
@@ -31,11 +30,7 @@ public class CombatManager : MonoBehaviour
 
     void Start()
     {
-        if (!grid) grid = FindAnyObjectByType<GridManager>();
-        if (!game) game = FindAnyObjectByType<GameManager>();
-        if (!bot) bot = FindAnyObjectByType<BotManager>();
-
-        ApplyPrepState(); 
+        ApplyPrepState();
     }
 
     // ───────────────────────── Public API ─────────────────────────
@@ -43,7 +38,6 @@ public class CombatManager : MonoBehaviour
     [ContextMenu("Start Combat")]
     public void StartCombat()
     {
-
         if (CurrentState == State.Combat) return;
         CurrentState = State.Combat;
 
@@ -55,31 +49,21 @@ public class CombatManager : MonoBehaviour
             bot.SpawnFromInspector();
         }
 
-        ForEachUnit((u, go) =>
+        ForEachUnit(u =>
         {
-            var targeting = go.GetComponent<UnitTargeting>();
-            if (targeting)
+            if (u.targeting) u.targeting.enabled = true;
+
+            if (disableDragDuringCombat && u.drag) u.drag.enabled = false;
+
+            if (u.agent)
             {
-                targeting.enabled = true;
+                u.agent.isStopped = false;
+                u.agent.ResetPath();
             }
 
-            var drag = go.GetComponent<DraggableUnit>();
-            if (drag && disableDragDuringCombat)
+            if (u.targeting && u.targeting.role == UnitTargeting.Role.Knife && u.anim && !string.IsNullOrEmpty(u.targeting.runBool))
             {
-                drag.enabled = false;
-            }
-
-            var agent = go.GetComponent<NavMeshAgent>();
-            if (agent)
-            {
-                agent.isStopped = false;
-                agent.ResetPath();
-            }
-
-            var ut = go.GetComponent<UnitTargeting>();
-            if (ut && ut.role == UnitTargeting.Role.Knife && ut.animator && !string.IsNullOrEmpty(ut.runBool))
-            {
-                ut.animator.SetBool(ut.runBool, true);
+                u.anim.SetBool(u.targeting.runBool, true);
             }
         });
     }
@@ -91,6 +75,7 @@ public class CombatManager : MonoBehaviour
         CurrentState = State.Prep;
         ApplyPrepState();
     }
+
     public void ToggleFight()
     {
         if (CurrentState == State.Prep) StartCombat();
@@ -103,26 +88,20 @@ public class CombatManager : MonoBehaviour
     {
         LockInput(false);
 
-        ForEachUnit((u, go) =>
+        ForEachUnit(u =>
         {
-            var targeting = go.GetComponent<UnitTargeting>();
-            if (targeting && disableTargetingInPrep)
-                targeting.enabled = false;
+            if (disableTargetingInPrep && u.targeting) u.targeting.enabled = false;
+            if (u.drag) u.drag.enabled = true;
 
-            var drag = go.GetComponent<DraggableUnit>();
-            if (drag) drag.enabled = true;
-
-            var agent = go.GetComponent<NavMeshAgent>();
-            if (agent && stopAgentsInPrep)
+            if (stopAgentsInPrep && u.agent)
             {
-                agent.isStopped = true;
-                agent.ResetPath();
+                u.agent.isStopped = true;
+                u.agent.ResetPath();
             }
 
-            var ut = go.GetComponent<UnitTargeting>();
-            if (ut && ut.role == UnitTargeting.Role.Knife && ut.animator && !string.IsNullOrEmpty(ut.runBool))
+            if (u.targeting && u.targeting.role == UnitTargeting.Role.Knife && u.anim && !string.IsNullOrEmpty(u.targeting.runBool))
             {
-                ut.animator.SetBool(ut.runBool, false);
+                u.anim.SetBool(u.targeting.runBool, false);
             }
         });
     }
@@ -132,32 +111,32 @@ public class CombatManager : MonoBehaviour
         if (!grid) return;
         if (lockOnlyBoard1)
         {
-            grid.lockBoard1Input = locked; 
+            grid.lockBoard1Input = locked;
         }
         else
         {
             grid.lockBoard1Input = locked;
-            grid.lockBoard2Input = locked;   
+            grid.lockBoard2Input = locked;
         }
     }
 
-    void ForEachUnit(System.Action<Unit, GameObject> action)
+    void ForEachUnit(Action<Unit> action)
     {
-        if (grid == null) return;
+        if (!grid) return;
 
-        void ScanBoard(GridManager.Board b)
+        void Scan(GridManager.Board b)
         {
             for (int r = 0; r < grid.Rows; r++)
+            {
                 for (int c = 0; c < grid.Cols; c++)
                 {
-                    var go = grid.GetOccupant(b, r, c);
-                    if (!go) continue;
-                    var u = go.GetComponent<Unit>();
-                    if (u) action(u, go);
+                    var u = grid.GetOccupantUnit(b, r, c);
+                    if (u != null) action(u);
                 }
+            }
         }
 
-        ScanBoard(GridManager.Board.Board1);
-        ScanBoard(GridManager.Board.Board2);
+        Scan(GridManager.Board.Board1);
+        Scan(GridManager.Board.Board2);
     }
 }

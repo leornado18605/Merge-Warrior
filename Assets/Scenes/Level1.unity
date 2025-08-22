@@ -157,15 +157,18 @@ MonoBehaviour:
   runKey: Running
   dieKey: Die
   runTick: 0.69
+  deadDespawnDelay: 1.51
+  winTrigger: Win
+  endCombatOnWin: 1
   upgradeEntries:
   - unitType: Knife
     levelPrefabs:
     - {fileID: 7946747790403629852, guid: c3848d5171f65c8429d6e73f26d52ac6, type: 3}
-    - {fileID: 5808349704129935754, guid: 4c5dfa1639f04b94baa9725e854e97c6, type: 3}
+    - {fileID: 6194276688369694687, guid: d50ed052893144b49bc406c359e5d09c, type: 3}
   - unitType: Gun
     levelPrefabs:
     - {fileID: 8463618596152674631, guid: 77ae2a035bd3f284f89e76a877f32a50, type: 3}
-    - {fileID: 7368252900174841059, guid: a87374a2224198045b85cd2e82239b1c, type: 3}
+    - {fileID: 1271512522970441901, guid: 02f6bd674d795d247903f6a8bc73b6e3, type: 3}
 --- !u!4 &434615163
 Transform:
   m_ObjectHideFlags: 0
@@ -931,7 +934,7 @@ MonoBehaviour:
   defaultBoard: 1
   spawnRows: 3
   spawnCols: 5
-  spawnLimit: 1
+  spawnLimit: 4
   disableDragForBots: 1
   modelYawOffset: 0
   rangedNameKeyword: Knife

@@ -1127,6 +1127,10 @@ MonoBehaviour:
   col: 3
   defaultMergeLockSeconds: 0.25
   core: {fileID: 5315048244858484303}
+  targeting: {fileID: 6087806675244384448}
+  agent: {fileID: 5433370909141634876}
+  anim: {fileID: 6474447679947078632}
+  drag: {fileID: 2457825504803916630}
 --- !u!114 &1233744641705634937
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1222,6 +1226,8 @@ MonoBehaviour:
   armor: 0
   useTable: 0
   table: []
+  animator: {fileID: 6474447679947078632}
+  dieTrigger: Die
 --- !u!1 &8318281658292244791
 GameObject:
   m_ObjectHideFlags: 0

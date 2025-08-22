@@ -1,9 +1,11 @@
-﻿using System;
+﻿using ObjectPooling;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using ObjectPooling;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -26,6 +28,10 @@ public class GameManager : MonoBehaviour
     [Header("Death")]
     [SerializeField] private float deadDespawnDelay = 1.2f;
 
+    [Header("Win/End")]
+    [SerializeField] private string winTrigger = "Win";   
+    [SerializeField] private bool endCombatOnWin = true; 
+    private bool battleEnded = false;
     [Serializable]
     public class UnitUpgradeEntry
     {
@@ -117,6 +123,7 @@ public class GameManager : MonoBehaviour
         ClearCell(u);
         OnUnitDead?.Invoke(u);
         StartCoroutine(DelayRelease(u.gameObject, deadDespawnDelay));
+        CheckBattleOver();
     }
 
     #endregion
@@ -263,6 +270,13 @@ public class GameManager : MonoBehaviour
         var u = obj.GetComponent<Unit>();
         if (u == null) return;
 
+        //Security Button
+        var es = obj.GetComponentsInChildren<EventSystem>(true);
+        for (int i = 0; i < es.Length; i++) Destroy(es[i].gameObject);
+
+        var raycasters = obj.GetComponentsInChildren<GraphicRaycaster>(true);
+        for (int i = 0; i < raycasters.Length; i++) raycasters[i].enabled = false;
+
         u.Initialize(type, lv, gridManager, b, row, col);
         gridManager.SetCellOccupied(b, row, col, obj);
 
@@ -270,6 +284,17 @@ public class GameManager : MonoBehaviour
 
         HookUnit(u);
         OnUnitMerged?.Invoke(u, row, col);
+
+        EnsureEventSystemExists();
+    }
+
+    private static void EnsureEventSystemExists()
+    {
+        if (UnityEngine.EventSystems.EventSystem.current != null) return;
+
+        var go = new GameObject("EventSystem");
+        go.AddComponent<UnityEngine.EventSystems.EventSystem>();
+        go.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
     }
 
     #endregion
@@ -318,20 +343,37 @@ public class GameManager : MonoBehaviour
         var posA = gridManager.GridToWorldPosition(b, tr, tc, true);
         var posB = gridManager.GridToWorldPosition(b, sr, sc, true);
 
-        posA.y = src.transform.position.y;
-        posB.y = tgt.transform.position.y;
-
         gridManager.SetCellOccupied(b, sr, sc, null);
         gridManager.SetCellOccupied(b, tr, tc, null);
-
-        src.transform.position = posA;
-        tgt.transform.position = posB;
 
         gridManager.SetCellOccupied(b, tr, tc, src);
         gridManager.SetCellOccupied(b, sr, sc, tgt);
 
         su.row = tr; su.col = tc;
         tu.row = sr; tu.col = sc;
+
+        su.UpdateOriginalPosition(posA, tr, tc);
+        tu.UpdateOriginalPosition(posB, sr, sc);
+
+        var sa = src.GetComponent<NavMeshAgent>();
+        var ta = tgt.GetComponent<NavMeshAgent>();
+
+        if (sa != null)
+        {
+            sa.Warp(posA);
+            sa.ResetPath();
+        }
+        if (ta != null)
+        {
+            ta.Warp(posB);
+            ta.ResetPath();
+        }
+
+        var sanim = src.GetComponent<Animator>();
+        if (sanim) sanim.SetBool(runKey, false);
+
+        var tanim = tgt.GetComponent<Animator>();
+        if (tanim) tanim.SetBool(runKey, false);
     }
 
     #endregion
@@ -398,4 +440,56 @@ public class GameManager : MonoBehaviour
     }
 
     #endregion
+
+    private void CheckBattleOver()
+    {
+        if (battleEnded || gridManager == null) return;
+
+        bool alive1 = HasAlive(GridManager.Board.Board1);
+        bool alive2 = HasAlive(GridManager.Board.Board2);
+
+        if (alive1 && alive2) return;                
+        battleEnded = true;
+
+        if (alive1 ^ alive2)                     
+        {
+            var winner = alive1 ? GridManager.Board.Board1 : GridManager.Board.Board2;
+            PlayWinForBoard(winner);
+        }
+
+        if (endCombatOnWin)
+        {
+            var cm = CombatManager.Instance;
+            if (cm != null) cm.EndCombat();
+        }
+    }
+
+    private bool HasAlive(GridManager.Board b)
+    {
+        for (int r = 0; r < gridManager.Rows; r++)
+            for (int c = 0; c < gridManager.Cols; c++)
+            {
+                var go = gridManager.GetOccupant(b, r, c);
+                if (!go) continue;
+
+                var u = go.GetComponent<Unit>();
+                if (u != null && u.core != null && u.core.Alive())
+                    return true;
+            }
+        return false;
+    }
+
+    private void PlayWinForBoard(GridManager.Board b)
+    {
+        for (int r = 0; r < gridManager.Rows; r++)
+            for (int c = 0; c < gridManager.Cols; c++)
+            {
+                var go = gridManager.GetOccupant(b, r, c);
+                if (!go) continue;
+
+                var anim = go.GetComponent<Animator>();
+                if (anim && !string.IsNullOrEmpty(winTrigger))
+                    anim.SetTrigger(winTrigger);
+            }
+    }
 }
