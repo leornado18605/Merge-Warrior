@@ -23,6 +23,9 @@ public class GameManager : MonoBehaviour
     [Header("Run Loop")]
     [SerializeField] private float runTick = 0.1f;
 
+    [Header("Death")]
+    [SerializeField] private float deadDespawnDelay = 1.2f;
+
     [Serializable]
     public class UnitUpgradeEntry
     {
@@ -90,11 +93,30 @@ public class GameManager : MonoBehaviour
     {
         if (!unitMap.TryGetValue(c, out var u)) return;
 
+        var targeting = u.GetComponent<UnitTargeting>();
+        if (targeting) targeting.enabled = false;
+
+        var agent = u.GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (agent)
+        {
+            agent.ResetPath();
+            agent.isStopped = true;
+            agent.updatePosition = true;
+            agent.updateRotation = false;
+            agent.enabled = false;
+        }
+        var rb = u.GetComponent<Rigidbody>();
+        if (rb)
+        {
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.isKinematic = true;
+        }
+
         PlayDieAnim(u);
         ClearCell(u);
         OnUnitDead?.Invoke(u);
-        Debug.Log("OnDeadCore is called");
-        StartCoroutine(DelayRelease(u.gameObject, 1.5f));
+        StartCoroutine(DelayRelease(u.gameObject, deadDespawnDelay));
     }
 
     #endregion

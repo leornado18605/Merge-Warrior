@@ -120,6 +120,7 @@ public class UnitCore : MonoBehaviour
     {
         Debug.Log($"[UnitCore.Die] {name} hp->0");
         hp = 0;
+
         onDead?.Invoke(this);
         
     }

@@ -127,6 +127,9 @@ public class BotManager : MonoBehaviour
         SetupTeam(bot);
         DisableDragIfNeeded(bot);
         SetupNavMesh(bot, gridManager.GridToWorldPosition(board, cell.x, cell.y, true));
+
+        var u = bot.GetComponent<Unit>();
+        if (u) GameManager.Instance?.HookUnit(u);
     }
 
     // ───────────────────────────── Helpers: per-system ─────────────────────────
