@@ -39,6 +39,8 @@ public class DraggableUnit : MonoBehaviour
             Grid.SetCellOccupied(board, originalRow, originalCol, null);
 
         isDragging = true;
+
+        if (agent) agent.updatePosition = false;
     }
 
     private void OnMouseDrag()
@@ -80,7 +82,12 @@ public class DraggableUnit : MonoBehaviour
             SyncToCurrentGridCell();
             return;
         }
-
+        if (agent)
+        {
+            agent.updatePosition = true;
+            agent.Warp(transform.position);
+            agent.ResetPath();
+        }
 
         Revert();
     }

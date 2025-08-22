@@ -8,8 +8,8 @@ public class RangedProjectile : MonoBehaviour, IPoolable
     [SerializeField] Rigidbody rb;
     [SerializeField] LayerMask hitMask = ~0;
     [SerializeField] float turnSpeed = 720f;
-    [SerializeField] bool autoFace = true;          // bật/tắt tự xoay
-    [SerializeField] Vector3 rotOffsetEuler;        // offset góc (yaw/pitch/roll)
+    [SerializeField] bool autoFace = true;         
+    [SerializeField] Vector3 rotOffsetEuler;       
 
     Transform target; Team fromTeam; int dmg;
     float life; float speed; Quaternion RotOff => Quaternion.Euler(rotOffsetEuler);
