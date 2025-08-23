@@ -260,7 +260,7 @@ MonoBehaviour:
   unit: {fileID: 8706450686235537275}
   tileLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   hoverColor: {r: 0.9, g: 0.8, b: 0.1, a: 1}
   raycastMaxDist: 200
 --- !u!114 &8706450686235537275
@@ -369,7 +369,7 @@ MonoBehaviour:
   fireDelay: 0.83
   stopDist: 6
   turnSpeed: 540
-  projectilePrefab: {fileID: 872808010744420583, guid: 20038e8f0052bb94fa66d994516709bb, type: 3}
+  projectilePrefab: {fileID: 872808010744420583, guid: 0bc19aa775724eb40bbe3f08e34a3f6c, type: 3}
   firePoint: {fileID: 3372992723348171211}
   projectileSpeed: 2242
   projectileLife: 2.5

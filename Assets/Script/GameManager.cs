@@ -30,7 +30,10 @@ public class GameManager : MonoBehaviour
 
     [Header("Win/End")]
     [SerializeField] private string winTrigger = "Win";   
-    [SerializeField] private bool endCombatOnWin = true; 
+    [SerializeField] private bool endCombatOnWin = true;
+
+    public event System.Action<Team?> OnBattleEnded;
+
     private bool battleEnded = false;
     [Serializable]
     public class UnitUpgradeEntry
@@ -514,4 +517,6 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < guns.Count; i++)
             if (guns[i]) guns[i].enabled = on;
     }
+
+
 }

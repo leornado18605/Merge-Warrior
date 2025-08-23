@@ -54,11 +54,16 @@ public class DraggableUnit : MonoBehaviour
     {
         if (!isDragging) return;
 
+        // kéo unit theo chuột như cũ
         Vector3 mousePos = GetMouseWorldPosition();
         transform.position = new Vector3(mousePos.x, originalPosition.y, mousePos.z);
 
-        Ray ray = Camera.main ? Camera.main.ScreenPointToRay(Input.mousePosition) : default;
-        if (Camera.main && Physics.Raycast(ray, out var hit, raycastMaxDist, tileLayer, QueryTriggerInteraction.Ignore))
+        // ----- RAYCAST THẲNG -Y TỪ UNIT -----
+        const float castStartOffset = 3f;   // nâng điểm bắn lên một chút
+        Vector3 start = transform.position + Vector3.up * castStartOffset;
+        Ray rayDown = new Ray(start, Vector3.down);
+
+        if (Physics.Raycast(rayDown, out var hit, raycastMaxDist, tileLayer, QueryTriggerInteraction.Ignore))
         {
             var hl = hit.collider.GetComponentInParent<TileHighlight>();
             if (hl != currentHL)
@@ -75,6 +80,8 @@ public class DraggableUnit : MonoBehaviour
         {
             ClearHighlight();
         }
+
+        Debug.DrawRay(start, Vector3.down * 20f, Color.cyan);
     }
 
     private void OnMouseUp()

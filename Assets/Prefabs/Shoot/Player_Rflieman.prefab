@@ -784,7 +784,7 @@ MonoBehaviour:
   unit: {fileID: 2900766751047485907}
   tileLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   hoverColor: {r: 0.9, g: 0.8, b: 0.1, a: 1}
   raycastMaxDist: 200
 --- !u!114 &2900766751047485907
@@ -864,7 +864,7 @@ MonoBehaviour:
   hpMax: 10
   hp: 10
   dmg: 4
-  atkGap: 2.11
+  atkGap: 2.49
   range: 3
   move: 6
   armor: 0
@@ -889,7 +889,7 @@ MonoBehaviour:
   agent: {fileID: 173204895374376490}
   anim: {fileID: 7675462057095777333}
   think: 0.1
-  attackGap: 3.07
+  attackGap: 2.61
   fireDelay: 2.67
   stopDist: 6
   turnSpeed: 540
