@@ -29,9 +29,11 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button noThanksButton;
 
     private int pendingReward;
+    public static UIManager Instance { get; private set; }
 
     private void Awake()
     {
+        Instance = this;
         // Clear old listeners
         if (startFightButton) startFightButton.onClick.RemoveAllListeners();
         if (placeKnifeButton) placeKnifeButton.onClick.RemoveAllListeners();
@@ -41,14 +43,21 @@ public class UIManager : MonoBehaviour
         if (placeKnifeButton) placeKnifeButton.onClick.AddListener(OnPlaceKnifeClicked);
         if (placeGunButton) placeGunButton.onClick.AddListener(OnPlaceGunClicked);
 
-        // Hide result panel lúc đầu
+        if (claimButton) claimButton.onClick.AddListener(OnClaimClicked);
+        if (noThanksButton) noThanksButton.onClick.AddListener(OnNoThanksClicked);
+    }
+
+    public void HideResultPanel()
+    {
         if (resultPanel) resultPanel.SetActive(false);
         if (victoryPrefab) victoryPrefab.SetActive(false);
         if (defeatPrefab) defeatPrefab.SetActive(false);
         if (spinPrefab) spinPrefab.SetActive(false);
+    }
 
-        if (claimButton) claimButton.onClick.AddListener(OnClaimClicked);
-        if (noThanksButton) noThanksButton.onClick.AddListener(OnNoThanksClicked);
+    public void ShowPlacementButtons()
+    {
+        if (buttonsPanel) buttonsPanel.SetActive(true);
     }
 
     // ───────────── Gameplay Buttons ─────────────
@@ -88,37 +97,28 @@ public class UIManager : MonoBehaviour
 
         if (resultPanel) resultPanel.SetActive(true);
 
-        if (victoryPrefab) victoryPrefab.SetActive(false);
-        if (defeatPrefab) defeatPrefab.SetActive(false);
-
-        if (win)
-        {
-            if (victoryPrefab) victoryPrefab.SetActive(true);
-        }
-        else
-        {
-            if (defeatPrefab) defeatPrefab.SetActive(true);
-        }
+        if (victoryPrefab) victoryPrefab.SetActive(win);
+        if (defeatPrefab) defeatPrefab.SetActive(!win);
 
         if (rewardText)
-            rewardText.text = win
-                ? $"YOU EARNED: " +
-                $"{reward} coins"
-                : $"YOU EARNED: " +
-                $"{reward} coins";
+            rewardText.text = $"YOU EARNED:\n{reward} coins"; // chỉ hiện coin kiếm được
     }
 
     private void OnClaimClicked()
     {
-        GameEconomyManager.Instance?.AddCoin(pendingReward);
+        if (GameEconomyManager.Instance != null)
+        {
+            GameEconomyManager.Instance.AddCoin(pendingReward);
+            GameEconomyManager.Instance.UpdateCoinUI();
+        }
 
-        Debug.Log("Claim reward, go next scene!");
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        Debug.Log("Claim reward, go next level!");
+        LevelController.Instance.NextLevel();  // 👈 gọi sang LevelController
     }
 
     private void OnNoThanksClicked()
     {
-        Debug.Log("Replay same level!");
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        Debug.Log("Replay current level!");
+        LevelController.Instance.SetupLevel(LevelController.Instance.currentLevel);
     }
 }

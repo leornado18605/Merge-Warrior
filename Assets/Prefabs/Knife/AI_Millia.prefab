@@ -870,6 +870,10 @@ MonoBehaviour:
   gizDetect: {r: 0, g: 0.6, b: 1, a: 0.6}
   gizPath: {r: 0.2, g: 1, b: 0.2, a: 0.9}
   gizTarget: {r: 1, g: 1, b: 0, a: 0.9}
+  disableAgentAvoidance: 1
+  avoidanceType: 0
+  avoidancePriority: 50
+  minSafeRadius: 0.25
 --- !u!195 &6914771273257116450
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -917,7 +921,7 @@ MonoBehaviour:
   armor: 0
   useTable: 1
   table: []
-  animator: {fileID: 0}
+  animator: {fileID: 7005503940176917017}
   dieTrigger: Die
 --- !u!114 &2452967256558417799
 MonoBehaviour:

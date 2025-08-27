@@ -683,6 +683,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   botManager: {fileID: 1109887454}
   gridManager: {fileID: 892392521}
+  unitManager: {fileID: 904087434}
+  uiManager: {fileID: 1039677583}
   mergeLockSeconds: 0.25
   runKey: Running
   dieKey: Die
@@ -690,7 +692,6 @@ MonoBehaviour:
   deadDespawnDelay: 1.51
   winTrigger: Win
   endCombatOnWin: 1
-  uiManager: {fileID: 1039677583}
   upgradeEntries:
   - unitType: Knife
     levelPrefabs:
@@ -1607,14 +1608,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   botLevelPrefabs:
-  - {fileID: 5808349704129935754, guid: 4c5dfa1639f04b94baa9725e854e97c6, type: 3}
-  - {fileID: 7368252900174841059, guid: a87374a2224198045b85cd2e82239b1c, type: 3}
-  - {fileID: 4830574070971071307, guid: 93ede4dcb3e9df945ad9a90c6ce778e8, type: 3}
+  - {fileID: 5037285563700240808, guid: ee6b3bb8964177f498158db53961ad73, type: 3}
   autoSpawnOnStart: 1
   defaultBoard: 1
   spawnRows: 3
   spawnCols: 5
-  spawnLimit: 3
+  spawnLimit: 1
   disableDragForBots: 1
   modelYawOffset: 0
   rangedNameKeyword: Knife
@@ -2740,7 +2739,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2127179041
 RectTransform:
   m_ObjectHideFlags: 0

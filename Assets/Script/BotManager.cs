@@ -113,7 +113,10 @@ public class BotManager : MonoBehaviour
 
         bot = PoolManager.Spawn(prefab, spawnPos, rot, gridManager.transform);
         if (bot == null) return false;
-
+        if (bot != null)
+        {
+            bot.transform.localScale = Vector3.one * 150f;
+        }
         gridManager.SetCellOccupied(board, cell.x, cell.y, bot);
         return true;
     }

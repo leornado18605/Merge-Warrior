@@ -25,6 +25,9 @@ public class GameEconomyManager : MonoBehaviour
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        Coins = PlayerPrefs.GetInt("PlayerCoins", Coins);
     }
 
     private void Start()
@@ -57,7 +60,7 @@ public class GameEconomyManager : MonoBehaviour
         return true;
     }
 
-    private void UpdateCoinUI()
+    public void UpdateCoinUI()
     {
         if (coinText != null)
             coinText.text = $"Coin: {Coins}";

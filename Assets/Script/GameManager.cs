@@ -12,8 +12,11 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     [Header("Refs")]
-    public BotManager botManager;
-    public GridManager gridManager;
+    [Header("Refs")]
+    [SerializeField] private BotManager botManager;
+    [SerializeField] private GridManager gridManager;
+    [SerializeField] private UnitManager unitManager;   // 👈 thêm
+    [SerializeField] private UIManager uiManager;
 
     [Header("Merge")]
     public float mergeLockSeconds = 0.25f;
@@ -31,9 +34,6 @@ public class GameManager : MonoBehaviour
     [Header("Win/End")]
     [SerializeField] private string winTrigger = "Win";   
     [SerializeField] private bool endCombatOnWin = true;
-
-    [Header("UI")]
-    [SerializeField] private UIManager uiManager;
 
     // CoinManager
     private int damageByPlayer = 0;
@@ -496,8 +496,8 @@ public class GameManager : MonoBehaviour
             uiManager?.ShowResult(false, reward);
         }
 
-        if (reward > 0 && GameEconomyManager.Instance != null)
-            GameEconomyManager.Instance.AddCoin(reward);
+        //if (reward > 0 && GameEconomyManager.Instance != null)
+        //    GameEconomyManager.Instance.AddCoin(reward);
 
         if (endCombatOnWin)
         {
@@ -520,20 +520,6 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    private void PlayWinForBoard(GridManager.Board b)
-    {
-        for (int r = 0; r < gridManager.Rows; r++)
-            for (int c = 0; c < gridManager.Cols; c++)
-            {
-                var go = gridManager.GetOccupant(b, r, c);
-                if (!go) continue;
-
-                var anim = go.GetComponent<Animator>();
-                if (anim && !string.IsNullOrEmpty(winTrigger))
-                    anim.SetTrigger(winTrigger);
-            }
-    }
-
     public void RegisterGun(GunController g)
     {
         if (g && !guns.Contains(g)) guns.Add(g);
@@ -550,5 +536,40 @@ public class GameManager : MonoBehaviour
             if (guns[i]) guns[i].enabled = on;
     }
 
+    public void ResetBattle()
+    {
+        Debug.Log("🔄 ResetBattle called!");
 
+        battleEnded = false;
+        damageByPlayer = 0;
+        damageByEnemy = 0;
+
+        unitMap.Clear();
+        guns.Clear();
+
+        if (gridManager)
+        {
+            gridManager.ClearAllUnits();
+        }
+
+        if (botManager)
+        {
+            botManager.SpawnFromInspector();
+        }
+
+        if (unitManager != null)
+        {
+            unitManager.PlaceKnife();
+            for(int i = 0; i < 3; i++)
+            {
+                unitManager.PlaceGun();
+            }
+        }
+
+        if (uiManager != null)
+        {
+            uiManager.HideResultPanel();
+            uiManager.ShowPlacementButtons();
+        }
+    }
 }

@@ -140,7 +140,7 @@ public sealed class GridManager : MonoBehaviour
         }
     }
 
-    private void SpawnBoards()
+    public void SpawnBoards()
     {
         SpawnSingleBoard(board2Tiles, board2Origin);
         SpawnSingleBoard(board1Tiles, board1Origin);
@@ -419,7 +419,7 @@ public sealed class GridManager : MonoBehaviour
 
     public void ClearAll()
     {
-        ClearBoard(Board.Board1);
+        ClearBoard(Board.Board2);
         ClearBoard(Board.Board2);
     }
 
@@ -514,5 +514,42 @@ public sealed class GridManager : MonoBehaviour
         else return lockBoard2Input;
     }
     #endregion
+
+
+    public void ClearUnitsOnly(Board board)
+    {
+        if (board == Board.Board1)
+        {
+            for (int r = 0; r < rows; r++)
+                for (int c = 0; c < cols; c++)
+                {
+                    if (occupantsB1[r, c] != null)
+                    {
+                        PoolManager.Release(occupantsB1[r, c]); 
+                        occupantsB1[r, c] = null;
+                        occUnitB1[r, c] = null;
+                    }
+                }
+        }
+        else
+        {
+            for (int r = 0; r < rows; r++)
+                for (int c = 0; c < cols; c++)
+                {
+                    if (occupantsB2[r, c] != null)
+                    {
+                        PoolManager.Release(occupantsB2[r, c]);
+                        occupantsB2[r, c] = null;
+                        occUnitB2[r, c] = null;
+                    }
+                }
+        }
+    }
+
+    public void ClearAllUnits()
+    {
+        ClearUnitsOnly(Board.Board1);
+        ClearUnitsOnly(Board.Board2);
+    }
 
 }

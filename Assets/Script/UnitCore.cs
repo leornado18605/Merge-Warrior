@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 
 [Serializable]
@@ -122,7 +122,7 @@ public class UnitCore : MonoBehaviour
         hp = 0;
 
         onDead?.Invoke(this);
-        
+
     }
 
     private void SetManual(int h, int d)

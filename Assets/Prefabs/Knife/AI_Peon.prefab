@@ -678,7 +678,6 @@ GameObject:
   - component: {fileID: 8544620079394364843}
   - component: {fileID: 3459654197576780872}
   - component: {fileID: 8553443340530364894}
-  - component: {fileID: -8020335724912443191}
   m_Layer: 7
   m_Name: AI_Peon
   m_TagString: Enemy
@@ -834,6 +833,10 @@ MonoBehaviour:
   gizDetect: {r: 0, g: 0.6, b: 1, a: 0.6}
   gizPath: {r: 0.2, g: 1, b: 0.2, a: 0.9}
   gizTarget: {r: 1, g: 1, b: 0, a: 0.9}
+  disableAgentAvoidance: 1
+  avoidanceType: 0
+  avoidancePriority: 50
+  minSafeRadius: 0.25
 --- !u!195 &3459654197576780872
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -881,27 +884,8 @@ MonoBehaviour:
   armor: 0
   useTable: 0
   table: []
-  animator: {fileID: 0}
+  animator: {fileID: 4468820813277755961}
   dieTrigger: Die
---- !u!114 &-8020335724912443191
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5808349704129935754}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c462c96cc723bf40905e961e4a9e55d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  unit: {fileID: 4042765928903906058}
-  agent: {fileID: 3459654197576780872}
-  allyRadius: 0.8
-  unitLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  normalAvoidance: 4
 --- !u!1 &6183644258781516674
 GameObject:
   m_ObjectHideFlags: 0
