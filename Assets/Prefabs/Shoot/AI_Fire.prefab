@@ -19402,10 +19402,12 @@ MonoBehaviour:
   rb: {fileID: 258277853330898341}
   hitMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   turnSpeed: 720
   autoFace: 1
   rotOffsetEuler: {x: 0, y: 0, z: 0}
+  loseTargetDespawnDelay: 0.25
+  maxLifetime: 5
 --- !u!1 &3980900472265093399
 GameObject:
   m_ObjectHideFlags: 0

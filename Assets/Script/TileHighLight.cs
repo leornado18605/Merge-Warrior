@@ -4,13 +4,12 @@
 public class TileHighlight : MonoBehaviour
 {
     [Header("Assign explicitly (no GetComponent)")]
-    [SerializeField] private Renderer targetRenderer;   // GÁN SẴN TRONG INSPECTOR
+    [SerializeField] private Renderer targetRenderer;  
 
-    private MaterialPropertyBlock mpb;  // <-- KHÔNG khởi tạo ở đây
+    private MaterialPropertyBlock mpb;  
     private bool isOn;
     private Color lastColor = Color.black;
 
-    // Cho phép gán bằng code khi spawn
     public void Init(Renderer rendererRef)
     {
         targetRenderer = rendererRef;
@@ -29,7 +28,7 @@ public class TileHighlight : MonoBehaviour
             return;
         }
 
-        EnsureMpb();        // <-- tạo MPB đúng chỗ
+        EnsureMpb();       
         PrepareMaterial();
         Apply(Color.black, false);
     }
@@ -41,7 +40,6 @@ public class TileHighlight : MonoBehaviour
 
     private void PrepareMaterial()
     {
-        // Bật keyword emission nếu material hỗ trợ
         if (targetRenderer != null)
             targetRenderer.material.EnableKeyword("_EMISSION");
     }

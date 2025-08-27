@@ -5,12 +5,12 @@ using UnityEngine.AI;
 public class AllyPhaseThroughNav : MonoBehaviour
 {
     [Header("Refs (assign in prefab)")]
-    [SerializeField] private Unit unit;           // gán sẵn
-    [SerializeField] private NavMeshAgent agent;  // gán sẵn
+    [SerializeField] private Unit unit;          
+    [SerializeField] private NavMeshAgent agent;  
 
     [Header("Settings")]
-    [SerializeField] private float allyRadius = 0.8f;     // bán kính kiểm tra đồng đội gần
-    [SerializeField] private LayerMask unitLayer;          // Layer của các unit (để Overlap)
+    [SerializeField] private float allyRadius = 0.8f;     
+    [SerializeField] private LayerMask unitLayer;          
     [SerializeField] private ObstacleAvoidanceType normalAvoidance = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
 
     float originalRadius;
@@ -28,7 +28,6 @@ public class AllyPhaseThroughNav : MonoBehaviour
     {
         if (!agent || !unit) return;
 
-        // kiểm tra có đồng đội rất gần không
         bool nearAlly = false;
         var pos = transform.position;
         var hits = Physics.OverlapSphere(pos, allyRadius, unitLayer, QueryTriggerInteraction.Ignore);
@@ -45,13 +44,11 @@ public class AllyPhaseThroughNav : MonoBehaviour
 
         if (nearAlly)
         {
-            // tắt avoidance để không “lách” đồng đội, giảm radius cho dễ xuyên
             agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
             agent.radius = Mathf.Min(originalRadius, 0.05f);
         }
         else
         {
-            // khôi phục
             agent.obstacleAvoidanceType = originalAvoid;
             agent.radius = originalRadius;
         }

@@ -32,6 +32,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private string winTrigger = "Win";   
     [SerializeField] private bool endCombatOnWin = true;
 
+    [Header("UI")]
+    [SerializeField] private UIManager uiManager;
+
+    // CoinManager
+    private int damageByPlayer = 0;
+    private int damageByEnemy = 0;
+
     public event System.Action<Team?> OnBattleEnded;
 
     private bool battleEnded = false;
@@ -89,6 +96,7 @@ public class GameManager : MonoBehaviour
 
         unitMap.Add(u.core, u);
         u.core.onDead += OnDeadCore;
+        u.core.onHit += OnUnitHit; //add Hook
         if (u.gun)
             RegisterGun(u.gun);
     }
@@ -102,6 +110,19 @@ public class GameManager : MonoBehaviour
         if (u.gun) UnregisterGun(u.gun);
         u.core.onDead -= OnDeadCore;
         unitMap.Remove(u.core);
+    }
+
+    public void OnUnitHit(UnitCore core, int dmg)
+    {
+        if (core == null) return;
+        if (core.team == Team.Player)
+        {
+            damageByEnemy += dmg;
+        }
+        else if (core.team == Team.Enemy)
+        {
+            damageByPlayer += dmg;
+        }
     }
 
     private void OnDeadCore(UnitCore c)
@@ -454,22 +475,33 @@ public class GameManager : MonoBehaviour
     {
         if (battleEnded || gridManager == null) return;
 
-        bool alive1 = HasAlive(GridManager.Board.Board1);
-        bool alive2 = HasAlive(GridManager.Board.Board2);
+        bool alivePlayer = HasAlive(GridManager.Board.Board1); 
+        bool aliveEnemy = HasAlive(GridManager.Board.Board2); 
 
-        if (alive1 && alive2) return;                
+        if (alivePlayer && aliveEnemy) return;
         battleEnded = true;
 
-        if (alive1 ^ alive2)                     
+        int reward = 0;
+
+        if (alivePlayer )
         {
-            var winner = alive1 ? GridManager.Board.Board1 : GridManager.Board.Board2;
-            PlayWinForBoard(winner);
+            //  Player win
+            reward = damageByPlayer * 10;
+            uiManager?.ShowResult(true, reward);
         }
+        else
+        {
+            //  Player lose
+            reward = damageByPlayer;
+            uiManager?.ShowResult(false, reward);
+        }
+
+        if (reward > 0 && GameEconomyManager.Instance != null)
+            GameEconomyManager.Instance.AddCoin(reward);
 
         if (endCombatOnWin)
         {
-            var cm = CombatManager.Instance;
-            if (cm != null) cm.EndCombat();
+            CombatManager.Instance?.EndCombat();
         }
     }
 

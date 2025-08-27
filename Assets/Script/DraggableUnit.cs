@@ -54,12 +54,10 @@ public class DraggableUnit : MonoBehaviour
     {
         if (!isDragging) return;
 
-        // kéo unit theo chuột như cũ
         Vector3 mousePos = GetMouseWorldPosition();
         transform.position = new Vector3(mousePos.x, originalPosition.y, mousePos.z);
 
-        // ----- RAYCAST THẲNG -Y TỪ UNIT -----
-        const float castStartOffset = 3f;   // nâng điểm bắn lên một chút
+        const float castStartOffset = 3f;  
         Vector3 start = transform.position + Vector3.up * castStartOffset;
         Ray rayDown = new Ray(start, Vector3.down);
 
