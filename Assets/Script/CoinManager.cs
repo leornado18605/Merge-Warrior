@@ -1,119 +1,176 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class CoinManager : MonoBehaviour
+public class GameEconomyManager : MonoBehaviour
 {
-    public static CoinManager Instance { get; private set; }
+    public static GameEconomyManager Instance { get; private set; }
 
+    // ───────── Coin ─────────
     [Header("Coin")]
+    public int defaultCoins = 120;
     public int Coins = 120;
-    public TMP_Text coinText;
+    [SerializeField] private TMP_Text coinText;
 
-    [Header("Shop Buttons")]
-    public Button buyLv1Button;
-    public Button buyLv2Button;
-    public Button buyLv3Button;
+    // ───────── Shop ─────────
+    [Header("Shop")]
+    [SerializeField] private Button buyKnifeButton;
+    [SerializeField] private Button buyGunButton;
 
-    [Header("Unit Prices")]
-    public int basePriceLv1 = 20;
-    public int basePriceLv2 = 40;
-    public int basePriceLv3 = 60;
+    [SerializeField] private TMP_Text knifePriceText;
+    [SerializeField] private TMP_Text gunPriceText;
 
-    private int currentPriceLv1;
-    private int currentPriceLv2;
-    private int currentPriceLv3;
+    public int basePriceKnife = 60;
+    public int basePriceGun = 100;
 
+    public float priceScale = 1.1f;
+
+    [SerializeField] private Color priceAffordable = Color.white;
+    [SerializeField] private Color priceNotEnough = new Color(1f, 0.65f, 0.65f);
+
+    private int currentPriceKnife;
+    private int currentPriceGun;
+
+    // ───────── Editor Behavior ─────────
+    [Header("Editor Behavior")]
+    public bool resetCoinsOnPlayInEditor = true;
+    public bool persistCoinsInEditor = false;
+
+    private const string PlayerCoinsKey = "PlayerCoins";
+
+    // ───────── Lifecycle ─────────
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
-
         DontDestroyOnLoad(gameObject);
+
+#if UNITY_EDITOR
+        if (resetCoinsOnPlayInEditor)
+        {
+            PlayerPrefs.DeleteKey(PlayerCoinsKey);
+            Coins = defaultCoins;
+        }
+        else
+        {
+            Coins = PlayerPrefs.GetInt(PlayerCoinsKey, defaultCoins);
+        }
+#else
+        Coins = PlayerPrefs.GetInt(PlayerCoinsKey, defaultCoins);
+#endif
     }
 
     private void Start()
     {
-        currentPriceLv1 = basePriceLv1;
-        currentPriceLv2 = basePriceLv2;
-        currentPriceLv3 = basePriceLv3;
+        currentPriceKnife = basePriceKnife;
+        currentPriceGun = basePriceGun;
 
-        UpdateCoinUI();
+        if (buyKnifeButton) buyKnifeButton.onClick.AddListener(BuyKnife);
+        if (buyGunButton) buyGunButton.onClick.AddListener(BuyGun);
 
-        buyLv1Button.onClick.AddListener(() => BuyUnit(1));
-        buyLv2Button.onClick.AddListener(() => BuyUnit(2));
-        buyLv3Button.onClick.AddListener(() => BuyUnit(3));
+        UpdateAllShopUI();
     }
 
+    // ───────── Public API ─────────
     public void AddCoin(int amount)
     {
         if (amount <= 0) return;
         Coins += amount;
-        UpdateCoinUI();
+        SaveCoins();
+        UpdateAllShopUI();
     }
 
     public bool SpendCoin(int amount)
     {
         if (Coins < amount) return false;
         Coins -= amount;
-        UpdateCoinUI();
+        SaveCoins();
+        UpdateAllShopUI();
         return true;
     }
 
-    private void UpdateCoinUI()
+    public void BindUI(
+        TMP_Text coinLabel,
+        Button knifeBtn, TMP_Text knifePrice,
+        Button gunBtn, TMP_Text gunPrice)
     {
-        if (coinText != null)
-            coinText.text = $"Coin: {Coins}";
+        coinText = coinLabel;
+        buyKnifeButton = knifeBtn;
+        buyGunButton = gunBtn;
+        knifePriceText = knifePrice;
+        gunPriceText = gunPrice;
+
+        if (buyKnifeButton) { buyKnifeButton.onClick.RemoveAllListeners(); buyKnifeButton.onClick.AddListener(BuyKnife); }
+        if (buyGunButton) { buyGunButton.onClick.RemoveAllListeners(); buyGunButton.onClick.AddListener(BuyGun); }
+
+        UpdateAllShopUI();
     }
 
-    private void BuyUnit(int level)
+    // ───────── Buying Logic ─────────
+    private void BuyKnife()
     {
-        int price = GetCurrentPrice(level);
+        if (!SpendCoin(currentPriceKnife)) return;
 
-        if (Coins < price)
+        currentPriceKnife = Mathf.CeilToInt(currentPriceKnife * priceScale);
+        UpdateAllShopUI();
+    }
+
+    private void BuyGun()
+    {
+        if (!SpendCoin(currentPriceGun)) return;
+
+        currentPriceGun = Mathf.CeilToInt(currentPriceGun * priceScale);
+        UpdateAllShopUI();
+    }
+
+    // ───────── UI Updates ─────────
+    private void UpdateAllShopUI()
+    {
+        UpdateCoinUI();
+        UpdatePriceUI();
+        UpdateButtonsInteractable();
+    }
+
+    public void UpdateCoinUI()
+    {
+        if (coinText) coinText.text = $"{Coins}";
+    }
+
+    private void UpdatePriceUI()
+    {
+        if (knifePriceText)
         {
-            return; 
+            knifePriceText.text = FormatPrice(currentPriceKnife);
+            knifePriceText.color = Coins >= currentPriceKnife ? priceAffordable : priceNotEnough;
         }
-
-        SpendCoin(price);
-        SpawnUnit(level);
-        IncreasePrice(level);
-
-        UpdateButtonInteractable();
-    }
-
-    private void UpdateButtonInteractable()
-    {
-        buyLv1Button.interactable = Coins >= currentPriceLv1;
-        buyLv2Button.interactable = Coins >= currentPriceLv2;
-        buyLv3Button.interactable = Coins >= currentPriceLv3;
-    }
-
-
-    private int GetCurrentPrice(int level)
-    {
-        return level switch
+        if (gunPriceText)
         {
-            1 => currentPriceLv1,
-            2 => currentPriceLv2,
-            3 => currentPriceLv3,
-            _ => 0
-        };
-    }
-
-    private void IncreasePrice(int level)
-    {
-        switch (level)
-        {
-            case 1: currentPriceLv1 = Mathf.CeilToInt(currentPriceLv1 * 1.2f); break;
-            case 2: currentPriceLv2 = Mathf.CeilToInt(currentPriceLv2 * 1.2f); break;
-            case 3: currentPriceLv3 = Mathf.CeilToInt(currentPriceLv3 * 1.2f); break;
+            gunPriceText.text = FormatPrice(currentPriceGun);
+            gunPriceText.color = Coins >= currentPriceGun ? priceAffordable : priceNotEnough;
         }
     }
 
-    private void SpawnUnit(int level)
+    private void UpdateButtonsInteractable()
     {
-        Debug.Log($"Spawn Unit Lv {level}");
-       
+        if (buyKnifeButton) buyKnifeButton.interactable = Coins >= currentPriceKnife;
+        if (buyGunButton) buyGunButton.interactable = Coins >= currentPriceGun;
+    }
+
+    private string FormatPrice(int value)
+    {
+        if (value >= 1_000_000) return (value / 1_000_000f).ToString("0.#") + "M";
+        if (value >= 1_000) return (value / 1_000f).ToString("0.#") + "K";
+        return value.ToString();
+    }
+
+    // ───────── Persistence ─────────
+    private void SaveCoins()
+    {
+#if UNITY_EDITOR
+        if (!persistCoinsInEditor) return;
+#endif
+        PlayerPrefs.SetInt(PlayerCoinsKey, Coins);
+        PlayerPrefs.Save();
     }
 }

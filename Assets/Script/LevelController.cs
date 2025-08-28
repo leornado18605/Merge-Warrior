@@ -13,6 +13,8 @@ public class LevelController : MonoBehaviour
     public int currentLevel = 1;
     public int maxLevel = 5;
 
+    [SerializeField] private float resultDelay = 0.6f;
+    private bool endBattleScheduled = false;
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -35,10 +37,6 @@ public class LevelController : MonoBehaviour
             currentLevel++;
             SetupLevel(currentLevel);
             Debug.Log($"➡️ Moving to level {currentLevel}");
-        }
-        else
-        {
-            Debug.Log("🎉 Đã hoàn thành tất cả các level!");
         }
     }
 

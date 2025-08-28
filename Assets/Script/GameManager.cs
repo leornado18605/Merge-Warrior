@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class GameManager : MonoBehaviour
 {
@@ -15,7 +16,7 @@ public class GameManager : MonoBehaviour
     [Header("Refs")]
     [SerializeField] private BotManager botManager;
     [SerializeField] private GridManager gridManager;
-    [SerializeField] private UnitManager unitManager;   // 👈 thêm
+    [SerializeField] private UnitManager unitManager;   
     [SerializeField] private UIManager uiManager;
 
     [Header("Merge")]
@@ -40,6 +41,11 @@ public class GameManager : MonoBehaviour
     // CoinManager
     private int damageByPlayer = 0;
     private int damageByEnemy = 0;
+
+
+    [SerializeField] private float resultDelay = 0.6f;
+    private bool endBattleScheduled = false;
+    private Coroutine endBattleRoutine;
 
     public event System.Action<Team?> OnBattleEnded;
 
@@ -473,9 +479,11 @@ public class GameManager : MonoBehaviour
 
     #endregion
 
+    #region End / Results
+
     private void CheckBattleOver()
     {
-        if (battleEnded || gridManager == null) return;
+        if (battleEnded || endBattleScheduled || gridManager == null) return;
 
         bool alivePlayer = HasAlive(playerBoard);
         bool aliveEnemy = HasAlive(enemyBoard);
@@ -485,51 +493,64 @@ public class GameManager : MonoBehaviour
 
         if (alivePlayer && aliveEnemy) return;
 
+        endBattleScheduled = true;
+        if (endBattleRoutine != null) StopCoroutine(endBattleRoutine);
+        endBattleRoutine = StartCoroutine(EndBattleAfterDelay());
+    }
+
+    private IEnumerator EndBattleAfterDelay()
+    {
+        yield return new WaitForSeconds(resultDelay);
+        if (battleEnded) yield break;
+
+        bool alivePlayer = HasAlive(playerBoard);
+        bool aliveEnemy = HasAlive(enemyBoard);
+
         battleEnded = true;
+        endBattleScheduled = false;
         SetGunsEnabled(false);
 
-        int reward = 0;
-
+        int reward;
         if (alivePlayer && !aliveEnemy)
         {
             reward = damageByPlayer * 10;
             Debug.Log($"[Result] WIN | reward={reward}");
-            uiManager?.ShowResult(false /*hide?*/, 0); // đảm bảo xoá trạng thái cũ (optional)
-            uiManager?.ShowResult(true, reward);       // WIN
-            if (endCombatOnWin) CombatManager.Instance?.EndCombat();
-            return;
+            uiManager?.ShowResult(true, reward);
         }
-
-        if (!alivePlayer && aliveEnemy)
+        else if (!alivePlayer && aliveEnemy)
         {
             reward = damageByPlayer;
             Debug.Log($"[Result] LOSE | reward={reward}");
-            uiManager?.ShowResult(false, reward);      // LOSE
-            if (endCombatOnWin) CombatManager.Instance?.EndCombat();
-            return;
+            uiManager?.ShowResult(false, reward);
+        }
+        else
+        {
+            reward = damageByPlayer;
+            Debug.Log($"[Result] DRAW | reward={reward}");
+            uiManager?.ShowResult(false, reward);
         }
 
-        // cả hai chết
-        reward = damageByPlayer;
-        Debug.Log($"[Result] DRAW | reward={reward}");
-        uiManager?.ShowResult(false, reward);
         if (endCombatOnWin) CombatManager.Instance?.EndCombat();
     }
 
-    private bool HasAlive(GridManager.Board b)
+    private bool HasAlive(GridManager.Board board)
     {
         for (int r = 0; r < gridManager.Rows; r++)
             for (int c = 0; c < gridManager.Cols; c++)
             {
-                var go = gridManager.GetOccupant(b, r, c);
+                GameObject go = gridManager.GetOccupant(board, r, c);
                 if (!go) continue;
 
-                var u = go.GetComponent<Unit>();
+                Unit u = go.GetComponent<Unit>();
                 if (u != null && u.core != null && u.core.Alive())
                     return true;
             }
         return false;
     }
+
+    #endregion
+    // ─────────────────────────────────────────────────────────────────────────────
+    #region Guns Control
 
     public void RegisterGun(GunController g)
     {
@@ -547,34 +568,36 @@ public class GameManager : MonoBehaviour
             if (guns[i]) guns[i].enabled = on;
     }
 
+    #endregion
+    // ─────────────────────────────────────────────────────────────────────────────
+    #region Reset
+
     public void ResetBattle()
     {
         Debug.Log("🔄 ResetBattle called!");
 
+        // stop pending end routine
+        if (endBattleRoutine != null)
+        {
+            StopCoroutine(endBattleRoutine);
+            endBattleRoutine = null;
+        }
+        endBattleScheduled = false;
         battleEnded = false;
+
         damageByPlayer = 0;
         damageByEnemy = 0;
 
         unitMap.Clear();
         guns.Clear();
 
-        if (gridManager)
-        {
-            gridManager.ClearAllUnits();
-        }
-
-        if (botManager)
-        {
-            botManager.SpawnFromInspector();
-        }
+        if (gridManager) gridManager.ClearAllUnits();
+        if (botManager) botManager.SpawnFromInspector();
 
         if (unitManager != null)
         {
             unitManager.PlaceKnife();
-            for(int i = 0; i < 3; i++)
-            {
-                unitManager.PlaceGun();
-            }
+            for (int i = 0; i < 3; i++) unitManager.PlaceGun();
         }
 
         if (uiManager != null)
@@ -583,4 +606,7 @@ public class GameManager : MonoBehaviour
             uiManager.ShowPlacementButtons();
         }
     }
+
+    #endregion
+    // ─────────────
 }

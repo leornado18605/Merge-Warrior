@@ -50,7 +50,6 @@ public class TileHighlight : MonoBehaviour
 
         if (enable)
         {
-            // highlight xanh neon cực chói
             Color neonGreen = new Color(0f, 1f, 0f, 1f);
             mpb.SetColor("_EmissionColor", neonGreen * 5f); // nhân 5 để sáng mạnh
             Debug.Log($"✨ [TileHighlight] {name} → Highlight xanh neon {neonGreen}");

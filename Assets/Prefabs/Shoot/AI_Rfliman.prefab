@@ -749,7 +749,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7368252900174841059}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0.9926356, z: -0, w: -0.1211388}
   m_LocalPosition: {x: -864, y: -8066.4365, z: -9308.818}
   m_LocalScale: {x: 300, y: 300, z: 300}
   m_ConstrainProportionsScale: 0
@@ -757,7 +757,7 @@ Transform:
   - {fileID: 3671474967520414584}
   - {fileID: 1953518050654034844}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -193.916, z: 0}
 --- !u!95 &6018145626324105152
 Animator:
   serializedVersion: 5
@@ -816,8 +816,8 @@ MonoBehaviour:
   tileLayer:
     serializedVersion: 2
     m_Bits: 0
-  hoverColor: {r: 0.9, g: 0.8, b: 0.1, a: 1}
   raycastMaxDist: 200
+  hoverColor: {r: 0.9, g: 0.8, b: 0.1, a: 1}
 --- !u!114 &222547044263229546
 MonoBehaviour:
   m_ObjectHideFlags: 0
