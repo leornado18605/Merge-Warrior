@@ -25,7 +25,7 @@ public class LevelController : MonoBehaviour
 
     private void Start()
     {
-        SetupLevel(currentLevel); // chạy level đầu tiên
+        SetupLevel(currentLevel); 
     }
 
     public void NextLevel()
@@ -34,6 +34,7 @@ public class LevelController : MonoBehaviour
         {
             currentLevel++;
             SetupLevel(currentLevel);
+            Debug.Log($"➡️ Moving to level {currentLevel}");
         }
         else
         {
@@ -45,13 +46,10 @@ public class LevelController : MonoBehaviour
     {
         Debug.Log($"🔄 SetupLevel {level}");
 
-        // 1. Clear units cũ
         gridManager.ClearAllUnits();
 
-        // 2. Reset game state
         gameManager.ResetBattle();
 
-        // 3. Spawn enemy theo level
         switch (level)
         {
             case 1:
@@ -68,13 +66,11 @@ public class LevelController : MonoBehaviour
                 break;
         }
 
-        // 4. Đổi background (nếu có)
         ChangeBackground(level);
     }
 
     private void ChangeBackground(int level)
     {
-        // Ví dụ: đổi màu background theo level
         Camera.main.backgroundColor = level switch
         {
             1 => Color.green,

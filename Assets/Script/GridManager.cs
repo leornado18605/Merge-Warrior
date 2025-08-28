@@ -158,6 +158,9 @@ public sealed class GridManager : MonoBehaviour
                 float x = c * tileSize;
                 Vector3 pos = origin + new Vector3(x, 0f, z);
                 buffer[r, c] = PoolManager.Spawn(tilePrefab, pos, Quaternion.identity, transform);
+
+                if(!tilePrefab.GetComponent<TileHighlight>())
+                    Debug.LogWarning($"[GridManager] Tile prefab '{tilePrefab.name}' does not have a TileHighlight component. Highlighting will not work.");
             }
         }
     }

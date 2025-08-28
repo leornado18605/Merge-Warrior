@@ -1112,7 +1112,7 @@ MonoBehaviour:
   tileLayer:
     serializedVersion: 2
     m_Bits: 256
-  hoverColor: {r: 0.9, g: 0.8, b: 0.1, a: 1}
+  hoverColor: {r: 0.9019608, g: 0.3351918, b: 0.10196079, a: 1}
   raycastMaxDist: 200
 --- !u!114 &561649842869463870
 MonoBehaviour:

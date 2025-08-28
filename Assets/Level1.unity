@@ -681,6 +681,7 @@ GameObject:
   - component: {fileID: 279085943}
   - component: {fileID: 279085942}
   - component: {fileID: 279085946}
+  - component: {fileID: 279085947}
   m_Layer: 5
   m_Name: TutorialCanvas
   m_TagString: Untagged
@@ -783,11 +784,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d25c0eb772f35b449021ffbe1090c04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  handPointer: {fileID: 866686182}
-  tutorialText: {fileID: 0}
+  uiCanvas: {fileID: 1248025201}
+  canvasRT: {fileID: 1248025202}
+  tutorialCanvasGroup: {fileID: 279085947}
+  handPointerRT: {fileID: 866686183}
+  handPointerGO: {fileID: 866686182}
+  handPointerAnim: {fileID: 866686186}
   placeKnifeButton: {fileID: 571080059}
   placeGunButton: {fileID: 1450697944}
   startFightButton: {fileID: 1570413995}
+  placeKnifeRT: {fileID: 571080058}
+  placeGunRT: {fileID: 1450697943}
+  startFightRT: {fileID: 1570413994}
+  step3Delay: 0.1
+--- !u!225 &279085947
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 279085941}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &434615161
 GameObject:
   m_ObjectHideFlags: 0
@@ -828,6 +849,8 @@ MonoBehaviour:
   deadDespawnDelay: 1.51
   winTrigger: Win
   endCombatOnWin: 1
+  playerBoard: 0
+  enemyBoard: 1
   upgradeEntries:
   - unitType: Knife
     levelPrefabs:
@@ -984,6 +1007,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 571080057}
   m_CullTransparentMesh: 1
+--- !u!1 &599879741 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8728818086224173463, guid: eee608ed6505a42869e8a864653f6b7e, type: 3}
+  m_PrefabInstance: {fileID: 138096796}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -1116,7 +1144,7 @@ MonoBehaviour:
   botManager: {fileID: 1109887454}
   gameManager: {fileID: 434615162}
   currentLevel: 1
-  maxLevel: 5
+  maxLevel: 3
 --- !u!4 &864881262
 Transform:
   m_ObjectHideFlags: 0
@@ -1701,6 +1729,8 @@ MonoBehaviour:
   rewardText: {fileID: 1104164949}
   claimButton: {fileID: 1615424592}
   noThanksButton: {fileID: 1615424592}
+  titleWinGO: {fileID: 599879741}
+  titleLoseGO: {fileID: 1535801143}
 --- !u!4 &1039677584
 Transform:
   m_ObjectHideFlags: 0
@@ -1896,12 +1926,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   botLevelPrefabs:
   - {fileID: 5808349704129935754, guid: 4c5dfa1639f04b94baa9725e854e97c6, type: 3}
-  - {fileID: 5037285563700240808, guid: ee6b3bb8964177f498158db53961ad73, type: 3}
   autoSpawnOnStart: 1
   defaultBoard: 1
   spawnRows: 3
   spawnCols: 5
-  spawnLimit: 2
+  spawnLimit: 1
   disableDragForBots: 1
   modelYawOffset: 0
   rangedNameKeyword: Knife
@@ -2385,6 +2414,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1450697942}
   m_CullTransparentMesh: 1
+--- !u!1 &1535801143 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7216595549606336001, guid: 642c7baabff554d75a2a3e1a1a0c891e, type: 3}
+  m_PrefabInstance: {fileID: 1316183277}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1570413993
 GameObject:
   m_ObjectHideFlags: 0

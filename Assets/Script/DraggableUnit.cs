@@ -11,7 +11,6 @@ public class DraggableUnit : MonoBehaviour
 
     [Header("Highlight (raycast)")]
     [SerializeField] private LayerMask tileLayer;  
-    [SerializeField] private Color hoverColor = new Color(0.9f, 0.8f, 0.1f, 1f);
     [SerializeField] private float raycastMaxDist = 200f;
 
     // Drag state
@@ -23,7 +22,7 @@ public class DraggableUnit : MonoBehaviour
 
     // runtime highlight cache
     private TileHighlight currentHL = null;
-
+    [SerializeField] private Color hoverColor = Color.cyan;
     private void Awake()
     {
         if (!unit) unit = GetComponent<Unit>();
@@ -57,8 +56,8 @@ public class DraggableUnit : MonoBehaviour
         Vector3 mousePos = GetMouseWorldPosition();
         transform.position = new Vector3(mousePos.x, originalPosition.y, mousePos.z);
 
-        const float castStartOffset = 3f;  
-        Vector3 start = transform.position + Vector3.up * castStartOffset;
+        const float castStartOffset = 3f;
+        Vector3 start = transform.position + Vector3.down * castStartOffset;
         Ray rayDown = new Ray(start, Vector3.down);
 
         if (Physics.Raycast(rayDown, out var hit, raycastMaxDist, tileLayer, QueryTriggerInteraction.Ignore))

@@ -164,6 +164,11 @@ public class UnitCore : MonoBehaviour
         return s;
     }
 
+    public void ResetHP()
+    {
+        hp = hpMax;
+    }
+
 #if UNITY_EDITOR
     private void OnValidate()
     {

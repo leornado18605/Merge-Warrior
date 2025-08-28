@@ -76,6 +76,7 @@ public class BotManager : MonoBehaviour
                 Debug.Log($"[BOT SPAWN] Board:{botBoard} Row:{cell.x} Col:{cell.y} Go:{bot.name}");
             }
         }
+
     }
 
     // ───────────────────────────── Helpers: flow ───────────────────────────────
@@ -175,11 +176,13 @@ public class BotManager : MonoBehaviour
     private void SetupNavMesh(GameObject bot, Vector3 spawnPos)
     {
         var agent = bot.GetComponent<UnityEngine.AI.NavMeshAgent>();
-        if (agent != null)
-        {
-            agent.Warp(spawnPos);
-            agent.updateRotation = false;
-        }
+        if (!agent) return;
+
+        if (!agent.enabled) agent.enabled = true;     // ← re-enable from pooled “dead” state
+        agent.updateRotation = false;
+        // Warp only when enabled
+        agent.Warp(spawnPos);
+        agent.ResetPath();
     }
 
     // ───────────────────────────── Utilities ───────────────────────────────────

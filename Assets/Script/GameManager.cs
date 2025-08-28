@@ -35,6 +35,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private string winTrigger = "Win";   
     [SerializeField] private bool endCombatOnWin = true;
 
+    [SerializeField] private GridManager.Board playerBoard = GridManager.Board.Board1;
+    [SerializeField] private GridManager.Board enemyBoard = GridManager.Board.Board2;
     // CoinManager
     private int damageByPlayer = 0;
     private int damageByEnemy = 0;
@@ -475,34 +477,43 @@ public class GameManager : MonoBehaviour
     {
         if (battleEnded || gridManager == null) return;
 
-        bool alivePlayer = HasAlive(GridManager.Board.Board1); 
-        bool aliveEnemy = HasAlive(GridManager.Board.Board2); 
+        bool alivePlayer = HasAlive(playerBoard);
+        bool aliveEnemy = HasAlive(enemyBoard);
+
+        Debug.Log($"[CheckBattleOver] alivePlayer={alivePlayer}, aliveEnemy={aliveEnemy}, " +
+                  $"playerBoard={playerBoard}, enemyBoard={enemyBoard}");
 
         if (alivePlayer && aliveEnemy) return;
+
         battleEnded = true;
+        SetGunsEnabled(false);
 
         int reward = 0;
 
-        if (alivePlayer )
+        if (alivePlayer && !aliveEnemy)
         {
-            //  Player win
             reward = damageByPlayer * 10;
-            uiManager?.ShowResult(true, reward);
+            Debug.Log($"[Result] WIN | reward={reward}");
+            uiManager?.ShowResult(false /*hide?*/, 0); // đảm bảo xoá trạng thái cũ (optional)
+            uiManager?.ShowResult(true, reward);       // WIN
+            if (endCombatOnWin) CombatManager.Instance?.EndCombat();
+            return;
         }
-        else
+
+        if (!alivePlayer && aliveEnemy)
         {
-            //  Player lose
             reward = damageByPlayer;
-            uiManager?.ShowResult(false, reward);
+            Debug.Log($"[Result] LOSE | reward={reward}");
+            uiManager?.ShowResult(false, reward);      // LOSE
+            if (endCombatOnWin) CombatManager.Instance?.EndCombat();
+            return;
         }
 
-        //if (reward > 0 && GameEconomyManager.Instance != null)
-        //    GameEconomyManager.Instance.AddCoin(reward);
-
-        if (endCombatOnWin)
-        {
-            CombatManager.Instance?.EndCombat();
-        }
+        // cả hai chết
+        reward = damageByPlayer;
+        Debug.Log($"[Result] DRAW | reward={reward}");
+        uiManager?.ShowResult(false, reward);
+        if (endCombatOnWin) CombatManager.Instance?.EndCombat();
     }
 
     private bool HasAlive(GridManager.Board b)
