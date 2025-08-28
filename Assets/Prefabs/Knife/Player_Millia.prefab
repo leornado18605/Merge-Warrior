@@ -1124,7 +1124,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6194276688369694687}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: -0, y: -1, z: -0, w: -0.00017282623}
   m_LocalPosition: {x: -864, y: -8066.4365, z: -9308.818}
   m_LocalScale: {x: 300, y: 300, z: 300}
   m_ConstrainProportionsScale: 0
@@ -1132,7 +1132,7 @@ Transform:
   - {fileID: 6375573776906571464}
   - {fileID: 805933551965728486}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -180.02, z: 0}
 --- !u!95 &7680368924380731546
 Animator:
   serializedVersion: 5
@@ -1191,8 +1191,8 @@ MonoBehaviour:
   tileLayer:
     serializedVersion: 2
     m_Bits: 256
-  hoverColor: {r: 0.9, g: 0.8, b: 0.1, a: 1}
   raycastMaxDist: 200
+  hoverColor: {r: 0.9, g: 0.8, b: 0.1, a: 1}
 --- !u!114 &8111530134449424566
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1264,6 +1264,10 @@ MonoBehaviour:
   gizDetect: {r: 0, g: 0.6, b: 1, a: 0.6}
   gizPath: {r: 0.2, g: 1, b: 0.2, a: 0.9}
   gizTarget: {r: 1, g: 1, b: 0, a: 0.9}
+  disableAgentAvoidance: 1
+  avoidanceType: 0
+  avoidancePriority: 50
+  minSafeRadius: 0.25
 --- !u!195 &844758072209990189
 NavMeshAgent:
   m_ObjectHideFlags: 0
