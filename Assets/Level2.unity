@@ -6340,6 +6340,7 @@ MonoBehaviour:
   grid: {fileID: 892392521}
   game: {fileID: 434615162}
   bot: {fileID: 1109887454}
+  snapUnitsBackInPrep: 1
   spawnBotsOnFight: 0
   disableDragDuringCombat: 1
   lockOnlyBoard1: 1

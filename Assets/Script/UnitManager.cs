@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class UnitManager : MonoBehaviour
 {
+    public static UnitManager Instance { get; private set; }
     [SerializeField] private GridManager gridManager;
 
     [Header("Unit Prefabs")]
@@ -16,6 +17,28 @@ public class UnitManager : MonoBehaviour
 
     [SerializeField] private Unit knifeUnit;
     [SerializeField] private Unit gunUnit;
+
+    private void Awake()
+    {
+        Instance = this;
+        TryAssignGrid();
+        DontDestroyOnLoad(gameObject);
+    }
+
+    private void OnEnable()
+    {
+        TryAssignGrid();
+    }
+
+    public void SetGrid(GridManager g)
+    {
+        if (g != null) gridManager = g;
+    }
+
+    private void TryAssignGrid()
+    {
+        gridManager = GridManager.Instance;  // fallback
+    }
 
     private void Start()
     {

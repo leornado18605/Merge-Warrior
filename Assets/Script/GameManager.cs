@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 
@@ -92,10 +93,8 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator InitWhenGridReady()
     {
-        // đợi reference có
         while (gridManager == null) yield return null;
 
-        // đợi GridManager dựng xong
         if (!gridManager.IsReady)
         {
             bool done = false;
@@ -103,7 +102,6 @@ public class GameManager : MonoBehaviour
             while (!gridManager.IsReady && !done) yield return null;
         }
 
-        // Lúc này bàn cờ đã sẵn sàng → mới set bot / spawn / run loop
         if (botManager != null) botManager.SetGridManager(gridManager);
         StartCoroutine(RunLoop());
     }
@@ -625,7 +623,50 @@ public class GameManager : MonoBehaviour
     #endregion
     // ─────────────
 
+    private void OnEnable()
+    {
+        // đăng ký callback mỗi khi scene load xong
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
 
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Sau khi load scene mới, tìm lại refs trong scene
+        gridManager = FindObjectOfType<GridManager>();
+        unitManager = FindObjectOfType<UnitManager>();
+        uiManager = FindObjectOfType<UIManager>();
+        botManager = FindObjectOfType<BotManager>();
+
+        // reset lại tham chiếu cho botManager
+        if (botManager != null && gridManager != null)
+            botManager.SetGridManager(gridManager);
+
+        // chạy lại init nếu cần
+        StartCoroutine(InitWhenGridReady());
+    }
+
+    public void OnSceneReady(
+        GridManager grid,
+        UnitManager um,
+        UIManager ui,
+        BotManager bot)
+    {
+        gridManager = grid;
+        unitManager = um;
+        uiManager = ui;
+        botManager = bot;
+
+        if (botManager != null && gridManager != null)
+            botManager.SetGridManager(gridManager);
+
+        if (uiManager != null)
+            uiManager.ShowPlacementButtons();
+    }
 }
 
 

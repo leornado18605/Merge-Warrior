@@ -58,7 +58,7 @@ public sealed class GridManager : MonoBehaviour
     {
 
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-        Instance = this;
+            Instance = this;
         DontDestroyOnLoad(gameObject);
 
         IsReady = false;

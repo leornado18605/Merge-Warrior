@@ -356,6 +356,9 @@ public class UnitTargeting : MonoBehaviour
         if (Grid == null) return false;
         if (self.IsMergeLocked()) return false;
         if (!agent.isOnNavMesh) return false;
+        if (CombatManager.Instance != null &&
+            CombatManager.Instance.CurrentState == CombatManager.State.Prep)
+            return false;
         return true;
 
 

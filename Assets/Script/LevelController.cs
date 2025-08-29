@@ -62,13 +62,26 @@ public class LevelController : MonoBehaviour
         yield return null;
         yield return null;
 
-        yield return WaitManagersReady();
+        // lấy instance trực tiếp qua singleton thay vì Find
+        GameManager gm = GameManager.Instance;
+        GridManager grid = GridManager.Instance;
+        UnitManager um = UnitManager.Instance;
+        UIManager ui = UIManager.Instance;
+        BotManager bot = BotManager.Instance;
+
+        // chờ grid build xong
+        int safety = 60;
+        while (grid != null && !grid.IsReady && safety-- > 0)
+            yield return null;
+
+        // báo cho GameManager là scene mới đã sẵn sàng
+        if (gm != null && grid != null)
+            gm.OnSceneReady(grid, um, ui, bot);
 
         if (CombatManager.Instance != null)
-        {
             CombatManager.Instance.ForcePrepState();
-        }
     }
+
 
     private IEnumerator LoadAndInitName(string sceneName)
     {
@@ -87,8 +100,10 @@ public class LevelController : MonoBehaviour
 
     private IEnumerator WaitManagersReady()
     {
-        int safety = 30;
-        while (GridManager.Instance == null && safety > 0)
+        int safety = 120;
+        while ((GridManager.Instance == null ||
+                !GridManager.Instance.IsReady) &&
+                safety > 0)
         {
             safety -= 1;
             yield return null;

@@ -3872,6 +3872,7 @@ MonoBehaviour:
   knifePriceText: {fileID: 176890818}
   buyGunButton: {fileID: 1450697944}
   gunPriceText: {fileID: 1475297539}
+  unitManager: {fileID: 904087434}
 --- !u!1 &1298572732
 GameObject:
   m_ObjectHideFlags: 0
@@ -4837,7 +4838,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 0
+  m_Interactable: 1
   m_TargetGraphic: {fileID: 1570413996}
   m_OnClick:
     m_PersistentCalls:
@@ -6666,7 +6667,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defaultCoins: 502
-  Coins: 517
+  Coins: 120
   coinText: {fileID: 894726705}
   buyKnifeButton: {fileID: 571080059}
   buyGunButton: {fileID: 1450697944}
@@ -6730,6 +6731,7 @@ MonoBehaviour:
   grid: {fileID: 892392521}
   game: {fileID: 434615162}
   bot: {fileID: 1109887454}
+  snapUnitsBackInPrep: 1
   spawnBotsOnFight: 0
   disableDragDuringCombat: 1
   lockOnlyBoard1: 1
