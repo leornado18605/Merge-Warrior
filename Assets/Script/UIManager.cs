@@ -70,6 +70,22 @@ public class UIManager : MonoBehaviour
         if (buttonsPanel) buttonsPanel.SetActive(true);
     }
 
+    public void SetPlacementUI(bool on)
+    {
+        if (buttonsPanel) buttonsPanel.SetActive(on);
+
+        if (placeKnifeButton) placeKnifeButton.interactable = on;
+        if (placeGunButton) placeGunButton.interactable = on;
+        if (startFightButton) startFightButton.interactable = on;
+
+        if (!buttonsPanel && !on)
+        {
+            if (placeKnifeButton) placeKnifeButton.gameObject.SetActive(false);
+            if (placeGunButton) placeGunButton.gameObject.SetActive(false);
+            if (startFightButton) startFightButton.gameObject.SetActive(false);
+        }
+    }
+
     // ───────────── Gameplay Buttons ─────────────
     private void OnStartFightClicked()
     {
@@ -90,15 +106,6 @@ public class UIManager : MonoBehaviour
         var econ = GameEconomyManager.Instance;
         if (econ != null) _ = econ.TryBuyGun(unitManager);
     }
-
-    //private void RefreshButtons()
-    //{
-    //    if (!unitManager) return;
-
-    //    bool full = unitManager.IsBoardFull();
-    //    if (placeKnifeButton) placeKnifeButton.interactable = !full;
-    //    if (placeGunButton) placeGunButton.interactable = !full;
-    //}
 
     // ───────────── Battle Result ─────────────
     public void ShowResult(bool win, int reward)
@@ -139,13 +146,10 @@ public class UIManager : MonoBehaviour
             GameEconomyManager.Instance.UpdateCoinUI();
         }
 
-        Debug.Log("Claim reward, go next level!");
-        //LevelController.Instance.NextLevel();
     }
 
     private void OnNoThanksClicked()
     {
         Debug.Log("Replay current level!");
-        //LevelController.Instance.SetupLevel(LevelController.Instance.currentLevel);
     }
 }

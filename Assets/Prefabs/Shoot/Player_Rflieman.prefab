@@ -785,8 +785,8 @@ MonoBehaviour:
   tileLayer:
     serializedVersion: 2
     m_Bits: 256
-  hoverColor: {r: 0.9, g: 0.8, b: 0.1, a: 1}
   raycastMaxDist: 200
+  hoverColor: {r: 0.9, g: 0.8, b: 0.1, a: 1}
 --- !u!114 &2900766751047485907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -895,7 +895,7 @@ MonoBehaviour:
   turnSpeed: 540
   projectilePrefab: {fileID: 872808010744420583, guid: 77f1e7176fcc23b4885d851bb41aa89c, type: 3}
   firePoint: {fileID: 8441797563155329434}
-  projectileSpeed: 2243
+  projectileSpeed: 3632
   projectileLife: 3.04
 --- !u!114 &9152939171673047095
 MonoBehaviour:

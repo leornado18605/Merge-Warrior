@@ -3807,7 +3807,7 @@ MonoBehaviour:
   turnSpeed: 540
   projectilePrefab: {fileID: 872808010744420583, guid: 77f1e7176fcc23b4885d851bb41aa89c, type: 3}
   firePoint: {fileID: 2622293214859307861}
-  projectileSpeed: 3112.2
+  projectileSpeed: 9526
   projectileLife: 3.17
 --- !u!1 &7589523804928394493
 GameObject:

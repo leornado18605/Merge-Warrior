@@ -12,9 +12,8 @@ public class SettingsUI : MonoBehaviour
     [SerializeField] private Button deleteDataButton;
 
     [Header("Reset config")]
-    [SerializeField] private string initialSceneName = "Level1"; // tên scene khởi đầu
-    [SerializeField] private int initialSceneBuildIndex = 0;     // hoặc để =0 và để tên trống
-
+    [SerializeField] private string initialSceneName = "Level1";
+    [SerializeField] private int initialSceneBuildIndex = 0;    
     // ───── lifecycle ─────
     private void Awake()
     {
@@ -34,7 +33,7 @@ public class SettingsUI : MonoBehaviour
     {
         if (!panel) return;
         panel.SetActive(true);
-        panel.transform.SetAsLastSibling(); // nổi lên trên
+        panel.transform.SetAsLastSibling(); 
         var cg = panel.GetComponentInParent<CanvasGroup>();
         if (cg) { cg.alpha = 1; cg.interactable = true; cg.blocksRaycasts = true; }
     }
@@ -64,18 +63,24 @@ public class SettingsUI : MonoBehaviour
     // ───── Delete data ─────
     private void DeleteAllDataAndReload()
     {
-        // 1) Xoá toàn bộ PlayerPrefs (nhanh, gọn)
         PlayerPrefs.DeleteAll();
         PlayerPrefs.Save();
 
-        // 2) Nếu bạn có hệ thống lưu khác, gọi reset ở đây (nếu có):
-        // NewUnitRevealUI.Instance?.ResetAllUnlockFlags();  // an toàn – DeleteAll đã đủ
-        // GameEconomyManager.Instance?.UpdateCoinUI();      // không bắt buộc vì sẽ reload
+        GameEconomyManager.Instance?.ResetForNewGame();
+        CombatManager.Instance?.ForcePrepState();
+        GameManager.Instance?.SetGunsEnabled(false);
 
-        // 3) Tải lại scene khởi đầu
-        if (!string.IsNullOrEmpty(initialSceneName))
-            SceneManager.LoadScene(initialSceneName);
+        var tut = FindObjectOfType<TutorialManager>();
+        if (tut) tut.gameObject.SetActive(false);
+
+        if (LevelController.Instance != null)
+        {
+            LevelController.Instance.LoadFirst();
+        }
         else
-            SceneManager.LoadScene(initialSceneBuildIndex);
+        {
+            SceneManager.LoadScene(string.IsNullOrEmpty(initialSceneName) ? initialSceneBuildIndex : SceneUtility.GetBuildIndexByScenePath(initialSceneName));
+        }
     }
+
 }

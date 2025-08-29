@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using System.Collections;
 
 public class TutorialManager : MonoBehaviour
@@ -23,12 +22,25 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private RectTransform placeGunRT;
     [SerializeField] private RectTransform startFightRT;
 
+    [Header("Gameplay refs")]
+    [SerializeField] private UnitManager unitManager;
+    [SerializeField] private bool useEconomyInTutorial = true;
+
     [Header("Config")]
     [SerializeField] private float step3Delay = 0.1f;
+    [SerializeField] private GameObject rootToHide;
 
     private int step = 0;
     private Coroutine subRoutine;
     private Coroutine pointerRoutine;
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    #region Unity
+
+    private void Awake()
+    {
+        if (!rootToHide) rootToHide = gameObject; 
+    }
 
     private void OnEnable()
     {
@@ -39,8 +51,10 @@ public class TutorialManager : MonoBehaviour
     {
         if (subRoutine != null) StopCoroutine(subRoutine);
         subRoutine = null;
+
         if (GameManager.Instance != null)
             GameManager.Instance.OnUnitMerged -= HandleUnitMerged;
+
         DetachAll();
     }
 
@@ -55,171 +69,184 @@ public class TutorialManager : MonoBehaviour
     {
         if (canvasRT == null && uiCanvas != null)
             canvasRT = uiCanvas.GetComponent<RectTransform>();
+
         ShowStep(0);
     }
+
+    #endregion
+    // ─────────────────────────────────────────────────────────────────────────────
+    #region Steps
 
     public void ShowStep(int index)
     {
         step = index;
-        if (handPointerGO != null) handPointerGO.SetActive(true);
-        if (step == 0) ShowStepKnife();
-        else if (step == 1) ShowStepGun();
-        else if (step == 2) ShowStepMerge();
-        else if (step == 3) ShowStepStart();
-        else if (step == 4) ShowStepDone();
+        if (handPointerGO) handPointerGO.SetActive(true);
+
+        switch (step)
+        {
+            case 0: ShowStepKnife(); break;
+            case 1: ShowStepGun(); break;
+            case 2: ShowStepMerge(); break;
+            case 3: ShowStepStart(); break;
+            case 4: ShowStepDone(); break;
+        }
     }
 
     private void ShowStepKnife()
     {
-        MoveHandTo(placeKnifeRT, new Vector2(0f, 50f));
-        SafeRemove(placeKnifeButton, OnPlacedKnife);
-        SafeAdd(placeKnifeButton, OnPlacedKnife);
+        SetInteractable(placeKnifeButton, true);
         SetInteractable(placeGunButton, false);
         SetInteractable(startFightButton, false);
-        SetTutorialRaycast(true);
+
+        SetTutorialRaycast(false);
+        MoveHandTo(placeKnifeRT, new Vector2(0f, 50f));
+
+        BindOneShot(placeKnifeButton, () =>
+        {
+            if (useEconomyInTutorial && GameEconomyManager.Instance != null)
+                _ = GameEconomyManager.Instance.TryBuyKnife(unitManager);
+            else
+                unitManager?.PlaceKnife();
+
+            ShowStep(1);
+        });
     }
 
     private void ShowStepGun()
     {
-        MoveHandTo(placeGunRT, new Vector2(0f, 50f));
-        SafeRemove(placeGunButton, OnPlacedGun);
-        SafeAdd(placeGunButton, OnPlacedGun);
+        // Chỉ bật Gun, khoá Start
+        SetInteractable(placeGunButton, true);
         SetInteractable(startFightButton, false);
-        SetTutorialRaycast(true);
+
+        SetTutorialRaycast(false);
+        MoveHandTo(placeGunRT, new Vector2(0f, 50f));
+
+        BindOneShot(placeGunButton, () =>
+        {
+            if (useEconomyInTutorial && GameEconomyManager.Instance != null)
+                _ = GameEconomyManager.Instance.TryBuyGun(unitManager);
+            else
+                unitManager?.PlaceGun();
+
+            ShowStep(2);
+        });
     }
 
     private void ShowStepMerge()
     {
-        if (handPointerGO != null) handPointerGO.SetActive(true);
+        if (handPointerGO) handPointerGO.SetActive(true);
         SetInteractable(startFightButton, false);
         SetTutorialRaycast(true);
 
         if (pointerRoutine != null) { StopCoroutine(pointerRoutine); pointerRoutine = null; }
-        pointerRoutine = StartCoroutine(PointerMoveBetweenTwoUnits()); 
+        pointerRoutine = StartCoroutine(PointerMoveBetweenTwoUnits());
     }
 
     private void ShowStepStart()
     {
-        if (handPointerGO != null) handPointerGO.SetActive(true);
-        SetInteractable(startFightButton, true);
+        if (handPointerGO) handPointerGO.SetActive(true);
         MoveHandTo(startFightRT, Vector2.zero);
-        SafeRemove(startFightButton, OnStartFight);
-        SafeAdd(startFightButton, OnStartFight);
         SetTutorialRaycast(false);
+
+
+        BindOneShot(startFightButton, () =>
+        {
+            CombatManager.Instance?.StartCombat();
+            UIManager.Instance?.SetPlacementUI(false);
+
+            if (handPointerGO) handPointerGO.SetActive(false);
+            if (rootToHide) rootToHide.SetActive(false);
+        });
     }
 
     private void ShowStepDone()
     {
-        if (handPointerGO != null) handPointerGO.SetActive(false);
-        SetInteractable(placeKnifeButton, true);
-        SetInteractable(placeGunButton, true);
-        SetInteractable(startFightButton, true);
+        if (handPointerGO) handPointerGO.SetActive(false);
         DetachAll();
         SetTutorialRaycast(false);
     }
 
-    private void MoveHandTo(RectTransform target, Vector2 offset)
+    #endregion
+    // ─────────────────────────────────────────────────────────────────────────────
+    #region Pointer move (+ camera safe)
+
+    bool EnsureCanvasAndPointer()
     {
-        if (handPointerRT == null || canvasRT == null || target == null) return;
-        Camera cam = uiCanvas != null ? uiCanvas.worldCamera : null;
+        if (!uiCanvas)
+            uiCanvas = GetComponentInParent<Canvas>();
+        if (!canvasRT && uiCanvas)
+            canvasRT = uiCanvas.GetComponent<RectTransform>();
+
+        if (!handPointerRT || !canvasRT) return false;
+
+        if (handPointerRT.parent != canvasRT)
+            handPointerRT.SetParent(canvasRT, false);
+
+        return true;
+    }
+
+    Camera UICamera()
+    {
+        if (!uiCanvas) return null;
+        if (uiCanvas.renderMode == RenderMode.ScreenSpaceOverlay) return null;
+        return uiCanvas.worldCamera ? uiCanvas.worldCamera : Camera.main;
+    }
+
+    public void MoveHandTo(RectTransform target, Vector2 offset)
+    {
+        if (!target) return;
+        if (handPointerGO) handPointerGO.SetActive(true);
+        StartCoroutine(CoMoveHandNextFrame(target, offset));
+    }
+
+    IEnumerator CoMoveHandNextFrame(RectTransform target, Vector2 offset)
+    {
+        yield return null;
+        Canvas.ForceUpdateCanvases();
+        if (!EnsureCanvasAndPointer()) yield break;
+
+        var cam = UICamera();
         Vector2 screen = RectTransformUtility.WorldToScreenPoint(cam, target.position);
         Vector2 local;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRT, screen, cam, out local);
-        handPointerRT.anchoredPosition = local + offset*5;
-        if (handPointerAnim != null) handPointerAnim.SetStartPos(handPointerRT.anchoredPosition);
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRT, screen, cam, out local))
+        {
+            handPointerRT.anchoredPosition = local + offset * 5;
+            if (handPointerAnim) handPointerAnim.SetStartPos(handPointerRT.anchoredPosition);
+        }
     }
 
-    private void SetInteractable(Button button, bool on)
-    {
-        if (button == null) return;
-        button.interactable = on;
-    }
-    private void SetTutorialRaycast(bool on)
-    {
-        if (tutorialCanvasGroup == null) return;
-        tutorialCanvasGroup.blocksRaycasts = on;
-        tutorialCanvasGroup.interactable = on;
-    }
+    #endregion
+    // ─────────────────────────────────────────────────────────────────────────────
+    #region Merge detection pointer
 
-    private void SafeAdd(Button button, UnityEngine.Events.UnityAction cb)
-    {
-        if (button == null || cb == null) return;
-        button.onClick.AddListener(cb);
-    }
-
-    private void SafeRemove(Button button, UnityEngine.Events.UnityAction cb)
-    {
-        if (button == null || cb == null) return;
-        button.onClick.RemoveListener(cb);
-    }
-
-    private void DetachAll()
-    {
-        SafeRemove(placeKnifeButton, OnPlacedKnife);
-        SafeRemove(placeGunButton, OnPlacedGun);
-        SafeRemove(startFightButton, OnStartFight);
-    }
-
-    private void OnPlacedKnife()
-    {
-        SafeRemove(placeKnifeButton, OnPlacedKnife);
-        ShowStep(1);
-    }
-
-    private void OnPlacedGun()
-    {
-        SafeRemove(placeGunButton, OnPlacedGun);
-        ShowStep(2);
-    }
-
-    public void OnMerged()
+    private void HandleUnitMerged(Unit u, int row, int col)
     {
         if (step != 2) return;
 
-        if (pointerRoutine != null)
-        {
-            StopCoroutine(pointerRoutine);
-            pointerRoutine = null;
-        }
-
+        if (pointerRoutine != null) { StopCoroutine(pointerRoutine); pointerRoutine = null; }
         StartCoroutine(GoToStep3());
     }
 
     private IEnumerator GoToStep3()
     {
-        if (handPointerGO != null) handPointerGO.SetActive(false);
+        if (handPointerGO) handPointerGO.SetActive(false);
         yield return new WaitForSeconds(step3Delay);
         ShowStep(3);
     }
 
-    private void OnStartFight()
-    {
-        SafeRemove(startFightButton, OnStartFight);
-        ShowStep(4);
-    }
-
-    private void HandleUnitMerged(Unit u, int row, int col)
-    {
-        if (step != 2) return;
-        OnMerged();
-    }
-
     private IEnumerator PointerMoveBetweenTwoUnits()
     {
-        Unit a = null;
-        Unit b = null;
-
+        Unit a = null, b = null;
         yield return StartCoroutine(WaitForMergeablePair((u1, u2) => { a = u1; b = u2; }));
         if (a == null || b == null) yield break;
 
-        if (handPointerGO != null) handPointerGO.SetActive(true);
+        if (handPointerGO) handPointerGO.SetActive(true);
         yield return StartCoroutine(LoopMoveBetweenTwoUnits(a, b));
     }
 
     private IEnumerator WaitForMergeablePair(System.Action<Unit, Unit> onFound)
     {
-        Unit first = null;
-        Unit second = null;
+        Unit first = null, second = null;
 
         while (step == 2 && (first == null || second == null))
         {
@@ -227,7 +254,7 @@ public class TutorialManager : MonoBehaviour
             TryPickPairFromArray(all, out first, out second);
             if (first != null && second != null)
             {
-                onFound(first, second);   
+                onFound(first, second);
                 yield break;
             }
             yield return null;
@@ -237,7 +264,6 @@ public class TutorialManager : MonoBehaviour
     private void TryPickPairFromArray(Unit[] all, out Unit first, out Unit second)
     {
         first = null; second = null;
-
         for (int i = 0; i < all.Length; i++)
         {
             if (!IsPlayerUnit(all[i])) continue;
@@ -249,42 +275,29 @@ public class TutorialManager : MonoBehaviour
         }
     }
 
-    private bool IsPlayerUnit(Unit u)
-    {
-        if (u == null) return false;
-        return u.CompareTag("Player");
-    }
-
-    private bool IsSameTypeAndLevel(Unit a, Unit b)
-    {
-        if (a == null || b == null) return false;
-        return a.unitType == b.unitType && a.level == b.level;
-    }
+    private bool IsPlayerUnit(Unit u) => u && u.CompareTag("Player");
+    private bool IsSameTypeAndLevel(Unit a, Unit b) => a && b && a.unitType == b.unitType && a.level == b.level;
 
     private IEnumerator LoopMoveBetweenTwoUnits(Unit a, Unit b)
     {
-        while (step == 2 && a != null && b != null)
+        while (step == 2 && a && b)
         {
-            Vector2 pa = GetTopCanvasPos(a);
-            Vector2 pb = GetTopCanvasPos(b);
+            Vector2 pa = WorldToCanvas(a.transform.position + Vector3.up * 1.5f);
+            Vector2 pb = WorldToCanvas(b.transform.position + Vector3.up * 1.5f);
             yield return MoveToPosition(handPointerRT, pa, 0.5f);
             yield return MoveToPosition(handPointerRT, pb, 0.5f);
         }
     }
 
-    private Vector2 GetTopCanvasPos(Unit u)
+    private Vector2 WorldToCanvas(Vector3 worldPos)
     {
-        Vector3 top = u.transform.position + Vector3.up * 1.5f;
-        return WorldToCanvas(top, handPointerRT.parent as RectTransform);
-    }
-
-    private Vector2 WorldToCanvas(Vector3 worldPos, RectTransform canvasRt)
-    {
+        if (!EnsureCanvasAndPointer()) return Vector2.zero;
+        var cam = UICamera();
         Vector2 localPos;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvasRt,
-            Camera.main.WorldToScreenPoint(worldPos),
-            null,
+            canvasRT,
+            Camera.main ? Camera.main.WorldToScreenPoint(worldPos) : Vector3.zero,
+            cam,
             out localPos
         );
         return localPos;
@@ -303,4 +316,49 @@ public class TutorialManager : MonoBehaviour
         rt.anchoredPosition = target;
     }
 
+    #endregion
+    // ─────────────────────────────────────────────────────────────────────────────
+    #region Utils: UI & one-shot
+
+    private void SetInteractable(Button button, bool on)
+    {
+        if (button) button.interactable = on;
+    }
+
+    private void SetTutorialRaycast(bool on)
+    {
+        if (tutorialCanvasGroup)
+        {
+            tutorialCanvasGroup.blocksRaycasts = on;
+            tutorialCanvasGroup.interactable = on;
+        }
+    }
+
+    private void DetachAll()
+    {
+        if (placeKnifeButton) placeKnifeButton.onClick.RemoveAllListeners();
+        if (placeGunButton) placeGunButton.onClick.RemoveAllListeners();
+        if (startFightButton) startFightButton.onClick.RemoveAllListeners();
+    }
+
+
+    private void BindOneShot(Button btn, UnityEngine.Events.UnityAction onClickOnce)
+    {
+        if (!btn) return;
+
+        btn.onClick.RemoveAllListeners();
+        btn.interactable = true;
+
+        btn.onClick.AddListener(() =>
+        {
+            if (!btn.interactable) return;      
+            btn.interactable = false;           
+            btn.onClick.RemoveAllListeners();   
+            btn.gameObject.SetActive(false);    
+
+            onClickOnce?.Invoke();
+        });
+    }
+
+    #endregion
 }
