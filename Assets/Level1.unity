@@ -1566,10 +1566,12 @@ MonoBehaviour:
     levelPrefabs:
     - {fileID: 7946747790403629852, guid: c3848d5171f65c8429d6e73f26d52ac6, type: 3}
     - {fileID: 6194276688369694687, guid: d50ed052893144b49bc406c359e5d09c, type: 3}
+    - {fileID: 8547706365578849493, guid: 03384a3d1ab276f42b69cd67f6148c90, type: 3}
   - unitType: Gun
     levelPrefabs:
     - {fileID: 8463618596152674631, guid: 77ae2a035bd3f284f89e76a877f32a50, type: 3}
     - {fileID: 1271512522970441901, guid: 02f6bd674d795d247903f6a8bc73b6e3, type: 3}
+    - {fileID: 7562681861219087298, guid: 239c393fc573bd64daf4d69ff60a96fd, type: 3}
 --- !u!4 &434615163
 Transform:
   m_ObjectHideFlags: 0
@@ -2473,7 +2475,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 231, y: -316}
+  m_AnchoredPosition: {x: 231, y: -398.8114}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &892392520
@@ -2794,8 +2796,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 18, y: 98}
-  m_SizeDelta: {x: 807.2537, y: 913.2002}
+  m_AnchoredPosition: {x: 30, y: 64}
+  m_SizeDelta: {x: 1027.6, y: 1200.4678}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &963194225
 GameObject:
@@ -3102,9 +3104,9 @@ RectTransform:
   m_Father: {fileID: 920209914}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -28, y: 45.0293}
-  m_SizeDelta: {x: 498.3106, y: 767.0813}
+  m_AnchorMax: {x: 0.5, y: 0.54914755}
+  m_AnchoredPosition: {x: 9, y: 58.6436}
+  m_SizeDelta: {x: 738.3566, y: 741.0721}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1015156070
 CanvasRenderer:
@@ -3535,7 +3537,7 @@ MonoBehaviour:
   defaultBoard: 1
   spawnRows: 3
   spawnCols: 5
-  spawnLimit: 1
+  spawnLimit: 3
   disableDragForBots: 1
   modelYawOffset: 0
   rangedNameKeyword: Knife
@@ -4315,17 +4317,21 @@ MonoBehaviour:
     portraitByLevel:
     - {fileID: 21300000, guid: 285af9a7c6fcec442a78de811567cd5d, type: 3}
     - {fileID: 21300000, guid: 680a45ed9d146f542956350645795221, type: 3}
+    - {fileID: 21300000, guid: ec0e0fe0825d6914498a363c8fda1c3d, type: 3}
     nameByLevel:
     - Rifleman
     - Sylvanas
+    - DrowRange
     coinRewardByLevel: 640000006e000000
   - unitType: Knife
     portraitByLevel:
     - {fileID: 21300000, guid: 77c81291dee01c3469e129258c3244f1, type: 3}
     - {fileID: 21300000, guid: 3aa229010fffe984c85b74c3d46848d9, type: 3}
+    - {fileID: 21300000, guid: e77aaa1e7112c374f87b1d529d63dd43, type: 3}
     nameByLevel:
     - Peon
     - Militia
+    - Wolverine
     coinRewardByLevel: 640000006e000000
   resetUnlocksOnPlayInEditor: 1
   alwaysShowInEditor: 1
@@ -4964,7 +4970,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 72.02698, y: -346.1886}
+  m_AnchoredPosition: {x: 72.02698, y: -429}
   m_SizeDelta: {x: 97.9461, y: 85.6228}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1574800609
@@ -5172,7 +5178,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1604385116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5890,7 +5896,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 198, y: 383}
+  m_AnchoredPosition: {x: 206, y: 578}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1890502655
@@ -6496,7 +6502,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -118, y: -313}
+  m_AnchoredPosition: {x: -118, y: -395.8114}
   m_SizeDelta: {x: 234.9162, y: 53}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2041801388
@@ -6715,7 +6721,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03df8bc7f7330d345ad2a483818fbba2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultCoins: 502
+  defaultCoins: 1187
   Coins: 120
   coinText: {fileID: 894726705}
   buyKnifeButton: {fileID: 571080059}

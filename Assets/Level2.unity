@@ -1247,10 +1247,12 @@ MonoBehaviour:
     levelPrefabs:
     - {fileID: 7946747790403629852, guid: c3848d5171f65c8429d6e73f26d52ac6, type: 3}
     - {fileID: 6194276688369694687, guid: d50ed052893144b49bc406c359e5d09c, type: 3}
+    - {fileID: 8547706365578849493, guid: 03384a3d1ab276f42b69cd67f6148c90, type: 3}
   - unitType: Gun
     levelPrefabs:
     - {fileID: 8463618596152674631, guid: 77ae2a035bd3f284f89e76a877f32a50, type: 3}
     - {fileID: 1271512522970441901, guid: 02f6bd674d795d247903f6a8bc73b6e3, type: 3}
+    - {fileID: 7562681861219087298, guid: 239c393fc573bd64daf4d69ff60a96fd, type: 3}
 --- !u!4 &434615163
 Transform:
   m_ObjectHideFlags: 0
@@ -2015,7 +2017,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 231, y: -316}
+  m_AnchoredPosition: {x: 231, y: -472.8114}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &892392520
@@ -2336,8 +2338,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 18, y: 98}
-  m_SizeDelta: {x: 807.2537, y: 913.2002}
+  m_AnchoredPosition: {x: 6.558899, y: 176.18091}
+  m_SizeDelta: {x: 1089.4673, y: 1405.1672}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &963194225
 GameObject:
@@ -2645,8 +2647,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -28, y: 45.0293}
-  m_SizeDelta: {x: 498.3106, y: 767.0813}
+  m_AnchoredPosition: {x: -3.5876, y: 67.9115}
+  m_SizeDelta: {x: 707.3161, y: 904.3745}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1015156070
 CanvasRenderer:
@@ -3073,16 +3075,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   botLevelPrefabs:
   - {fileID: 5808349704129935754, guid: 4c5dfa1639f04b94baa9725e854e97c6, type: 3}
-  - {fileID: 5037285563700240808, guid: ee6b3bb8964177f498158db53961ad73, type: 3}
+  - {fileID: 7368252900174841059, guid: a87374a2224198045b85cd2e82239b1c, type: 3}
   autoSpawnOnStart: 1
   defaultBoard: 1
   spawnRows: 3
   spawnCols: 5
-  spawnLimit: 3
+  spawnLimit: 5
   disableDragForBots: 1
   modelYawOffset: 0
   rangedNameKeyword: Knife
-  gridManager: {fileID: 0}
+  gridManager: {fileID: 892392521}
 --- !u!1001 &1116151929
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3619,7 +3621,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3045470984261114269, guid: 100c59203fd3e45ef92fe1bf7e2356d3, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -698
+      value: -954
       objectReference: {fileID: 0}
     - target: {fileID: 3045470984261114269, guid: 100c59203fd3e45ef92fe1bf7e2356d3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -3813,18 +3815,22 @@ MonoBehaviour:
     portraitByLevel:
     - {fileID: 21300000, guid: 285af9a7c6fcec442a78de811567cd5d, type: 3}
     - {fileID: 21300000, guid: 680a45ed9d146f542956350645795221, type: 3}
+    - {fileID: 21300000, guid: ec0e0fe0825d6914498a363c8fda1c3d, type: 3}
     nameByLevel:
     - Rifleman
     - Sylvanas
+    - DrowRanger
     coinRewardByLevel: 640000006e000000
   - unitType: Knife
     portraitByLevel:
     - {fileID: 21300000, guid: 77c81291dee01c3469e129258c3244f1, type: 3}
     - {fileID: 21300000, guid: 3aa229010fffe984c85b74c3d46848d9, type: 3}
+    - {fileID: 21300000, guid: e77aaa1e7112c374f87b1d529d63dd43, type: 3}
     nameByLevel:
     - Peon
     - Militia
-    coinRewardByLevel: 640000006e000000
+    - Wolverine
+    coinRewardByLevel: 640000006e00000076000000
   resetUnlocksOnPlayInEditor: 1
   alwaysShowInEditor: 1
 --- !u!114 &1381046039
@@ -4493,7 +4499,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 72.02698, y: -346.1886}
+  m_AnchoredPosition: {x: 72.02698, y: -503}
   m_SizeDelta: {x: 97.9461, y: 85.6228}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1574800609
@@ -4701,7 +4707,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1604385116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5450,6 +5456,7 @@ MonoBehaviour:
   unitManager: {fileID: 904087434}
   uiManager: {fileID: 1039677583}
   botManager: {fileID: 1109887454}
+  economyUI: {fileID: 1248025203}
 --- !u!4 &1815039364
 Transform:
   m_ObjectHideFlags: 0
@@ -5499,7 +5506,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 198, y: 383}
+  m_AnchoredPosition: {x: 198, y: 646}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1890502655
@@ -6105,7 +6112,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -118, y: -313}
+  m_AnchoredPosition: {x: -118, y: -469.8114}
   m_SizeDelta: {x: 234.9162, y: 53}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2041801388
@@ -6324,7 +6331,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03df8bc7f7330d345ad2a483818fbba2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultCoins: 502
+  defaultCoins: 700
   Coins: 517
   coinText: {fileID: 894726705}
   buyKnifeButton: {fileID: 571080059}
