@@ -1,16 +1,17 @@
 ﻿using ObjectPooling;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class BotManager : MonoBehaviour
 {
     public static BotManager Instance { get; private set; }
 
     [Header("Bot Unit Prefabs")]
-    public GameObject[] botLevelPrefabs;
+    [SerializeField] private GameObject[] botLevelPrefabs;
 
-    [Header("Spawn Settings (Inspector)")]
-    [SerializeField] private bool autoSpawnOnStart = true;
+    [Header("Spawn Settings")]
+    [SerializeField] private bool autoSpawnOnStart = false;              // để false, spawn khi bấm Start
     [SerializeField] private GridManager.Board defaultBoard = GridManager.Board.Board2;
     [SerializeField, Min(1)] private int spawnRows = 3;
     [SerializeField, Min(1)] private int spawnCols = 5;
@@ -19,15 +20,13 @@ public class BotManager : MonoBehaviour
     [Header("Input")]
     [SerializeField] private bool disableDragForBots = true;
 
-    [Header("Facing Settings")]
+    [Header("Facing")]
     [SerializeField] private float modelYawOffset = 0f;
 
-    [Header("Ranged Detect")]
+    [Header("Detect")]
     [SerializeField] private string rangedNameKeyword = "Gun";
 
-    private GridManager gridManager;
-
-    // ─────────────────────────────────────────────────────────────────────────────
+    [SerializeField] private GridManager gridManager;
 
     private void Awake()
     {
@@ -35,12 +34,17 @@ public class BotManager : MonoBehaviour
         Instance = this;
     }
 
-    public void SetGridManager(GridManager gm) => gridManager = gm;
+    public void SetGridManager(GridManager gm)
+    {
+        gridManager = gm;
+    }
 
     private void Start()
     {
-        if (gridManager == null) gridManager = FindObjectOfType<GridManager>();
-        if (autoSpawnOnStart && gridManager != null) SpawnFromInspector();
+        if (autoSpawnOnStart && gridManager != null)
+        {
+            SpawnFromInspector();
+        }
     }
 
     [ContextMenu("Spawn Now (from Inspector settings)")]
@@ -48,8 +52,6 @@ public class BotManager : MonoBehaviour
     {
         SpawnBot(defaultBoard, spawnRows, spawnCols, botLevelPrefabs, spawnLimit);
     }
-
-    // ───────────────────────────── Orchestrator ────────────────────────────────
 
     public void SpawnBot(GridManager.Board botBoard,
                          int rows,
@@ -60,32 +62,30 @@ public class BotManager : MonoBehaviour
         if (!ValidateInputs(prefabs, limit)) return;
 
         int spawned = 0;
-        foreach (var cell in EnumerateCenteredArea(rows, cols))
+        foreach (Vector2Int cell in EnumerateCenteredArea(rows, cols))
         {
             if (spawned >= limit) break;
             if (!gridManager.IsValidGridPosition(cell.x, cell.y)) continue;
             if (!gridManager.IsEmptyCell(botBoard, cell.x, cell.y)) continue;
 
             int levelIndex = PickLevelIndex(prefabs);
-            var prefab = prefabs[levelIndex];
+            GameObject prefab = prefabs[levelIndex];
 
-            if (TrySpawnAt(botBoard, cell, prefab, levelIndex, out var bot))
+            if (TrySpawnAt(botBoard, cell, prefab, out GameObject bot))
             {
                 ConfigureSpawnedBot(bot, botBoard, cell, levelIndex);
-                spawned++;
-                Debug.Log($"[BOT SPAWN] Board:{botBoard} Row:{cell.x} Col:{cell.y} Go:{bot.name}");
+                spawned += 1;
             }
         }
-
     }
 
-    // ───────────────────────────── Helpers: flow ───────────────────────────────
+    // ───────────────── helpers ─────────────────
 
     private bool ValidateInputs(GameObject[] prefabs, int limit)
     {
-        if (gridManager == null) { return false; }
-        if (prefabs == null || prefabs.Length == 0) { return false; }
-        if (limit <= 0) { return false; }
+        if (gridManager == null) return false;
+        if (prefabs == null || prefabs.Length == 0) return false;
+        if (limit <= 0) return false;
         return true;
     }
 
@@ -106,18 +106,14 @@ public class BotManager : MonoBehaviour
     private bool TrySpawnAt(GridManager.Board board,
                             Vector2Int cell,
                             GameObject prefab,
-                            int levelIndex,
                             out GameObject bot)
     {
-        Vector3 spawnPos = gridManager.GridToWorldPosition(board, cell.x, cell.y, true);
-        Quaternion rot = GetRotationFacingCamera(spawnPos, modelYawOffset);
+        Vector3 pos = gridManager.GridToWorldPosition(board, cell.x, cell.y, true);
+        Quaternion rot = GetRotationFacingCamera(pos, modelYawOffset);
 
-        bot = PoolManager.Spawn(prefab, spawnPos, rot, gridManager.transform);
+        bot = PoolManager.Spawn(prefab, pos, rot, gridManager.transform);
         if (bot == null) return false;
-        if (bot != null)
-        {
-            bot.transform.localScale = Vector3.one * 150f;
-        }
+
         gridManager.SetCellOccupied(board, cell.x, cell.y, bot);
         return true;
     }
@@ -127,76 +123,44 @@ public class BotManager : MonoBehaviour
                                      Vector2Int cell,
                                      int levelIndex)
     {
-        SetupUnit(bot, board, cell, levelIndex);
-        SetupTeam(bot);
-        DisableDragIfNeeded(bot);
-        SetupNavMesh(bot, gridManager.GridToWorldPosition(board, cell.x, cell.y, true));
+        Unit u = bot.GetComponent<Unit>();
+        if (u == null) return;
 
-        var u = bot.GetComponent<Unit>();
-        if (u) GameManager.Instance?.HookUnit(u);
-
-        if (u && u.core) u.core.team = Team.Enemy;
-
+        UnitTeam t = bot.GetComponent<UnitTeam>();
+        if (t == null) t = bot.AddComponent<UnitTeam>();
+        t.team = Team.Enemy;
         bot.tag = "Enemy";
-    }
 
-    // ───────────────────────────── Helpers: per-system ─────────────────────────
+        UnitCore core = u.core;
+        if (core != null) core.team = Team.Enemy;
 
-    private void SetupUnit(GameObject bot,
-                           GridManager.Board board,
-                           Vector2Int cell,
-                           int levelIndex)
-    {
-        var unit = bot.GetComponent<Unit>();
-        if (unit != null)
+        u.Initialize(u.unitType, levelIndex + 1, gridManager, board, cell.x, cell.y);
+
+        DraggableUnit drag = u.drag;
+        if (disableDragForBots && drag) drag.enabled = false;
+
+        NavMeshAgent ag = u.agent;
+        if (ag != null)
         {
-            unit.Initialize(unit.unitType, levelIndex + 1, gridManager, board, cell.x, cell.y);
+            if (!ag.enabled) ag.enabled = true;
+            ag.updateRotation = false;
+            ag.Warp(gridManager.GridToWorldPosition(board, cell.x, cell.y, true));
+            ag.ResetPath();
         }
+
+        GameManager.Instance?.HookUnit(u);
     }
 
-    private void SetupTeam(GameObject bot)
+    private static Quaternion GetRotationFacingCamera(Vector3 pos, float yawOffset)
     {
-        var team = bot.GetComponent<UnitTeam>() ?? bot.AddComponent<UnitTeam>();
-        team.team = Team.Enemy;
-
-        bot.tag = "Enemy";
-
-        var core = bot.GetComponent<UnitCore>();
-        if (core)
-            core.team = Team.Enemy;
-    }
-
-    private void DisableDragIfNeeded(GameObject bot)
-    {
-        if (!disableDragForBots) return;
-        var drag = bot.GetComponent<DraggableUnit>();
-        if (drag) drag.enabled = false;
-    }
-
-    private void SetupNavMesh(GameObject bot, Vector3 spawnPos)
-    {
-        var agent = bot.GetComponent<UnityEngine.AI.NavMeshAgent>();
-        if (!agent) return;
-
-        if (!agent.enabled) agent.enabled = true;     // ← re-enable from pooled “dead” state
-        agent.updateRotation = false;
-        // Warp only when enabled
-        agent.Warp(spawnPos);
-        agent.ResetPath();
-    }
-
-    // ───────────────────────────── Utilities ───────────────────────────────────
-
-    private static Quaternion GetRotationFacingCamera(Vector3 spawnPos, float yawOffset = 0f)
-    {
-        var cam = Camera.main;
+        Camera cam = Camera.main;
         if (!cam) return Quaternion.identity;
 
-        Vector3 toCam = cam.transform.position - spawnPos;
+        Vector3 toCam = cam.transform.position - pos;
         toCam.y = 0f;
         if (toCam.sqrMagnitude < 1e-4f) toCam = -cam.transform.forward;
 
-        var rot = Quaternion.LookRotation(toCam.normalized, Vector3.up);
+        Quaternion rot = Quaternion.LookRotation(toCam.normalized, Vector3.up);
         if (Mathf.Abs(yawOffset) > 0.001f) rot *= Quaternion.Euler(0f, yawOffset, 0f);
         return rot;
     }

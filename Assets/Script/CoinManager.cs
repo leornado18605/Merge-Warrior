@@ -32,6 +32,9 @@ public class GameEconomyManager : MonoBehaviour
     private int currentPriceKnife;
     private int currentPriceGun;
 
+    public int KnifePrice => currentPriceKnife;
+    public int GunPrice => currentPriceGun;
+
     // ───────── Editor Behavior ─────────
     [Header("Editor Behavior")]
     public bool resetCoinsOnPlayInEditor = true;
@@ -187,4 +190,31 @@ public class GameEconomyManager : MonoBehaviour
 
         Debug.Log("[Economy] ResetForNewGame -> Coins & shop reset về mặc định");
     }
+
+    public bool TryBuyKnife(UnitManager um)
+    {
+        if (!SpendCoin(currentPriceKnife)) return false;
+        currentPriceKnife = Mathf.CeilToInt(currentPriceKnife * priceScale);
+        if (um != null) um.PlaceKnife();
+        UpdateAllShopUI();
+        return true;
+    }
+
+    public bool TryBuyGun(UnitManager um)
+    {
+        if (!SpendCoin(currentPriceGun)) return false;
+        currentPriceGun = Mathf.CeilToInt(currentPriceGun * priceScale);
+        if (um != null) um.PlaceGun();
+        UpdateAllShopUI();
+        return true;
+    }
+
+    public void BindDisplayOnly(TMP_Text coinLabel, TMP_Text knifePrice, TMP_Text gunPrice)
+    {
+        coinText = coinLabel;
+        knifePriceText = knifePrice;
+        gunPriceText = gunPrice;
+        UpdateAllShopUI();
+    }
+
 }

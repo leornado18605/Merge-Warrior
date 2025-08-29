@@ -120,6 +120,9 @@ public class GameManager : MonoBehaviour
         u.core.onHit += OnUnitHit; //add Hook
         if (u.gun)
             RegisterGun(u.gun);
+
+        if (CombatManager.Instance != null)
+            CombatManager.Instance.ApplyStateToUnit(u);
     }
 
     public void UnhookUnit(Unit u)
@@ -567,7 +570,12 @@ public class GameManager : MonoBehaviour
 
     public void RegisterGun(GunController g)
     {
-        if (g && !guns.Contains(g)) guns.Add(g);
+        if (!g) return;
+        if (!guns.Contains(g)) guns.Add(g);
+
+        bool inCombat = CombatManager.Instance != null &&
+                        CombatManager.Instance.CurrentState == CombatManager.State.Combat;
+        g.enabled = inCombat;
     }
 
     public void UnregisterGun(GunController g)
@@ -651,10 +659,10 @@ public class GameManager : MonoBehaviour
     }
 
     public void OnSceneReady(
-        GridManager grid,
-        UnitManager um,
-        UIManager ui,
-        BotManager bot)
+      GridManager grid,
+      UnitManager um,
+      UIManager ui,
+      BotManager bot)
     {
         gridManager = grid;
         unitManager = um;
@@ -662,10 +670,20 @@ public class GameManager : MonoBehaviour
         botManager = bot;
 
         if (botManager != null && gridManager != null)
+        {
             botManager.SetGridManager(gridManager);
+        }
+
+        if (CombatManager.Instance != null)
+        {
+            CombatManager.Instance.Bind(gridManager, this, botManager);
+            CombatManager.Instance.ForcePrepState();
+        }
 
         if (uiManager != null)
+        {
             uiManager.ShowPlacementButtons();
+        }
     }
 }
 

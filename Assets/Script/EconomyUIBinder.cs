@@ -18,5 +18,13 @@ public class EconomyUIBinder : MonoBehaviour
         {
             econ.BindUI(coinText, buyKnifeButton, knifePriceText, buyGunButton, gunPriceText);
         }
+
+    }
+
+    public void Rebind()
+    {
+        GameEconomyManager econ = GameEconomyManager.Instance;
+        if (econ == null) return;
+        econ.BindDisplayOnly(coinText, knifePriceText, gunPriceText);
     }
 }

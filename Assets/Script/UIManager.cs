@@ -81,24 +81,24 @@ public class UIManager : MonoBehaviour
 
     private void OnPlaceKnifeClicked()
     {
-        if (unitManager) unitManager.PlaceKnife();
-        RefreshButtons();
+        var econ = GameEconomyManager.Instance;
+        if (econ != null) _ = econ.TryBuyKnife(unitManager);
     }
 
     private void OnPlaceGunClicked()
     {
-        if (unitManager) unitManager.PlaceGun();
-        RefreshButtons();
+        var econ = GameEconomyManager.Instance;
+        if (econ != null) _ = econ.TryBuyGun(unitManager);
     }
 
-    private void RefreshButtons()
-    {
-        if (!unitManager) return;
+    //private void RefreshButtons()
+    //{
+    //    if (!unitManager) return;
 
-        bool full = unitManager.IsBoardFull();
-        if (placeKnifeButton) placeKnifeButton.interactable = !full;
-        if (placeGunButton) placeGunButton.interactable = !full;
-    }
+    //    bool full = unitManager.IsBoardFull();
+    //    if (placeKnifeButton) placeKnifeButton.interactable = !full;
+    //    if (placeGunButton) placeGunButton.interactable = !full;
+    //}
 
     // ───────────── Battle Result ─────────────
     public void ShowResult(bool win, int reward)

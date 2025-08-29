@@ -2154,6 +2154,55 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 731676045}
   m_CullTransparentMesh: 1
+--- !u!1 &755635972
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 755635974}
+  - component: {fileID: 755635973}
+  m_Layer: 0
+  m_Name: SceneRefs
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &755635973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755635972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b98cd62e7a3cac6448472c3b26c14fa3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grid: {fileID: 892392521}
+  unitManager: {fileID: 904087434}
+  uiManager: {fileID: 1039677583}
+  botManager: {fileID: 1109887454}
+  economyUI: {fileID: 1248025203}
+--- !u!4 &755635974
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755635972}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1085.5839, y: 3066.7046, z: 7284.7026}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &777481832 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7216595549606336002, guid: 642c7baabff554d75a2a3e1a1a0c891e, type: 3}
@@ -3490,6 +3539,7 @@ MonoBehaviour:
   disableDragForBots: 1
   modelYawOffset: 0
   rangedNameKeyword: Knife
+  gridManager: {fileID: 892392521}
 --- !u!1001 &1116151929
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3872,7 +3922,6 @@ MonoBehaviour:
   knifePriceText: {fileID: 176890818}
   buyGunButton: {fileID: 1450697944}
   gunPriceText: {fileID: 1475297539}
-  unitManager: {fileID: 904087434}
 --- !u!1 &1298572732
 GameObject:
   m_ObjectHideFlags: 0
@@ -6859,3 +6908,4 @@ SceneRoots:
   - {fileID: 613691110}
   - {fileID: 1763656739}
   - {fileID: 1216819506}
+  - {fileID: 755635974}
