@@ -46,6 +46,14 @@ public class GunController : MonoBehaviour
     #region Lifecycle
     void OnEnable()
     {
+
+        if (CombatManager.Instance == null ||
+            CombatManager.Instance.CurrentState == CombatManager.State.Prep)
+        {
+            enabled = false; 
+            return;
+        }
+
         grid = self ? self.Grid : null;
         agent.stoppingDistance = stopDist;
         agent.updateRotation = false;

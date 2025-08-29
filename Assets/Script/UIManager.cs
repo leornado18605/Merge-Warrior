@@ -140,12 +140,12 @@ public class UIManager : MonoBehaviour
         }
 
         Debug.Log("Claim reward, go next level!");
-        LevelController.Instance.NextLevel();
+        //LevelController.Instance.NextLevel();
     }
 
     private void OnNoThanksClicked()
     {
         Debug.Log("Replay current level!");
-        LevelController.Instance.SetupLevel(LevelController.Instance.currentLevel);
+        //LevelController.Instance.SetupLevel(LevelController.Instance.currentLevel);
     }
 }

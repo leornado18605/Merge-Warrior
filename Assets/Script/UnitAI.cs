@@ -88,8 +88,26 @@ public class UnitTargeting : MonoBehaviour
 
     void OnEnable()
     {
+        if (CombatManager.Instance == null || CombatManager.Instance.CurrentState == CombatManager.State.Prep)
+        {
+            enabled = false; 
+            return;
+        }
+
         SnapToNav();
         StartCoroutine(Loop());
+    }
+    void OnDisable()
+    {
+        if (agent)
+        {
+            agent.isStopped = true;
+            agent.ResetPath();
+            agent.velocity = Vector3.zero;
+        }
+        target = null;
+        cachedDest = default;
+        SetRun(false);
     }
 
     void LateUpdate()
@@ -339,6 +357,8 @@ public class UnitTargeting : MonoBehaviour
         if (self.IsMergeLocked()) return false;
         if (!agent.isOnNavMesh) return false;
         return true;
+
+
     }
 
     void OnDrawGizmosSelected()

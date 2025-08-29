@@ -2,8 +2,8 @@
 
 public class HandPointerAnim : MonoBehaviour
 {
-    public float amplitude = 10f;   // biên độ nhún
-    public float speed = 2f;        // tốc độ nhún
+    public float amplitude = 10f;   
+    public float speed = 2f;       
     private Vector3 startPos;
 
     void OnEnable()

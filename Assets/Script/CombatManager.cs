@@ -141,4 +141,10 @@ public class CombatManager : MonoBehaviour
         Scan(GridManager.Board.Board1);
         Scan(GridManager.Board.Board2);
     }
+
+    public void ForcePrepState()
+    {
+        CurrentState = State.Prep;
+        ApplyPrepState();
+    }
 }

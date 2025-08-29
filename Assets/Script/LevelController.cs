@@ -1,20 +1,26 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LevelController : MonoBehaviour
 {
     public static LevelController Instance { get; private set; }
 
-    [Header("Refs")]
-    [SerializeField] private GridManager gridManager;
-    [SerializeField] private BotManager botManager;
-    [SerializeField] private GameManager gameManager;
+    public int CurrentIndex
+    {
+        get { return SceneManager.GetActiveScene().buildIndex; }
+    }
 
-    [Header("Level Settings")]
-    public int currentLevel = 1;
-    public int maxLevel = 5;
+    public int TotalScenes
+    {
+        get { return SceneManager.sceneCountInBuildSettings; }
+    }
 
-    [SerializeField] private float resultDelay = 0.6f;
-    private bool endBattleScheduled = false;
+    public bool HasNext()
+    {
+        return CurrentIndex + 1 < TotalScenes;
+    }
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -23,58 +29,69 @@ public class LevelController : MonoBehaviour
             return;
         }
         Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
-    private void Start()
+    public void LoadNext()
     {
-        SetupLevel(currentLevel); 
-    }
-
-    public void NextLevel()
-    {
-        if (currentLevel < maxLevel)
+        if (HasNext())
         {
-            currentLevel++;
-            SetupLevel(currentLevel);
-            Debug.Log($"➡️ Moving to level {currentLevel}");
+            StartCoroutine(LoadAndInitIndex(CurrentIndex + 1));
         }
     }
 
-    public void SetupLevel(int level)
+    public void Reload()
     {
-        Debug.Log($"🔄 SetupLevel {level}");
-
-        gridManager.ClearAllUnits();
-
-        gameManager.ResetBattle();
-
-        switch (level)
-        {
-            case 1:
-                botManager.SpawnBot(GridManager.Board.Board2, 2, 3, botManager.botLevelPrefabs, 5);
-                break;
-            case 2:
-                botManager.SpawnBot(GridManager.Board.Board2, 3, 4, botManager.botLevelPrefabs, 8);
-                break;
-            case 3:
-                botManager.SpawnBot(GridManager.Board.Board2, 4, 5, botManager.botLevelPrefabs, 10);
-                break;
-            default:
-                botManager.SpawnBot(GridManager.Board.Board2, 5, 5, botManager.botLevelPrefabs, 12);
-                break;
-        }
-
-        ChangeBackground(level);
+        StartCoroutine(LoadAndInitIndex(CurrentIndex));
     }
 
-    private void ChangeBackground(int level)
+    public void LoadFirst()
     {
-        Camera.main.backgroundColor = level switch
+        StartCoroutine(LoadAndInitIndex(0));
+    }
+
+    public void LoadByName(string sceneName)
+    {
+        StartCoroutine(LoadAndInitName(sceneName));
+    }
+
+    private IEnumerator LoadAndInitIndex(int buildIndex)
+    {
+        AsyncOperation op = SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Single);
+        yield return op;
+        yield return null;
+        yield return null;
+
+        yield return WaitManagersReady();
+
+        if (CombatManager.Instance != null)
         {
-            1 => Color.green,
-            2 => Color.blue,
-            3 => Color.red,
-            _ => Color.black,
-        };
+            CombatManager.Instance.ForcePrepState();
+        }
+    }
+
+    private IEnumerator LoadAndInitName(string sceneName)
+    {
+        AsyncOperation op = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+        yield return op;
+        yield return null;
+        yield return null;
+
+        yield return WaitManagersReady();
+
+        if (CombatManager.Instance != null)
+        {
+            CombatManager.Instance.ForcePrepState();
+        }
+    }
+
+    private IEnumerator WaitManagersReady()
+    {
+        int safety = 30;
+        while (GridManager.Instance == null && safety > 0)
+        {
+            safety -= 1;
+            yield return null;
+        }
     }
 }

@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using ObjectPooling;
+using System;
 
+[DefaultExecutionOrder(-100)]
 public sealed class GridManager : MonoBehaviour
 {
+    public static GridManager Instance { get; private set; }
     public enum Board { Board1, Board2 }
 
     [Header("Grid Settings")]
@@ -48,12 +51,25 @@ public sealed class GridManager : MonoBehaviour
     public Vector3 Board1Origin => board1Origin;
     public Vector3 Board2Origin => board2Origin;
 
+    public bool IsReady { get; private set; }
+    public event Action Built;
+
     private void Awake()
     {
+
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        IsReady = false;
         AllocateArrays();
         PrecreatePools();
         ComputeOrigins();
         SpawnBoards();
+        IsReady = true;
+
+        Built?.Invoke();
+
     }
 
     #region Allocation / Pooling / Rebuild
@@ -83,6 +99,7 @@ public sealed class GridManager : MonoBehaviour
     /// </summary>
     public void Rebuild()
     {
+        IsReady = false;
         ClearAllVisuals();
         AllocateArrays();
         PrecreatePools();
@@ -96,6 +113,8 @@ public sealed class GridManager : MonoBehaviour
                 occupantsB1[r, c] = null;
                 occupantsB2[r, c] = null;
             }
+        IsReady = true;
+        Built?.Invoke();
     }
 
     private void ClearAllVisuals()

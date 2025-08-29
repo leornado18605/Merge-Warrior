@@ -87,9 +87,24 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        if (botManager != null)
-            botManager.SetGridManager(gridManager);
+        StartCoroutine(InitWhenGridReady());
+    }
 
+    private IEnumerator InitWhenGridReady()
+    {
+        // đợi reference có
+        while (gridManager == null) yield return null;
+
+        // đợi GridManager dựng xong
+        if (!gridManager.IsReady)
+        {
+            bool done = false;
+            gridManager.Built += () => done = true;
+            while (!gridManager.IsReady && !done) yield return null;
+        }
+
+        // Lúc này bàn cờ đã sẵn sàng → mới set bot / spawn / run loop
+        if (botManager != null) botManager.SetGridManager(gridManager);
         StartCoroutine(RunLoop());
     }
 
@@ -612,4 +627,5 @@ public class GameManager : MonoBehaviour
 
 
 }
+
 

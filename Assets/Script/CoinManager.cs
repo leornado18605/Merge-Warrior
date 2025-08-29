@@ -101,9 +101,7 @@ public class GameEconomyManager : MonoBehaviour
         knifePriceText = knifePrice;
         gunPriceText = gunPrice;
 
-        if (buyKnifeButton) { buyKnifeButton.onClick.RemoveAllListeners(); buyKnifeButton.onClick.AddListener(BuyKnife); }
-        if (buyGunButton) { buyGunButton.onClick.RemoveAllListeners(); buyGunButton.onClick.AddListener(BuyGun); }
-
+     
         UpdateAllShopUI();
     }
 
@@ -172,5 +170,21 @@ public class GameEconomyManager : MonoBehaviour
 #endif
         PlayerPrefs.SetInt(PlayerCoinsKey, Coins);
         PlayerPrefs.Save();
+    }
+
+    // ───────── Reset for new game ─────────
+    public void ResetForNewGame()
+    {
+        // reset coins
+        Coins = defaultCoins;
+
+        // reset giá Knife/Gun
+        currentPriceKnife = basePriceKnife;
+        currentPriceGun = basePriceGun;
+
+        SaveCoins();
+        UpdateAllShopUI();
+
+        Debug.Log("[Economy] ResetForNewGame -> Coins & shop reset về mặc định");
     }
 }
