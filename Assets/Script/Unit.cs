@@ -1,7 +1,8 @@
-﻿using System.Collections;
+﻿using ObjectPooling;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
-
+using DG.Tweening; 
 public class Unit : MonoBehaviour
 {
     public string unitType;
@@ -24,6 +25,16 @@ public class Unit : MonoBehaviour
     [SerializeField] public DraggableUnit drag;
 
     [SerializeField] public GunController gun;
+
+    [Header("Merge Effect")]
+    [SerializeField] private GameObject mergeEffectPrefab;
+    [SerializeField] private float mergeEffectDuration = 1.5f;
+
+    [Header("Level Up Effect")]
+    [SerializeField] private GameObject levelUpEffectPrefab;
+    [SerializeField] private float levelUpEffectDuration = 1f;
+
+    private GameObject currentMergeEffect;
 
     public void Initialize(string unitType, int level, GridManager gridManager, GridManager.Board board, int row, int col)
     {
@@ -71,4 +82,45 @@ public class Unit : MonoBehaviour
         mergeLock = false;
     }
 
+    public void MergeWithEffect(GameObject nextPrefab, int nextLevel)
+    {
+        StartCoroutine(MergeEffectCoroutine(nextPrefab, nextLevel));
+    }
+
+    private IEnumerator MergeEffectCoroutine(GameObject nextPrefab, int nextLevel)
+    {
+        // 🔹 Step 1: thu nhỏ unit cũ
+        transform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack);
+
+        // 🔹 Spawn hiệu ứng merge
+        GameObject fx = null;
+        if (mergeEffectPrefab)
+            fx = Instantiate(mergeEffectPrefab, transform.position + Vector3.up, Quaternion.identity, transform);
+
+        MergeLockTemporary(mergeEffectDuration);
+
+        yield return new WaitForSeconds(mergeEffectDuration);
+
+        if (fx) Destroy(fx);
+
+        // despawn unit cũ
+        PoolManager.Release(gameObject);
+
+        // 🔹 Step 2: spawn unit mới (scale từ 0 -> 1)
+        var pos = Grid.GridToWorldPosition(Board, row, col, true);
+        var newObj = GameManager.Instance.CreateMergedUnit(nextPrefab, unitType, nextLevel, Board, row, col, pos);
+
+        if (newObj != null)
+        {
+            newObj.transform.localScale = Vector3.zero;
+            newObj.transform.DOScale(Vector3.one * 300f, 0.4f).SetEase(Ease.OutBack); // hiệu ứng bật nảy
+        }
+
+        // 🔹 Step 3: Spawn hiệu ứng level-up
+        if (levelUpEffectPrefab && newObj != null)
+        {
+            var levelFx = Instantiate(levelUpEffectPrefab, newObj.transform.position + Vector3.up, Quaternion.identity, newObj.transform);
+            Destroy(levelFx, levelUpEffectDuration);
+        }
+    }
 }

@@ -21,7 +21,7 @@ public class NewUnitRevealUI : MonoBehaviour
     // ===== CTA =====
     [Header("CTA")]
     [SerializeField] private Button claimButton;
-    [SerializeField] private TMP_Text claimCoinText;
+    [SerializeField] private TMP_Text claimCoinText;    
     [SerializeField] private Button noThanksButton;
 
     // ===== Reward default =====
@@ -65,7 +65,6 @@ public class NewUnitRevealUI : MonoBehaviour
 #endif
 
         if (panel) panel.SetActive(false);
-        if (claimButton) claimButton.onClick.AddListener(OnClaim);
         if (noThanksButton) noThanksButton.onClick.AddListener(Close);
 
         BuildMap();
@@ -74,7 +73,7 @@ public class NewUnitRevealUI : MonoBehaviour
 #if UNITY_EDITOR
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F9)) ResetAllUnlockFlags(); 
+        if (Input.GetKeyDown(KeyCode.F9)) ResetAllUnlockFlags();
     }
 #endif
 
@@ -109,16 +108,15 @@ public class NewUnitRevealUI : MonoBehaviour
         Show(u);
     }
 
-    // Hiển thị thử cho dev (không cần object Unit)
     public void ShowFor(string unitType, int level, int hp, int dmg, Sprite portraitOverride = null, int rewardOverride = -1)
     {
         current = null;
         isShowing = true;
         FillCardManual(unitType, level, hp, dmg, portraitOverride, rewardOverride);
         OpenPanelOnTop();
+
     }
 
-    // Xoá 1 flag cụ thể
     public void ResetUnlockFlag(string unitType, int level)
     {
         string key = MakeSeenKey(unitType, level);
@@ -126,7 +124,6 @@ public class NewUnitRevealUI : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    // Xoá tất cả flag (dựa trên catalog)
     [ContextMenu("DEV: Reset All Unlock Flags")]
     public void ResetAllUnlockFlags()
     {
@@ -154,6 +151,7 @@ public class NewUnitRevealUI : MonoBehaviour
         isShowing = true;
         FillCard(u);
         OpenPanelOnTop();
+
     }
 
     private void OpenPanelOnTop()
@@ -236,14 +234,6 @@ public class NewUnitRevealUI : MonoBehaviour
             if (portrait && portraitOverride) portrait.sprite = portraitOverride;
             if (claimCoinText) claimCoinText.text = (rewardOverride > 0 ? rewardOverride : coinReward).ToString();
         }
-    }
-
-    private void OnClaim()
-    {
-        int reward = coinReward;
-        if (claimCoinText && int.TryParse(claimCoinText.text, out var parsed)) reward = parsed;
-        GameEconomyManager.Instance?.AddCoin(reward);
-        Close();
     }
 
     private void Close()

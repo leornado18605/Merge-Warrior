@@ -3704,6 +3704,10 @@ MonoBehaviour:
   anim: {fileID: 4363888405414256594}
   drag: {fileID: 3924579617559795851}
   gun: {fileID: 6496690504707668072}
+  mergeEffectPrefab: {fileID: 4548092828928976001, guid: a73595b1d0633e5488efe1f1eb71cc4a, type: 3}
+  mergeEffectDuration: 1.5
+  levelUpEffectPrefab: {fileID: 245778096654299747, guid: b2ee2defcb5a85645be5359be5dfe9a2, type: 3}
+  levelUpEffectDuration: 1
 --- !u!195 &5500843348205797342
 NavMeshAgent:
   m_ObjectHideFlags: 0

@@ -48,8 +48,6 @@ public class GameManager : MonoBehaviour
     private bool endBattleScheduled = false;
     private Coroutine endBattleRoutine;
 
-    public event System.Action<Team?> OnBattleEnded;
-
     private bool battleEnded = false;
     [Serializable]
     public class UnitUpgradeEntry
@@ -281,7 +279,15 @@ public class GameManager : MonoBehaviour
         CleanupSource(sourceUnit, sourceObj);
         PoolManager.Release(targetObj);
 
-        CreateMergedUnit(arr[newLv - 1], targetUnit.unitType, newLv, board, targetRow, targetCol, pos);
+        if (newLv == 2)
+        {
+            var dummy = CreateMergedUnit(arr[0], targetUnit.unitType, 1, board, targetRow, targetCol, pos);
+            dummy.GetComponent<Unit>()?.MergeWithEffect(arr[newLv - 1], newLv);
+        }
+        else
+        {
+            CreateMergedUnit(arr[newLv - 1], targetUnit.unitType, newLv, board, targetRow, targetCol, pos);
+        }
         return true;
     }
 
@@ -311,7 +317,7 @@ public class GameManager : MonoBehaviour
         UnhookUnit(u);
     }
 
-    private void CreateMergedUnit(
+    public GameObject CreateMergedUnit(
         GameObject prefab,
         string type,
         int lv,
@@ -322,9 +328,9 @@ public class GameManager : MonoBehaviour
     {
         var obj = PoolManager.Spawn(prefab, pos, Quaternion.identity);
         var u = obj.GetComponent<Unit>();
-        if (u == null) return;
+        if (u == null) return null;   // ✅ thêm return null để code an toàn
 
-        //Security Button
+        // Security Button
         var es = obj.GetComponentsInChildren<EventSystem>(true);
         for (int i = 0; i < es.Length; i++) Destroy(es[i].gameObject);
 
@@ -340,6 +346,8 @@ public class GameManager : MonoBehaviour
         OnUnitMerged?.Invoke(u, row, col);
 
         EnsureEventSystemExists();
+
+        return obj;   // ✅ trả về GameObject vừa spawn
     }
 
     private static void EnsureEventSystemExists()
@@ -633,7 +641,6 @@ public class GameManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // đăng ký callback mỗi khi scene load xong
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
@@ -644,17 +651,14 @@ public class GameManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // Sau khi load scene mới, tìm lại refs trong scene
         gridManager = FindObjectOfType<GridManager>();
         unitManager = FindObjectOfType<UnitManager>();
         uiManager = FindObjectOfType<UIManager>();
         botManager = FindObjectOfType<BotManager>();
 
-        // reset lại tham chiếu cho botManager
         if (botManager != null && gridManager != null)
             botManager.SetGridManager(gridManager);
 
-        // chạy lại init nếu cần
         StartCoroutine(InitWhenGridReady());
     }
 

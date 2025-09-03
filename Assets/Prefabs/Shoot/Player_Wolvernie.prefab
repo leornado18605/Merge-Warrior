@@ -421,6 +421,10 @@ MonoBehaviour:
   anim: {fileID: 8248948379739500666}
   drag: {fileID: 942240961122081041}
   gun: {fileID: 1813911944006950378}
+  mergeEffectPrefab: {fileID: 4548092828928976001, guid: a73595b1d0633e5488efe1f1eb71cc4a, type: 3}
+  mergeEffectDuration: 1.5
+  levelUpEffectPrefab: {fileID: 245778096654299747, guid: b2ee2defcb5a85645be5359be5dfe9a2, type: 3}
+  levelUpEffectDuration: 1
 --- !u!114 &2782565315230856250
 MonoBehaviour:
   m_ObjectHideFlags: 0

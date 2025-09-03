@@ -1112,8 +1112,8 @@ MonoBehaviour:
   tileLayer:
     serializedVersion: 2
     m_Bits: 256
-  hoverColor: {r: 0.9019608, g: 0.3351918, b: 0.10196079, a: 1}
   raycastMaxDist: 200
+  hoverColor: {r: 0.9019608, g: 0.3351918, b: 0.10196079, a: 1}
 --- !u!114 &561649842869463870
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1137,6 +1137,10 @@ MonoBehaviour:
   anim: {fileID: 6474447679947078632}
   drag: {fileID: 2457825504803916630}
   gun: {fileID: 0}
+  mergeEffectPrefab: {fileID: 4548092828928976001, guid: b0ffaf9f65a863e4f98539d68d7baa72, type: 3}
+  mergeEffectDuration: 1.15
+  levelUpEffectPrefab: {fileID: 245778096654299747, guid: 4cd3a526908d4be4a96b87248b75d19d, type: 3}
+  levelUpEffectDuration: 1
 --- !u!114 &1233744641705634937
 MonoBehaviour:
   m_ObjectHideFlags: 0
