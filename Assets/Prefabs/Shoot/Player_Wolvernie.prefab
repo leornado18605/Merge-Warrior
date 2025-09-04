@@ -313,6 +313,7 @@ GameObject:
   - component: {fileID: 2246015773284395403}
   - component: {fileID: 1813911944006950378}
   - component: {fileID: 3244173299680929965}
+  - component: {fileID: 8382478674171679541}
   m_Layer: 6
   m_Name: Player_Wolvernie
   m_TagString: Player
@@ -393,6 +394,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unit: {fileID: 8706450686235537275}
+  agent: {fileID: 0}
   tileLayer:
     serializedVersion: 2
     m_Bits: 256
@@ -425,6 +427,7 @@ MonoBehaviour:
   mergeEffectDuration: 1.5
   levelUpEffectPrefab: {fileID: 245778096654299747, guid: b2ee2defcb5a85645be5359be5dfe9a2, type: 3}
   levelUpEffectDuration: 1
+  rb: {fileID: 0}
 --- !u!114 &2782565315230856250
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -531,6 +534,33 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   normalAvoidance: 4
+--- !u!54 &8382478674171679541
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1271512522970441901}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1383649037753395227
 GameObject:
   m_ObjectHideFlags: 0

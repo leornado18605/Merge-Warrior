@@ -92,102 +92,190 @@ public class GunController : MonoBehaviour
             SetTarget(Reacquire());
             if (!Valid(target))
             {
-                Debug.Log($"[GunController] {name} cannot find valid target | team={core.team} | tag={self.tag}");
                 StopMove();
                 return;
             }
         }
 
-        Debug.Log($"[GunController] {name} has target {target.name} | team={core.team}");
         StopMove();
         TryShoot();
     }
     #endregion
 
     #region Targeting
-    bool Valid(Unit u)
+
+    private bool Valid(Unit unit)
     {
-        if (!u || !u.core || !u.core.Alive()) return false;
-        string need = self.tag == "Player" ? "Enemy" : "Player";
-        return u.CompareTag(need);
+        if (unit == null) return false;
+        if (unit.core == null) return false;
+        if (!unit.core.Alive()) return false;
+
+        string neededTag;
+        if (self.tag == "Player")
+        {
+            neededTag = "Enemy";
+        }
+        else
+        {
+            neededTag = "Player";
+        }
+
+        return unit.CompareTag(neededTag);
     }
 
-    Unit Reacquire()
+    private Unit Reacquire()
     {
-        var opp = self.Board == GridManager.Board.Board1
-            ? GridManager.Board.Board2 : GridManager.Board.Board1;
+        GridManager.Board opponentBoard;
+        if (self.Board == GridManager.Board.Board1)
+        {
+            opponentBoard = GridManager.Board.Board2;
+        }
+        else
+        {
+            opponentBoard = GridManager.Board.Board1;
+        }
 
-        Unit best = null; float bestD = float.MaxValue;
+        Unit bestUnit = null;
+        float bestDistance = float.MaxValue;
+
         for (int r = 0; r < grid.Rows; r++)
+        {
             for (int c = 0; c < grid.Cols; c++)
             {
-                var u = grid.GetOccupantUnit(opp, r, c);
-                if (!Valid(u)) continue;
-                float d = Vector3.Distance(transform.position, u.transform.position);
-                if (d < bestD) { bestD = d; best = u; }
+                Unit candidate = grid.GetOccupantUnit(opponentBoard, r, c);
+                if (!Valid(candidate)) continue;
+
+                float distance = Vector3.Distance(transform.position, candidate.transform.position);
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    bestUnit = candidate;
+                }
             }
-        return best;
+        }
+
+        return bestUnit;
     }
 
-    void SetTarget(Unit u)
+    private void SetTarget(Unit unit)
     {
-        if (u == target) return;
+        if (unit == target) return;
+
         UnsubscribeTarget();
-        target = u;
-        targetCore = target ? target.core : null;
-        if (targetCore != null) targetCore.onDead += OnTargetDead;
+        target = unit;
+
+        if (target != null)
+        {
+            targetCore = target.core;
+            if (targetCore != null)
+            {
+                targetCore.onDead += OnTargetDead;
+            }
+        }
+        else
+        {
+            targetCore = null;
+        }
     }
 
-    void UnsubscribeTarget()
+    private void UnsubscribeTarget()
     {
-        if (targetCore != null) targetCore.onDead -= OnTargetDead;
+        if (targetCore != null)
+        {
+            targetCore.onDead -= OnTargetDead;
+        }
         targetCore = null;
     }
 
-    void OnTargetDead(UnitCore _) { SetTarget(null); }
+    private void OnTargetDead(UnitCore deadCore)
+    {
+        SetTarget(null);
+    }
+
     #endregion
 
-    #region Movement/Rotation
-    void StopMove()
+    #region Movement / Rotation
+
+    private void StopMove()
     {
+        if (agent == null) return;
+
         agent.isStopped = true;
         agent.ResetPath();
     }
 
-    void SmoothFace(Vector3 p)
+    private void SmoothFace(Vector3 targetPosition)
     {
-        var dir = p - transform.position; dir.y = 0f;
-        if (dir.sqrMagnitude < 1e-4f) return;
-        var to = Quaternion.LookRotation(dir.normalized);
+        Vector3 direction = targetPosition - transform.position;
+        direction.y = 0f;
+
+        if (direction.sqrMagnitude < 0.0001f) return;
+
+        Quaternion targetRotation = Quaternion.LookRotation(direction.normalized);
         transform.rotation = Quaternion.RotateTowards(
-            transform.rotation, to, turnSpeed * Time.deltaTime);
+            transform.rotation,
+            targetRotation,
+            turnSpeed * Time.deltaTime
+        );
     }
+
     #endregion
 
     #region Shooting
-    void TryShoot()
+
+    private void TryShoot()
     {
         if (Time.time - lastAtk < attackGap) return;
         if (!Valid(target)) return;
-        anim?.SetTrigger("Attack");
+
+        if (anim != null)
+        {
+            anim.SetTrigger("Attack");
+        }
+
         lastAtk = Time.time;
         StartCoroutine(FireAfterDelay());
-        Debug.Log($"[GunController] {name} TryShoot() | team={core.team} | target={(target ? target.name : "null")}");
+
+        string targetName = (target != null) ? target.name : "null";
     }
 
-    IEnumerator FireAfterDelay()
+    private IEnumerator FireAfterDelay()
     {
         yield return new WaitForSeconds(fireDelay);
-        if (!Valid(target)) SetTarget(Reacquire());
-        if (!Valid(target) || !projectilePrefab || !firePoint) yield break;
 
-        var go = PoolManager.Spawn(projectilePrefab, firePoint.position, firePoint.rotation, null);
-        var proj = go ? go.GetComponent<RangedProjectile>() : null;
-        if (proj)
+        if (!Valid(target))
         {
-            proj.Launch(core.team, core.dmg, target.transform, projectileLife, projectileSpeed);
+            SetTarget(Reacquire());
+        }
+
+        if (!Valid(target)) yield break;
+        if (projectilePrefab == null) yield break;
+        if (firePoint == null) yield break;
+
+        GameObject projectileObject = PoolManager.Spawn(
+            projectilePrefab,
+            firePoint.position,
+            firePoint.rotation,
+            null
+        );
+
+        if (projectileObject == null) yield break;
+
+        RangedProjectile projectile =
+            projectileObject.GetComponent<RangedProjectile>();
+
+        if (projectile != null)
+        {
+            projectile.Launch(
+                core.team,
+                core.dmg,
+                target.transform,
+                projectileLife,
+                projectileSpeed
+            );
         }
     }
+
     #endregion
 
     #region Validation
@@ -214,10 +302,26 @@ public class GunController : MonoBehaviour
         return true;
     }
     #endregion
-    void SnapToNav()
+
+    #region Navigation
+
+    private void SnapToNav()
     {
-        if (NavMesh.SamplePosition(transform.position, out var hit, 5f, NavMesh.AllAreas))
+        NavMeshHit hit;
+
+        bool found = NavMesh.SamplePosition(
+            transform.position,
+            out hit,
+            5f,
+            NavMesh.AllAreas
+        );
+
+        if (found)
+        {
             agent.Warp(hit.position);
+        }
     }
+
+    #endregion
 
 }

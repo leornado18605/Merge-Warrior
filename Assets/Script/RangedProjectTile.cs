@@ -4,26 +4,31 @@ using ObjectPooling;
 [DisallowMultipleComponent]
 public class RangedProjectile : MonoBehaviour, IPoolable
 {
+    #region Config
     [Header("Links/Config")]
-    [SerializeField] Rigidbody rb;
-    [SerializeField] LayerMask hitMask = ~0;
-    [SerializeField] float turnSpeed = 720f;
-    [SerializeField] bool autoFace = true;
-    [SerializeField] Vector3 rotOffsetEuler;
+    [SerializeField] private Rigidbody rb;
+    [SerializeField] private LayerMask hitMask = ~0;
+    [SerializeField] private float turnSpeed = 720f;
+    [SerializeField] private bool autoFace = true;
+    [SerializeField] private Vector3 rotOffsetEuler;
 
     [Header("Fail-safe")]
-    [SerializeField] float loseTargetDespawnDelay = 0.25f;
-    [SerializeField] float maxLifetime = 5f;             
+    [SerializeField] private float loseTargetDespawnDelay = 0.25f;
+    [SerializeField] private float maxLifetime = 5f;
+    #endregion
 
-    Transform target;
-    UnitCore targetCore;
-    Team fromTeam;
-    int dmg;
-    float life;
-    float speed;
-    float lostTargetTimer;
-    Quaternion RotOff => Quaternion.Euler(rotOffsetEuler);
+    #region Runtime state
+    private Transform target;
+    private UnitCore targetCore;
+    private Team fromTeam;
+    private int dmg;
+    private float life;
+    private float speed;
+    private float lostTargetTimer;
+    private Quaternion RotOff => Quaternion.Euler(rotOffsetEuler);
+    #endregion
 
+    #region Launch
     public void Launch(Team from, int damage, Transform t, float lifetime, float projSpeed)
     {
         fromTeam = from;
@@ -33,7 +38,6 @@ public class RangedProjectile : MonoBehaviour, IPoolable
         speed = Mathf.Max(0.1f, projSpeed);
         lostTargetTimer = 0f;
 
-
         if (rb) rb.velocity = Vector3.zero;
 
         UnhookTarget();
@@ -41,10 +45,15 @@ public class RangedProjectile : MonoBehaviour, IPoolable
         if (targetCore != null) targetCore.onDead += OnTargetDead;
 
         if (target)
-            SetRotation(Quaternion.LookRotation((target.position - transform.position).normalized) * RotOff);
+        {
+            Vector3 dir = (target.position - transform.position).normalized;
+            SetRotation(Quaternion.LookRotation(dir) * RotOff);
+        }
     }
+    #endregion
 
-    void FixedUpdate()
+    #region FixedUpdate
+    private void FixedUpdate()
     {
         life -= Time.fixedDeltaTime;
         if (life <= 0f) { Despawn(); return; }
@@ -52,8 +61,9 @@ public class RangedProjectile : MonoBehaviour, IPoolable
         bool targetAlive = (targetCore != null && targetCore.Alive());
         if (autoFace && targetAlive)
         {
-            var want = Quaternion.LookRotation((target.position - transform.position).normalized) * RotOff;
-            var to = Quaternion.RotateTowards(transform.rotation, want, turnSpeed * Time.fixedDeltaTime);
+            Vector3 dir = (target.position - transform.position).normalized;
+            Quaternion want = Quaternion.LookRotation(dir) * RotOff;
+            Quaternion to = Quaternion.RotateTowards(transform.rotation, want, turnSpeed * Time.fixedDeltaTime);
             SetRotation(to);
         }
         else
@@ -69,39 +79,53 @@ public class RangedProjectile : MonoBehaviour, IPoolable
         if (rb) rb.velocity = transform.forward * speed;
         else transform.position += transform.forward * speed * Time.fixedDeltaTime;
     }
+    #endregion
 
-    void OnTriggerEnter(Collider other)
+    #region Collision
+    private void OnTriggerEnter(Collider other)
     {
         if (((1 << other.gameObject.layer) & hitMask) == 0) return;
 
-        var core = other.GetComponent<UnitCore>();
+        UnitCore core = other.GetComponent<UnitCore>();
         if (!core) return;
-        if (!core.Alive()) return;           
-        if (core.team == fromTeam) return;    
+        if (!core.Alive()) return;
+        if (core.team == fromTeam) return;
 
         core.Hit(new DamageData(dmg, fromTeam, transform.position));
         Despawn();
     }
+    #endregion
 
-    void OnTargetDead(UnitCore _)
-    {
-        Despawn();
-    }
+    #region Target Hooks
+    private void OnTargetDead(UnitCore _) { Despawn(); }
 
-    public void OnSpawned() { if (rb) rb.velocity = Vector3.zero; }
-    public void OnDespawned() { if (rb) rb.velocity = Vector3.zero; UnhookTarget(); target = null; }
-
-    // helpers
-    void SetRotation(Quaternion q) { if (rb) rb.MoveRotation(q); else transform.rotation = q; }
-
-    void Despawn()
-    {
-        PoolManager.Release(gameObject);
-    }
-
-    void UnhookTarget()
+    private void UnhookTarget()
     {
         if (targetCore != null) targetCore.onDead -= OnTargetDead;
         targetCore = null;
     }
+    #endregion
+
+    #region Pool Callbacks
+    public void OnSpawned() { if (rb) rb.velocity = Vector3.zero; }
+    public void OnDespawned()
+    {
+        if (rb) rb.velocity = Vector3.zero;
+        UnhookTarget();
+        target = null;
+    }
+    #endregion
+
+    #region Helpers
+    private void SetRotation(Quaternion q)
+    {
+        if (rb) rb.MoveRotation(q);
+        else transform.rotation = q;
+    }
+
+    private void Despawn()
+    {
+        PoolManager.Release(gameObject);
+    }
+    #endregion
 }

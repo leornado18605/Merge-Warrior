@@ -5,26 +5,30 @@ using UnityEngine.AI;
 public class CombatManager : MonoBehaviour
 {
     public enum State { Prep, Combat }
-
     public static CombatManager Instance { get; private set; }
 
-    [Header("Refs")]
+    #region References
+    [Header("References")]
     [SerializeField] private GridManager grid;
     [SerializeField] private GameManager game;
     [SerializeField] private BotManager bot;
+    #endregion
 
+    #region Options
     [Header("Options")]
     [SerializeField] private bool snapUnitsBackInPrep = true;
-    public bool spawnBotsOnFight = false;
-    public bool disableDragDuringCombat = true;
-    public bool lockOnlyBoard1 = true;
+    [SerializeField] private bool spawnBotsOnFight = false;
+    [SerializeField] private bool disableDragDuringCombat = true;
+    [SerializeField] private bool lockOnlyBoard1 = true;
 
     [Header("Nav/AI Defaults")]
-    public bool stopAgentsInPrep = true;
-    public bool disableTargetingInPrep = true;
+    [SerializeField] private bool stopAgentsInPrep = true;
+    [SerializeField] private bool disableTargetingInPrep = true;
+    #endregion
 
     public State CurrentState { get; private set; } = State.Prep;
 
+    #region Lifecycle
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -37,23 +41,20 @@ public class CombatManager : MonoBehaviour
 
     private void Start()
     {
-        if (grid != null)
-        {
-            ApplyPrepState();
-        }
+        if (grid != null) ApplyPrepState();
     }
+    #endregion
 
-    public void Bind(
-        GridManager gm,
-        GameManager g,
-        BotManager bm)
+    #region Binding
+    public void Bind(GridManager gm, GameManager g, BotManager bm)
     {
         grid = gm;
         game = g;
         bot = bm;
     }
+    #endregion
 
-    [ContextMenu("Start Combat")]
+    #region State Control
     public void StartCombat()
     {
         if (CurrentState == State.Combat) return;
@@ -61,17 +62,12 @@ public class CombatManager : MonoBehaviour
         CurrentState = State.Combat;
         LockInput(true);
 
-        if (spawnBotsOnFight && bot != null)
-        {
-            bot.SetGridManager(grid);
-            bot.SpawnFromInspector();
-        }
+        if (spawnBotsOnFight && bot != null) SpawnBots();
 
         ForEachUnit(HandleStartForUnit);
-        GameManager.Instance?.SetGunsEnabled(true);
+        if (game != null) game.SetGunsEnabled(true);
     }
 
-    [ContextMenu("End Combat")]
     public void EndCombat()
     {
         if (CurrentState == State.Prep) return;
@@ -82,14 +78,8 @@ public class CombatManager : MonoBehaviour
 
     public void ToggleFight()
     {
-        if (CurrentState == State.Prep)
-        {
-            StartCombat();
-        }
-        else
-        {
-            EndCombat();
-        }
+        if (CurrentState == State.Prep) StartCombat();
+        else EndCombat();
     }
 
     public void ForcePrepState()
@@ -97,7 +87,9 @@ public class CombatManager : MonoBehaviour
         CurrentState = State.Prep;
         ApplyPrepState();
     }
+    #endregion
 
+    #region Prep State
     private void ApplyPrepState()
     {
         if (grid == null) return;
@@ -105,41 +97,33 @@ public class CombatManager : MonoBehaviour
         LockInput(false);
         ForEachUnit(HandlePrepForUnit);
 
-        if (snapUnitsBackInPrep)
-        {
-            SnapAllUnitsToCells();
-        }
-
-        GameManager.Instance?.SetGunsEnabled(false);
+        if (snapUnitsBackInPrep) SnapAllUnitsToCells();
+        if (game != null) game.SetGunsEnabled(false);
     }
 
     private void LockInput(bool locked)
     {
         if (grid == null) return;
 
-        if (lockOnlyBoard1)
-        {
-            grid.lockBoard1Input = locked;
-        }
+        if (lockOnlyBoard1) grid.lockBoard1Input = locked;
         else
         {
             grid.lockBoard1Input = locked;
             grid.lockBoard2Input = locked;
         }
     }
+    #endregion
 
+    #region Unit Iteration
     private void ForEachUnit(Action<Unit> action)
     {
-        if (grid == null) return;
-        if (action == null) return;
+        if (grid == null || action == null) return;
 
         IterateBoard(GridManager.Board.Board1, action);
         IterateBoard(GridManager.Board.Board2, action);
     }
 
-    private void IterateBoard(
-        GridManager.Board board,
-        Action<Unit> action)
+    private void IterateBoard(GridManager.Board board, Action<Unit> action)
     {
         for (int r = 0; r < grid.Rows; r++)
         {
@@ -150,101 +134,67 @@ public class CombatManager : MonoBehaviour
             }
         }
     }
+    #endregion
 
+    #region Unit State Handlers
     private void HandleStartForUnit(Unit u)
     {
         EnsureAgentOnNavMesh(u);
 
-        if (u.targeting != null)
-        {
-            u.targeting.enabled = true;
-        }
+        if (u.targeting != null) u.targeting.enabled = true;
+        if (disableDragDuringCombat && u.drag != null) u.drag.enabled = false;
 
-        if (disableDragDuringCombat && u.drag != null)
-        {
-            u.drag.enabled = false;
-        }
+        EnableAgentMovement(u);
+        TriggerRunAnimation(u);
+    }
 
+    private void HandlePrepForUnit(Unit u)
+    {
+        if (disableTargetingInPrep && u.targeting != null) u.targeting.enabled = false;
+        if (u.drag != null) u.drag.enabled = true;
+
+        StopAgentIfNeeded(u);
+        StopRunAnimation(u);
+    }
+    #endregion
+
+    #region Agent Helpers
+    private void EnsureAgentOnNavMesh(Unit u)
+    {
+        if (u == null || u.agent == null || grid == null) return;
+
+        if (!u.agent.enabled) u.agent.enabled = true;
+
+        Vector3 pos = grid.GridToWorldPosition(u.Board, u.row, u.col, true);
+
+        NavMeshHit hit;
+        bool ok = NavMesh.SamplePosition(pos, out hit, 2.0f, NavMesh.AllAreas);
+
+        u.agent.Warp(ok ? hit.position : pos);
+        u.agent.ResetPath();
+    }
+
+    private void EnableAgentMovement(Unit u)
+    {
         if (u.agent != null)
         {
             u.agent.isStopped = false;
             u.agent.ResetPath();
         }
-
-        if (u.targeting != null &&
-            u.anim != null &&
-            !string.IsNullOrEmpty(u.targeting.runBool))
-        {
-            if (u.targeting.role == UnitTargeting.Role.Knife)
-            {
-                u.anim.SetBool(u.targeting.runBool, true);
-            }
-        }
     }
 
-    private void HandlePrepForUnit(Unit u)
+    private void StopAgentIfNeeded(Unit u)
     {
-        if (disableTargetingInPrep && u.targeting != null)
-        {
-            u.targeting.enabled = false;
-        }
-
-        if (u.drag != null)
-        {
-            u.drag.enabled = true;
-        }
-
         if (stopAgentsInPrep && u.agent != null)
         {
             u.agent.isStopped = true;
             u.agent.ResetPath();
             u.agent.velocity = Vector3.zero;
         }
-
-        if (u.targeting != null &&
-            u.anim != null &&
-            !string.IsNullOrEmpty(u.targeting.runBool))
-        {
-            u.anim.SetBool(u.targeting.runBool, false);
-        }
     }
+    #endregion
 
-    private void EnsureAgentOnNavMesh(Unit u)
-    {
-        if (u == null) return;
-        if (u.agent == null) return;
-        if (grid == null) return;
-
-        if (!u.agent.enabled)
-        {
-            u.agent.enabled = true;
-        }
-
-        Vector3 pos = grid.GridToWorldPosition(
-            u.Board,
-            u.row,
-            u.col,
-            true);
-
-        NavMeshHit hit;
-        bool ok = NavMesh.SamplePosition(
-            pos,
-            out hit,
-            2.0f,
-            NavMesh.AllAreas);
-
-        if (ok)
-        {
-            u.agent.Warp(hit.position);
-        }
-        else
-        {
-            u.agent.Warp(pos);
-        }
-
-        u.agent.ResetPath();
-    }
-
+    #region Snap Helpers
     private void SnapAllUnitsToCells()
     {
         if (grid == null) return;
@@ -259,51 +209,48 @@ public class CombatManager : MonoBehaviour
         }
     }
 
-    private void SnapCell(
-        GridManager.Board board,
-        int row,
-        int col)
+    private void SnapCell(GridManager.Board board, int row, int col)
     {
         Unit u = grid.GetOccupantUnit(board, row, col);
         if (u == null) return;
 
-        Vector3 pos = grid.GridToWorldPosition(
-            board,
-            row,
-            col,
-            true);
-
+        Vector3 pos = grid.GridToWorldPosition(board, row, col, true);
         u.transform.position = pos;
         u.UpdateOriginalPosition(pos, row, col);
 
-        if (u.agent != null)
+        SnapAgentToPosition(u, pos);
+        StopRunAnimation(u);
+    }
+
+    private void SnapAgentToPosition(Unit u, Vector3 pos)
+    {
+        if (u.agent == null) return;
+        if (!u.agent.enabled) u.agent.enabled = true;
+
+        NavMeshHit hit;
+        bool ok = NavMesh.SamplePosition(pos, out hit, 2.0f, NavMesh.AllAreas);
+
+        u.agent.Warp(ok ? hit.position : pos);
+        u.agent.ResetPath();
+        u.agent.isStopped = true;
+        u.agent.velocity = Vector3.zero;
+    }
+    #endregion
+
+    #region Animation Helpers
+    private void TriggerRunAnimation(Unit u)
+    {
+        if (u.targeting != null &&
+            u.anim != null &&
+            !string.IsNullOrEmpty(u.targeting.runBool) &&
+            u.targeting.role == UnitTargeting.Role.Knife)
         {
-            if (!u.agent.enabled)
-            {
-                u.agent.enabled = true;
-            }
-
-            NavMeshHit hit;
-            bool ok = NavMesh.SamplePosition(
-                pos,
-                out hit,
-                2.0f,
-                NavMesh.AllAreas);
-
-            if (ok)
-            {
-                u.agent.Warp(hit.position);
-            }
-            else
-            {
-                u.agent.Warp(pos);
-            }
-
-            u.agent.ResetPath();
-            u.agent.isStopped = true;
-            u.agent.velocity = Vector3.zero;
+            u.anim.SetBool(u.targeting.runBool, true);
         }
+    }
 
+    private void StopRunAnimation(Unit u)
+    {
         if (u.targeting != null &&
             u.anim != null &&
             !string.IsNullOrEmpty(u.targeting.runBool))
@@ -311,16 +258,26 @@ public class CombatManager : MonoBehaviour
             u.anim.SetBool(u.targeting.runBool, false);
         }
     }
+    #endregion
 
+    #region Bots
+    private void SpawnBots()
+    {
+        bot.SetGridManager(grid);
+        bot.SpawnFromInspector();
+    }
+    #endregion
+
+    #region Apply State
     public void ApplyStateToUnit(Unit u)
     {
         if (u == null) return;
 
         bool isPrep = CurrentState == State.Prep;
 
-        if (u.drag) u.drag.enabled = isPrep;
+        if (u.drag != null) u.drag.enabled = isPrep;
 
-        if (u.agent)
+        if (u.agent != null)
         {
             if (!u.agent.enabled) u.agent.enabled = true;
             u.agent.isStopped = isPrep && stopAgentsInPrep;
@@ -329,16 +286,14 @@ public class CombatManager : MonoBehaviour
 
         if (disableTargetingInPrep)
         {
-            if (u.targeting) u.targeting.enabled = !isPrep;
+            if (u.targeting != null) u.targeting.enabled = !isPrep;
         }
         else
         {
-            if (u.targeting) u.targeting.enabled = true;
+            if (u.targeting != null) u.targeting.enabled = true;
         }
 
-        if (!isPrep)
-        {
-            EnsureAgentOnNavMesh(u);
-        }
+        if (!isPrep) EnsureAgentOnNavMesh(u);
     }
+    #endregion
 }

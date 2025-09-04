@@ -1820,6 +1820,7 @@ GameObject:
   - component: {fileID: 4186101108997938834}
   - component: {fileID: 4131994886057645051}
   - component: {fileID: 6483074915160810808}
+  - component: {fileID: -7135800838074509205}
   m_Layer: 7
   m_Name: AI_Wolverine 1
   m_TagString: Enemy
@@ -1909,6 +1910,11 @@ MonoBehaviour:
   anim: {fileID: 6591220587699371277}
   drag: {fileID: 4131994886057645051}
   gun: {fileID: 0}
+  mergeEffectPrefab: {fileID: 0}
+  mergeEffectDuration: 1.5
+  levelUpEffectPrefab: {fileID: 0}
+  levelUpEffectDuration: 1
+  rb: {fileID: -7135800838074509205}
 --- !u!195 &6821315282849481922
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -2010,6 +2016,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unit: {fileID: 7081958687244698934}
+  agent: {fileID: 0}
   tileLayer:
     serializedVersion: 2
     m_Bits: 256
@@ -2028,6 +2035,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   team: 1
+--- !u!54 &-7135800838074509205
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8547706365578849493}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &8593570340077882268
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,7 +11,7 @@ public class BotManager : MonoBehaviour
     [SerializeField] private GameObject[] botLevelPrefabs;
 
     [Header("Spawn Settings")]
-    [SerializeField] private bool autoSpawnOnStart = false;              // để false, spawn khi bấm Start
+    [SerializeField] private bool autoSpawnOnStart = false;
     [SerializeField] private GridManager.Board defaultBoard = GridManager.Board.Board2;
     [SerializeField, Min(1)] private int spawnRows = 3;
     [SerializeField, Min(1)] private int spawnCols = 5;
@@ -26,17 +26,21 @@ public class BotManager : MonoBehaviour
     [Header("Detect")]
     [SerializeField] private string rangedNameKeyword = "Gun";
 
+    [Header("Refs")]
     [SerializeField] private GridManager gridManager;
+
+    // ──────────────────────────────────────────────
+    #region Lifecycle
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-        Instance = this;
-    }
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
 
-    public void SetGridManager(GridManager gm)
-    {
-        gridManager = gm;
+        Instance = this;
     }
 
     private void Start()
@@ -47,21 +51,46 @@ public class BotManager : MonoBehaviour
         }
     }
 
+    private void OnValidate()
+    {
+        if (spawnRows < 1) spawnRows = 1;
+        if (spawnCols < 1) spawnCols = 1;
+        if (spawnLimit < 0) spawnLimit = 0;
+    }
+
+    #endregion
+    // ──────────────────────────────────────────────
+    #region Public API
+
+    public void SetGridManager(GridManager gm)
+    {
+        gridManager = gm;
+    }
+
     [ContextMenu("Spawn Now (from Inspector settings)")]
     public void SpawnFromInspector()
     {
-        SpawnBot(defaultBoard, spawnRows, spawnCols, botLevelPrefabs, spawnLimit);
+        SpawnBot(
+            defaultBoard,
+            spawnRows,
+            spawnCols,
+            botLevelPrefabs,
+            spawnLimit
+        );
     }
 
-    public void SpawnBot(GridManager.Board botBoard,
-                         int rows,
-                         int cols,
-                         GameObject[] prefabs,
-                         int limit = int.MaxValue)
+    public void SpawnBot(
+        GridManager.Board botBoard,
+        int rows,
+        int cols,
+        GameObject[] prefabs,
+        int limit = int.MaxValue
+    )
     {
         if (!ValidateInputs(prefabs, limit)) return;
 
         int spawned = 0;
+
         foreach (Vector2Int cell in EnumerateCenteredArea(rows, cols))
         {
             if (spawned >= limit) break;
@@ -71,21 +100,43 @@ public class BotManager : MonoBehaviour
             int levelIndex = PickLevelIndex(prefabs);
             GameObject prefab = prefabs[levelIndex];
 
-            if (TrySpawnAt(botBoard, cell, prefab, out GameObject bot))
+            GameObject bot;
+            bool success = TrySpawnAt(botBoard, cell, prefab, out bot);
+
+            if (success)
             {
                 ConfigureSpawnedBot(bot, botBoard, cell, levelIndex);
                 spawned += 1;
             }
         }
     }
+    public void ClearEnemies()
+    {
+        if (gridManager == null) return;
 
-    // ───────────────── helpers ─────────────────
+        for (int r = 0; r < gridManager.Rows; r++)
+        {
+            for (int c = 0; c < gridManager.Cols; c++)
+            {
+                GameObject enemy = gridManager.GetOccupant(GridManager.Board.Board2, r, c);
+                if (enemy != null)
+                {
+                    PoolManager.Release(enemy);
+                    gridManager.SetCellOccupied(GridManager.Board.Board2, r, c, null);
+                }
+            }
+        }
+    }
+    #endregion
+    // ──────────────────────────────────────────────
+    #region Spawn Helpers
 
     private bool ValidateInputs(GameObject[] prefabs, int limit)
     {
         if (gridManager == null) return false;
         if (prefabs == null || prefabs.Length == 0) return false;
         if (limit <= 0) return false;
+
         return true;
     }
 
@@ -93,9 +144,14 @@ public class BotManager : MonoBehaviour
     {
         int startRow = 0;
         int startCol = Mathf.Max(0, (gridManager.Cols - cols) / 2);
+
         for (int r = 0; r < rows; r++)
+        {
             for (int c = 0; c < cols; c++)
+            {
                 yield return new Vector2Int(startRow + r, startCol + c);
+            }
+        }
     }
 
     private int PickLevelIndex(GameObject[] prefabs)
@@ -103,10 +159,12 @@ public class BotManager : MonoBehaviour
         return Random.Range(0, prefabs.Length);
     }
 
-    private bool TrySpawnAt(GridManager.Board board,
-                            Vector2Int cell,
-                            GameObject prefab,
-                            out GameObject bot)
+    private bool TrySpawnAt(
+        GridManager.Board board,
+        Vector2Int cell,
+        GameObject prefab,
+        out GameObject bot
+    )
     {
         Vector3 pos = gridManager.GridToWorldPosition(board, cell.x, cell.y, true);
         Quaternion rot = GetRotationFacingCamera(pos, modelYawOffset);
@@ -118,57 +176,85 @@ public class BotManager : MonoBehaviour
         return true;
     }
 
-    private void ConfigureSpawnedBot(GameObject bot,
-                                     GridManager.Board board,
-                                     Vector2Int cell,
-                                     int levelIndex)
+    private void ConfigureSpawnedBot(
+        GameObject bot,
+        GridManager.Board board,
+        Vector2Int cell,
+        int levelIndex
+    )
     {
-        Unit u = bot.GetComponent<Unit>();
-        if (u == null) return;
+        Unit unit = bot.GetComponent<Unit>();
+        if (unit == null) return;
 
-        UnitTeam t = bot.GetComponent<UnitTeam>();
-        if (t == null) t = bot.AddComponent<UnitTeam>();
-        t.team = Team.Enemy;
+        // Team
+        UnitTeam team = bot.GetComponent<UnitTeam>();
+        if (team == null) team = bot.AddComponent<UnitTeam>();
+        team.team = Team.Enemy;
         bot.tag = "Enemy";
 
-        UnitCore core = u.core;
+        // Core
+        UnitCore core = unit.core;
         if (core != null) core.team = Team.Enemy;
 
-        u.Initialize(u.unitType, levelIndex + 1, gridManager, board, cell.x, cell.y);
+        unit.Initialize(
+            unit.unitType,
+            levelIndex + 1,
+            gridManager,
+            board,
+            cell.x,
+            cell.y
+        );
 
-        DraggableUnit drag = u.drag;
-        if (disableDragForBots && drag) drag.enabled = false;
-
-        NavMeshAgent ag = u.agent;
-        if (ag != null)
+        // Drag
+        DraggableUnit drag = unit.drag;
+        if (disableDragForBots && drag != null)
         {
-            if (!ag.enabled) ag.enabled = true;
-            ag.updateRotation = false;
-            ag.Warp(gridManager.GridToWorldPosition(board, cell.x, cell.y, true));
-            ag.ResetPath();
+            drag.enabled = false;
         }
 
-        GameManager.Instance?.HookUnit(u);
+        // NavMeshAgent
+        NavMeshAgent agent = unit.agent;
+        if (agent != null)
+        {
+            if (!agent.enabled) agent.enabled = true;
+            agent.updateRotation = false;
+
+            Vector3 worldPos = gridManager.GridToWorldPosition(board, cell.x, cell.y, true);
+            agent.Warp(worldPos);
+            agent.ResetPath();
+        }
+
+        // Hook GameManager
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.HookUnit(unit);
+        }
     }
 
     private static Quaternion GetRotationFacingCamera(Vector3 pos, float yawOffset)
     {
         Camera cam = Camera.main;
-        if (!cam) return Quaternion.identity;
+        if (cam == null) return Quaternion.identity;
 
-        Vector3 toCam = cam.transform.position - pos;
+        Vector3 camPos = cam.transform.position;
+        Vector3 toCam = camPos - pos;
         toCam.y = 0f;
-        if (toCam.sqrMagnitude < 1e-4f) toCam = -cam.transform.forward;
+
+        float sqrLen = toCam.sqrMagnitude;
+        if (sqrLen < 0.0001f)
+        {
+            toCam = -cam.transform.forward;
+        }
 
         Quaternion rot = Quaternion.LookRotation(toCam.normalized, Vector3.up);
-        if (Mathf.Abs(yawOffset) > 0.001f) rot *= Quaternion.Euler(0f, yawOffset, 0f);
+
+        if (Mathf.Abs(yawOffset) > 0.001f)
+        {
+            rot *= Quaternion.Euler(0f, yawOffset, 0f);
+        }
+
         return rot;
     }
 
-    private void OnValidate()
-    {
-        if (spawnRows < 1) spawnRows = 1;
-        if (spawnCols < 1) spawnCols = 1;
-        if (spawnLimit < 0) spawnLimit = 0;
-    }
+    #endregion
 }

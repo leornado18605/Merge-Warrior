@@ -3615,6 +3615,7 @@ GameObject:
   - component: {fileID: 7726920186804045006}
   - component: {fileID: 3924579617559795851}
   - component: {fileID: 6496690504707668072}
+  - component: {fileID: 4780582993566704321}
   m_Layer: 6
   m_Name: Player_DrowRanger
   m_TagString: Player
@@ -3708,6 +3709,7 @@ MonoBehaviour:
   mergeEffectDuration: 1.5
   levelUpEffectPrefab: {fileID: 245778096654299747, guid: b2ee2defcb5a85645be5359be5dfe9a2, type: 3}
   levelUpEffectDuration: 1
+  rb: {fileID: 4780582993566704321}
 --- !u!195 &5500843348205797342
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -3783,6 +3785,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unit: {fileID: 5075732707522080786}
+  agent: {fileID: 0}
   tileLayer:
     serializedVersion: 2
     m_Bits: 256
@@ -3813,6 +3816,33 @@ MonoBehaviour:
   firePoint: {fileID: 2622293214859307861}
   projectileSpeed: 9526
   projectileLife: 3.17
+--- !u!54 &4780582993566704321
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7562681861219087298}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &7589523804928394493
 GameObject:
   m_ObjectHideFlags: 0

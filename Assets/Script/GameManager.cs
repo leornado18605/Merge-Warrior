@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
     [Header("Refs")]
     [SerializeField] private BotManager botManager;
     [SerializeField] private GridManager gridManager;
-    [SerializeField] private UnitManager unitManager;   
+    [SerializeField] private UnitManager unitManager;
     [SerializeField] private UIManager uiManager;
 
     [Header("Merge")]
@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float deadDespawnDelay = 1.2f;
 
     [Header("Win/End")]
-    [SerializeField] private string winTrigger = "Win";   
+    [SerializeField] private string winTrigger = "Win";
     [SerializeField] private bool endCombatOnWin = true;
 
     [SerializeField] private GridManager.Board playerBoard = GridManager.Board.Board1;
@@ -108,77 +108,97 @@ public class GameManager : MonoBehaviour
     // ─────────────────────────────────────────────────────────────────────────────
     #region Register Units / Death
 
-    public void HookUnit(Unit u)
+    public void HookUnit(Unit unit)
     {
-        if (u == null || u.core == null) return;
-        if (unitMap.ContainsKey(u.core)) return;
+        if (unit == null || unit.core == null) return;
+        if (unitMap.ContainsKey(unit.core)) return;
 
-        unitMap.Add(u.core, u);
-        u.core.onDead += OnDeadCore;
-        u.core.onHit += OnUnitHit; //add Hook
-        if (u.gun)
-            RegisterGun(u.gun);
+        unitMap.Add(unit.core, unit);
+        unit.core.onDead += OnDeadCore;
+        unit.core.onHit += OnUnitHit;
+
+        if (unit.gun != null)
+        {
+            RegisterGun(unit.gun);
+        }
 
         if (CombatManager.Instance != null)
-            CombatManager.Instance.ApplyStateToUnit(u);
+        {
+            CombatManager.Instance.ApplyStateToUnit(unit);
+        }
     }
 
-    public void UnhookUnit(Unit u)
+    public void UnhookUnit(Unit unit)
     {
-        if (u == null || u.core == null) return;
-        if (!unitMap.ContainsKey(u.core)) return;
+        if (unit == null || unit.core == null) return;
+        if (!unitMap.ContainsKey(unit.core)) return;
 
+        if (unit.gun != null)
+        {
+            UnregisterGun(unit.gun);
+        }
 
-        if (u.gun) UnregisterGun(u.gun);
-        u.core.onDead -= OnDeadCore;
-        unitMap.Remove(u.core);
+        unit.core.onDead -= OnDeadCore;
+        unitMap.Remove(unit.core);
     }
 
-    public void OnUnitHit(UnitCore core, int dmg)
+    public void OnUnitHit(UnitCore core, int damage)
     {
         if (core == null) return;
+
         if (core.team == Team.Player)
         {
-            damageByEnemy += dmg;
+            damageByEnemy += damage;
         }
         else if (core.team == Team.Enemy)
         {
-            damageByPlayer += dmg;
+            damageByPlayer += damage;
         }
     }
 
-    private void OnDeadCore(UnitCore c)
+    private void OnDeadCore(UnitCore core)
     {
-        if (!unitMap.TryGetValue(c, out var u)) return;
+        Unit unit;
+        if (!unitMap.TryGetValue(core, out unit)) return;
 
-        var targeting = u.GetComponent<UnitTargeting>();
-        if (targeting) targeting.enabled = false;
-
-        var agent = u.GetComponent<UnityEngine.AI.NavMeshAgent>();
-        if (agent)
+        // Disable targeting
+        if (unit.targeting != null)
         {
-            agent.ResetPath();
-            agent.isStopped = true;
-            agent.updatePosition = true;
-            agent.updateRotation = false;
-            agent.enabled = false;
-        }
-        var rb = u.GetComponent<Rigidbody>();
-        if (rb)
-        {
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            rb.isKinematic = true;
+            unit.targeting.enabled = false;
         }
 
-        PlayDieAnim(u);
-        ClearCell(u);
-        OnUnitDead?.Invoke(u);
-        StartCoroutine(DelayRelease(u.gameObject, deadDespawnDelay));
+        // Disable agent
+        if (unit.agent != null)
+        {
+            unit.agent.ResetPath();
+            unit.agent.isStopped = true;
+            unit.agent.updatePosition = true;
+            unit.agent.updateRotation = false;
+            unit.agent.enabled = false;
+        }
+
+        // Reset rigidbody
+        if (unit.rb != null)
+        {
+            unit.rb.velocity = Vector3.zero;
+            unit.rb.angularVelocity = Vector3.zero;
+            unit.rb.isKinematic = true;
+        }
+
+        PlayDieAnim(unit);
+        ClearCell(unit);
+
+        if (OnUnitDead != null)
+        {
+            OnUnitDead.Invoke(unit);
+        }
+
+        StartCoroutine(DelayRelease(unit.gameObject, deadDespawnDelay));
         CheckBattleOver();
     }
 
     #endregion
+
     // ─────────────────────────────────────────────────────────────────────────────
     #region Attack
 
@@ -214,11 +234,11 @@ public class GameManager : MonoBehaviour
 
     #endregion
     // ─────────────────────────────────────────────────────────────────────────────
-    #region Running (set Running bool theo Agent)
+    #region Running (update Running bool by NavMeshAgent)
 
     private IEnumerator RunLoop()
     {
-        var wait = new WaitForSeconds(runTick);
+        WaitForSeconds wait = new WaitForSeconds(runTick);
 
         while (true)
         {
@@ -228,66 +248,70 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void ApplyRunState(GridManager.Board b)
+    private void ApplyRunState(GridManager.Board board)
     {
         if (gridManager == null) return;
 
-        for (int r = 0; r < gridManager.Rows; r++)
+        for (int row = 0; row < gridManager.Rows; row++)
         {
-            for (int c = 0; c < gridManager.Cols; c++)
+            for (int col = 0; col < gridManager.Cols; col++)
             {
-                var go = gridManager.GetOccupant(b, r, c);
-                if (!go) continue;
+                GameObject go = gridManager.GetOccupant(board, row, col);
+                if (go == null) continue;
 
-                var agent = go.GetComponent<NavMeshAgent>();
-                var anim = go.GetComponent<Animator>();
+                Unit unit = go.GetComponent<Unit>();
+                if (unit == null) continue;
+                if (unit.agent == null || unit.anim == null) continue;
 
-                if (!agent || !anim) continue;
+                bool moving = unit.agent.enabled &&
+                              unit.agent.hasPath &&
+                              unit.agent.remainingDistance >
+                              unit.agent.stoppingDistance + 0.05f;
 
-                bool moving =
-                    agent.enabled &&
-                    agent.hasPath &&
-                    agent.remainingDistance >
-                    agent.stoppingDistance + 0.05f;
-
-                anim.SetBool(runKey, moving);
+                unit.anim.SetBool(runKey, moving);
             }
         }
     }
 
     #endregion
+
     // ─────────────────────────────────────────────────────────────────────────────
     #region Merge
 
     public bool TryMerge(GridManager.Board board, int targetRow, int targetCol, GameObject sourceObj)
     {
-        var targetObj = gridManager.GetOccupant(board, targetRow, targetCol);
+        GameObject targetObj = gridManager.GetOccupant(board, targetRow, targetCol);
+        if (targetObj == null || sourceObj == null) return false;
 
-        if (!ValidMerge(targetObj, sourceObj, out var targetUnit, out var sourceUnit))
-            return false;
+        Unit targetUnit;
+        Unit sourceUnit;
+        if (!ValidMerge(targetObj, sourceObj, out targetUnit, out sourceUnit)) return false;
 
-        int newLv = targetUnit.level + 1;
+        int newLevel = targetUnit.level + 1;
 
-        if (!prefabMap.TryGetValue(targetUnit.unitType, out var arr))
-            return false;
+        GameObject[] prefabs;
+        if (!prefabMap.TryGetValue(targetUnit.unitType, out prefabs)) return false;
+        if (newLevel - 1 >= prefabs.Length || prefabs[newLevel - 1] == null) return false;
 
-        if (newLv - 1 >= arr.Length || arr[newLv - 1] == null)
-            return false;
-
-        var pos = gridManager.GridToWorldPosition(board, targetRow, targetCol, true);
+        Vector3 pos = gridManager.GridToWorldPosition(board, targetRow, targetCol, true);
 
         CleanupSource(sourceUnit, sourceObj);
         PoolManager.Release(targetObj);
 
-        if (newLv == 2)
+        if (newLevel == 2)
         {
-            var dummy = CreateMergedUnit(arr[0], targetUnit.unitType, 1, board, targetRow, targetCol, pos);
-            dummy.GetComponent<Unit>()?.MergeWithEffect(arr[newLv - 1], newLv);
+            GameObject dummy = CreateMergedUnit(prefabs[0], targetUnit.unitType, 1, board, targetRow, targetCol, pos);
+            if (dummy != null)
+            {
+                Unit unit = dummy.GetComponent<Unit>();
+                if (unit != null) unit.MergeWithEffect(prefabs[newLevel - 1], newLevel);
+            }
         }
         else
         {
-            CreateMergedUnit(arr[newLv - 1], targetUnit.unitType, newLv, board, targetRow, targetCol, pos);
+            CreateMergedUnit(prefabs[newLevel - 1], targetUnit.unitType, newLevel, board, targetRow, targetCol, pos);
         }
+
         return true;
     }
 
@@ -295,12 +319,10 @@ public class GameManager : MonoBehaviour
     {
         ua = null;
         ub = null;
-
         if (a == null || b == null) return false;
 
         ua = a.GetComponent<Unit>();
         ub = b.GetComponent<Unit>();
-
         if (ua == null || ub == null) return false;
         if (ua.unitType != ub.unitType) return false;
         if (ua.level != ub.level) return false;
@@ -308,69 +330,86 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
-    private void CleanupSource(Unit u, GameObject go)
+    private void CleanupSource(Unit unit, GameObject go)
     {
-        if (u != null && u.Grid != null && u.Grid.IsValidGridPosition(u.row, u.col))
-            u.Grid.SetCellOccupied(u.Board, u.row, u.col, null);
+        if (unit != null && unit.Grid != null && unit.Grid.IsValidGridPosition(unit.row, unit.col))
+        {
+            unit.Grid.SetCellOccupied(unit.Board, unit.row, unit.col, null);
+        }
 
         PoolManager.Release(go);
-        UnhookUnit(u);
+        UnhookUnit(unit);
     }
 
     public GameObject CreateMergedUnit(
         GameObject prefab,
         string type,
-        int lv,
-        GridManager.Board b,
+        int level,
+        GridManager.Board board,
         int row,
         int col,
         Vector3 pos)
     {
-        var obj = PoolManager.Spawn(prefab, pos, Quaternion.identity);
-        var u = obj.GetComponent<Unit>();
-        if (u == null) return null;   // ✅ thêm return null để code an toàn
+        GameObject obj = PoolManager.Spawn(prefab, pos, Quaternion.identity);
+        Unit unit = obj != null ? obj.GetComponent<Unit>() : null;
+        if (unit == null) return null;
 
-        // Security Button
-        var es = obj.GetComponentsInChildren<EventSystem>(true);
-        for (int i = 0; i < es.Length; i++) Destroy(es[i].gameObject);
+        // Destroy cached event systems if any
+        if (unit.eventSystems != null)
+        {
+            for (int i = 0; i < unit.eventSystems.Length; i++)
+            {
+                if (unit.eventSystems[i] != null)
+                    Destroy(unit.eventSystems[i].gameObject);
+            }
+        }
 
-        var raycasters = obj.GetComponentsInChildren<GraphicRaycaster>(true);
-        for (int i = 0; i < raycasters.Length; i++) raycasters[i].enabled = false;
+        // Disable cached raycasters if any
+        if (unit.raycasters != null)
+        {
+            for (int i = 0; i < unit.raycasters.Length; i++)
+            {
+                if (unit.raycasters[i] != null)
+                    unit.raycasters[i].enabled = false;
+            }
+        }
 
-        u.Initialize(type, lv, gridManager, b, row, col);
-        gridManager.SetCellOccupied(b, row, col, obj);
+        unit.Initialize(type, level, gridManager, board, row, col);
+        gridManager.SetCellOccupied(board, row, col, obj);
 
-        u.MergeLockTemporary(mergeLockSeconds);
+        unit.MergeLockTemporary(mergeLockSeconds);
 
-        HookUnit(u);
-        OnUnitMerged?.Invoke(u, row, col);
+        HookUnit(unit);
+        if (OnUnitMerged != null) OnUnitMerged.Invoke(unit, row, col);
 
         EnsureEventSystemExists();
-
-        return obj;   // ✅ trả về GameObject vừa spawn
+        return obj;
     }
 
     private static void EnsureEventSystemExists()
     {
         if (UnityEngine.EventSystems.EventSystem.current != null) return;
 
-        var go = new GameObject("EventSystem");
+        GameObject go = new GameObject("EventSystem");
         go.AddComponent<UnityEngine.EventSystems.EventSystem>();
         go.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
     }
 
     #endregion
+
     // ─────────────────────────────────────────────────────────────────────────────
     #region Swap
 
     public bool TrySwap(GridManager.Board board, int targetRow, int targetCol, GameObject sourceObj)
     {
-        var targetObj = gridManager.GetOccupant(board, targetRow, targetCol);
+        GameObject targetObj = gridManager.GetOccupant(board, targetRow, targetCol);
+        if (targetObj == null || sourceObj == null) return false;
 
-        if (!ValidSwap(targetObj, sourceObj, out var su, out var tu))
-            return false;
+        Unit sourceUnit;
+        Unit targetUnit;
+        if (!ValidSwap(targetObj, sourceObj, out sourceUnit, out targetUnit)) return false;
 
-        DoSwap(board, sourceObj, targetObj, su, tu, targetRow, targetCol);
+        DoSwap(board, sourceObj, targetObj, sourceUnit, targetUnit, targetRow, targetCol);
         return true;
     }
 
@@ -383,7 +422,6 @@ public class GameManager : MonoBehaviour
 
         ua = b.GetComponent<Unit>();
         ub = a.GetComponent<Unit>();
-
         if (ua == null || ub == null) return false;
         if (ua.Board != ub.Board) return false;
 
@@ -391,54 +429,63 @@ public class GameManager : MonoBehaviour
     }
 
     private void DoSwap(
-        GridManager.Board b,
+        GridManager.Board board,
         GameObject src,
         GameObject tgt,
-        Unit su,
-        Unit tu,
-        int tr,
-        int tc)
+        Unit sourceUnit,
+        Unit targetUnit,
+        int targetRow,
+        int targetCol)
     {
-        int sr = su.row;
-        int sc = su.col;
+        int sourceRow = sourceUnit.row;
+        int sourceCol = sourceUnit.col;
 
-        var posA = gridManager.GridToWorldPosition(b, tr, tc, true);
-        var posB = gridManager.GridToWorldPosition(b, sr, sc, true);
+        Vector3 posA = gridManager.GridToWorldPosition(board, targetRow, targetCol, true);
+        Vector3 posB = gridManager.GridToWorldPosition(board, sourceRow, sourceCol, true);
 
-        gridManager.SetCellOccupied(b, sr, sc, null);
-        gridManager.SetCellOccupied(b, tr, tc, null);
+        // clear old cells
+        gridManager.SetCellOccupied(board, sourceRow, sourceCol, null);
+        gridManager.SetCellOccupied(board, targetRow, targetCol, null);
 
-        gridManager.SetCellOccupied(b, tr, tc, src);
-        gridManager.SetCellOccupied(b, sr, sc, tgt);
+        // swap references
+        gridManager.SetCellOccupied(board, targetRow, targetCol, src);
+        gridManager.SetCellOccupied(board, sourceRow, sourceCol, tgt);
 
-        su.row = tr; su.col = tc;
-        tu.row = sr; tu.col = sc;
+        // update row/col
+        sourceUnit.row = targetRow;
+        sourceUnit.col = targetCol;
+        targetUnit.row = sourceRow;
+        targetUnit.col = sourceCol;
 
-        su.UpdateOriginalPosition(posA, tr, tc);
-        tu.UpdateOriginalPosition(posB, sr, sc);
+        // update original position
+        sourceUnit.UpdateOriginalPosition(posA, targetRow, targetCol);
+        targetUnit.UpdateOriginalPosition(posB, sourceRow, sourceCol);
 
-        var sa = src.GetComponent<NavMeshAgent>();
-        var ta = tgt.GetComponent<NavMeshAgent>();
-
-        if (sa != null)
+        // sync NavMeshAgent
+        if (sourceUnit.agent != null)
         {
-            sa.Warp(posA);
-            sa.ResetPath();
+            sourceUnit.agent.Warp(posA);
+            sourceUnit.agent.ResetPath();
         }
-        if (ta != null)
+        if (targetUnit.agent != null)
         {
-            ta.Warp(posB);
-            ta.ResetPath();
+            targetUnit.agent.Warp(posB);
+            targetUnit.agent.ResetPath();
         }
 
-        var sanim = src.GetComponent<Animator>();
-        if (sanim) sanim.SetBool(runKey, false);
-
-        var tanim = tgt.GetComponent<Animator>();
-        if (tanim) tanim.SetBool(runKey, false);
+        // reset animator
+        if (sourceUnit.anim != null)
+        {
+            sourceUnit.anim.SetBool(runKey, false);
+        }
+        if (targetUnit.anim != null)
+        {
+            targetUnit.anim.SetBool(runKey, false);
+        }
     }
 
     #endregion
+
     // ─────────────────────────────────────────────────────────────────────────────
     #region Prefab Map / Pools
 
@@ -449,11 +496,11 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < upgradeEntries.Length; i++)
         {
-            var e = upgradeEntries[i];
-            if (e == null) continue;
-            if (string.IsNullOrEmpty(e.unitType)) continue;
+            UnitUpgradeEntry entry = upgradeEntries[i];
+            if (entry == null) continue;
+            if (string.IsNullOrEmpty(entry.unitType)) continue;
 
-            prefabMap[e.unitType] = e.levelPrefabs;
+            prefabMap[entry.unitType] = entry.levelPrefabs;
         }
     }
 
@@ -461,43 +508,55 @@ public class GameManager : MonoBehaviour
     {
         if (prefabMap == null) return;
 
-        foreach (var kv in prefabMap)
-        {
-            var arr = kv.Value;
-            if (arr == null) continue;
+        // iterate keys manually, no foreach
+        List<string> keys = new List<string>(prefabMap.Keys);
 
-            for (int j = 0; j < arr.Length; j++)
-                if (arr[j] != null)
-                    PoolManager.CreatePool(arr[j], 8, 64, true);
+        for (int i = 0; i < keys.Count; i++)
+        {
+            string key = keys[i];
+            GameObject[] prefabs = prefabMap[key];
+            if (prefabs == null) continue;
+
+            for (int j = 0; j < prefabs.Length; j++)
+            {
+                GameObject prefab = prefabs[j];
+                if (prefab == null) continue;
+
+                PoolManager.CreatePool(prefab, 8, 64, true);
+            }
         }
     }
 
     #endregion
+
     // ─────────────────────────────────────────────────────────────────────────────
     #region Utils
 
-    private void PlayDieAnim(Unit u)
+    // play death animation if animator exists
+    private void PlayDieAnim(Unit unit)
     {
-        var anim = u.GetComponent<Animator>();
-        if (anim && !string.IsNullOrEmpty(dieKey))
-        {
-            anim.SetTrigger(dieKey);
-            Debug.Log("anbim die");
-        }
+        if (unit == null) return;
+        if (unit.anim == null) return;
+        if (string.IsNullOrEmpty(dieKey)) return;
+
+        unit.anim.SetTrigger(dieKey);
+        Debug.Log("PlayDieAnim triggered");
     }
 
-    private void ClearCell(Unit u)
+    // clear cell occupancy in grid
+    private void ClearCell(Unit unit)
     {
-        var g = u.Grid;
-        if (g == null) return;
-        if (!g.IsValidGridPosition(u.row, u.col)) return;
+        if (unit == null) return;
+        if (unit.Grid == null) return;
+        if (!unit.Grid.IsValidGridPosition(unit.row, unit.col)) return;
 
-        g.SetCellOccupied(u.Board, u.row, u.col, null);
+        unit.Grid.SetCellOccupied(unit.Board, unit.row, unit.col, null);
     }
 
-    private IEnumerator DelayRelease(GameObject go, float sec)
+    // delayed release back to pool
+    private IEnumerator DelayRelease(GameObject go, float seconds)
     {
-        yield return new WaitForSeconds(sec);
+        yield return new WaitForSeconds(seconds);
         PoolManager.Release(go);
     }
 
@@ -505,23 +564,27 @@ public class GameManager : MonoBehaviour
 
     #region End / Results
 
+    // check if battle should end
     private void CheckBattleOver()
     {
-        if (battleEnded || endBattleScheduled || gridManager == null) return;
+        if (battleEnded) return;
+        if (endBattleScheduled) return;
+        if (gridManager == null) return;
 
         bool alivePlayer = HasAlive(playerBoard);
         bool aliveEnemy = HasAlive(enemyBoard);
 
-        Debug.Log($"[CheckBattleOver] alivePlayer={alivePlayer}, aliveEnemy={aliveEnemy}, " +
-                  $"playerBoard={playerBoard}, enemyBoard={enemyBoard}");
-
         if (alivePlayer && aliveEnemy) return;
 
         endBattleScheduled = true;
-        if (endBattleRoutine != null) StopCoroutine(endBattleRoutine);
+        if (endBattleRoutine != null)
+        {
+            StopCoroutine(endBattleRoutine);
+        }
         endBattleRoutine = StartCoroutine(EndBattleAfterDelay());
     }
 
+    // delay before declaring result
     private IEnumerator EndBattleAfterDelay()
     {
         yield return new WaitForSeconds(resultDelay);
@@ -534,45 +597,51 @@ public class GameManager : MonoBehaviour
         endBattleScheduled = false;
         SetGunsEnabled(false);
 
-        int reward;
+        int reward = damageByPlayer;
         if (alivePlayer && !aliveEnemy)
         {
             reward = damageByPlayer * 10;
-            Debug.Log($"[Result] WIN | reward={reward}");
-            uiManager?.ShowResult(true, reward);
+           
+            if (uiManager != null) uiManager.ShowResult(true, reward);
         }
         else if (!alivePlayer && aliveEnemy)
         {
-            reward = damageByPlayer;
-            Debug.Log($"[Result] LOSE | reward={reward}");
-            uiManager?.ShowResult(false, reward);
+            if (uiManager != null) uiManager.ShowResult(false, reward);
         }
         else
         {
-            reward = damageByPlayer;
-            Debug.Log($"[Result] DRAW | reward={reward}");
-            uiManager?.ShowResult(false, reward);
+            Debug.Log("[Result] DRAW | reward=" + reward);
+            if (uiManager != null) uiManager.ShowResult(false, reward);
         }
 
-        if (endCombatOnWin) CombatManager.Instance?.EndCombat();
+        if (endCombatOnWin && CombatManager.Instance != null)
+        {
+            CombatManager.Instance.EndCombat();
+        }
     }
 
+    // check if any alive unit exists on board
     private bool HasAlive(GridManager.Board board)
     {
         for (int r = 0; r < gridManager.Rows; r++)
+        {
             for (int c = 0; c < gridManager.Cols; c++)
             {
-                GameObject go = gridManager.GetOccupant(board, r, c);
-                if (!go) continue;
+                GameObject occupant = gridManager.GetOccupant(board, r, c);
+                if (occupant == null) continue;
 
-                Unit u = go.GetComponent<Unit>();
-                if (u != null && u.core != null && u.core.Alive())
+                Unit unit = occupant.GetComponent<Unit>();
+                if (unit != null && unit.core != null && unit.core.Alive())
+                {
                     return true;
+                }
             }
+        }
         return false;
     }
 
     #endregion
+
     // ─────────────────────────────────────────────────────────────────────────────
     #region Guns Control
 
@@ -639,6 +708,7 @@ public class GameManager : MonoBehaviour
     #endregion
     // ─────────────
 
+    #region Scene Handling
     private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -689,6 +759,5 @@ public class GameManager : MonoBehaviour
             uiManager.ShowPlacementButtons();
         }
     }
+    #endregion
 }
-
-

@@ -4,60 +4,97 @@ using UnityEngine.AI;
 [DisallowMultipleComponent]
 public class AllyPhaseThroughNav : MonoBehaviour
 {
-    [Header("Refs (assign in prefab)")]
-    [SerializeField] private Unit unit;          
-    [SerializeField] private NavMeshAgent agent;  
+    [Header("References (assign in prefab)")]
+    [SerializeField] private Unit unit;
+    [SerializeField] private NavMeshAgent agent;
 
     [Header("Settings")]
-    [SerializeField] private float allyRadius = 0.8f;     
-    [SerializeField] private LayerMask unitLayer;          
-    [SerializeField] private ObstacleAvoidanceType normalAvoidance = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
+    [SerializeField] private float allyRadius = 0.8f;
+    [SerializeField] private LayerMask unitLayer;
+    [SerializeField]
+    private ObstacleAvoidanceType normalAvoidance =
+        ObstacleAvoidanceType.HighQualityObstacleAvoidance;
 
-    float originalRadius;
-    ObstacleAvoidanceType originalAvoid;
+    private float originalRadius;
+    private ObstacleAvoidanceType originalAvoid;
 
-    void Awake()
+    // ──────────────────────────────────────────────
+    // Lifecycle
+    private void Awake()
     {
-        if (!agent) return;
+        if (agent == null) return;
+
         originalRadius = agent.radius;
         originalAvoid = normalAvoidance;
+
         agent.obstacleAvoidanceType = normalAvoidance;
     }
 
-    void Update()
+    private void Update()
     {
-        if (!agent || !unit) return;
+        if (agent == null || unit == null) return;
 
-        bool nearAlly = false;
-        var pos = transform.position;
-        var hits = Physics.OverlapSphere(pos, allyRadius, unitLayer, QueryTriggerInteraction.Ignore);
-        var myTag = unit.tag;
-
-        for (int i = 0; i < hits.Length; i++)
-        {
-            var other = hits[i];
-            if (other.attachedRigidbody && other.attachedRigidbody.gameObject == gameObject) continue;
-            var go = other.attachedRigidbody ? other.attachedRigidbody.gameObject : other.gameObject;
-            if (go == gameObject) continue;
-            if (go.CompareTag(myTag)) { nearAlly = true; break; }
-        }
+        bool nearAlly = CheckNearAlly();
 
         if (nearAlly)
         {
-            agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
-            agent.radius = Mathf.Min(originalRadius, 0.05f);
+            EnterPhaseMode();
         }
         else
         {
-            agent.obstacleAvoidanceType = originalAvoid;
-            agent.radius = originalRadius;
+            RestoreNormalMode();
         }
     }
 
-#if UNITY_EDITOR
-    void OnDrawGizmosSelected()
+    // ──────────────────────────────────────────────
+    // Helpers
+    private bool CheckNearAlly()
     {
-        Gizmos.color = new Color(0, 1, 1, 0.25f);
+        Vector3 pos = transform.position;
+
+        Collider[] hits = Physics.OverlapSphere(
+            pos,
+            allyRadius,
+            unitLayer,
+            QueryTriggerInteraction.Ignore
+        );
+
+        string myTag = unit.tag;
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            Collider other = hits[i];
+
+            Rigidbody rb = other.attachedRigidbody;
+            if (rb != null && rb.gameObject == gameObject)
+                continue;
+
+            GameObject go = rb != null ? rb.gameObject : other.gameObject;
+            if (go == gameObject) continue;
+
+            if (go.CompareTag(myTag)) return true;
+        }
+
+        return false;
+    }
+
+    private void EnterPhaseMode()
+    {
+        agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
+        agent.radius = Mathf.Min(originalRadius, 0.05f);
+    }
+
+    private void RestoreNormalMode()
+    {
+        agent.obstacleAvoidanceType = originalAvoid;
+        agent.radius = originalRadius;
+    }
+
+    // ──────────────────────────────────────────────
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = new Color(0f, 1f, 1f, 0.25f);
         Gizmos.DrawWireSphere(transform.position, allyRadius);
     }
 #endif

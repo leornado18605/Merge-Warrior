@@ -734,6 +734,7 @@ GameObject:
   - component: {fileID: 1341271358838150365}
   - component: {fileID: 4359972618681718951}
   - component: {fileID: 3027723680924418467}
+  - component: {fileID: 3120969097751420291}
   m_Layer: 7
   m_Name: AI_Rfliman
   m_TagString: Enemy
@@ -813,6 +814,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unit: {fileID: 222547044263229546}
+  agent: {fileID: 0}
   tileLayer:
     serializedVersion: 2
     m_Bits: 0
@@ -841,6 +843,11 @@ MonoBehaviour:
   anim: {fileID: 6018145626324105152}
   drag: {fileID: 8218980550595831477}
   gun: {fileID: 4359972618681718951}
+  mergeEffectPrefab: {fileID: 0}
+  mergeEffectDuration: 1.5
+  levelUpEffectPrefab: {fileID: 0}
+  levelUpEffectDuration: 1
+  rb: {fileID: 3120969097751420291}
 --- !u!114 &64646323459247002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -947,6 +954,33 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   normalAvoidance: 4
+--- !u!54 &3120969097751420291
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7368252900174841059}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &7631641409391408114
 GameObject:
   m_ObjectHideFlags: 0

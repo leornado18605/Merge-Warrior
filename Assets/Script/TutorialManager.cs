@@ -114,7 +114,6 @@ public class TutorialManager : MonoBehaviour
 
     private void ShowStepGun()
     {
-        // Chỉ bật Gun, khoá Start
         SetInteractable(placeGunButton, true);
         SetInteractable(startFightButton, false);
 

@@ -7,24 +7,27 @@ public class GameEconomyManager : MonoBehaviour
 {
     public static GameEconomyManager Instance { get; private set; }
 
-    // ───────── Coin ─────────
-    [Header("Coin")]
-    public int defaultCoins = 120;
+    #region Coin
+    [Header("Coin Settings")]
+    [SerializeField] private int defaultCoins = 120;
     public int Coins = 120;
-    [SerializeField] private TMP_Text coinText;
 
-    // ───────── Shop ─────────
-    [Header("Shop")]
+    [SerializeField] private TMP_Text coinText;
+    private const string PlayerCoinsKey = "PlayerCoins";
+    #endregion
+
+    #region Shop
+    [Header("Shop Settings")]
     [SerializeField] private Button buyKnifeButton;
     [SerializeField] private Button buyGunButton;
 
     [SerializeField] private TMP_Text knifePriceText;
     [SerializeField] private TMP_Text gunPriceText;
 
-    public int basePriceKnife = 60;
-    public int basePriceGun = 100;
+    [SerializeField] private int basePriceKnife = 60;
+    [SerializeField] private int basePriceGun = 100;
 
-    public float priceScale = 1.1f;
+    [SerializeField] private float priceScale = 1.1f;
 
     [SerializeField] private Color priceAffordable = Color.white;
     [SerializeField] private Color priceNotEnough = new Color(1f, 0.65f, 0.65f);
@@ -34,18 +37,23 @@ public class GameEconomyManager : MonoBehaviour
 
     public int KnifePrice => currentPriceKnife;
     public int GunPrice => currentPriceGun;
+    #endregion
 
-    // ───────── Editor Behavior ─────────
+    #region Editor Options
     [Header("Editor Behavior")]
-    public bool resetCoinsOnPlayInEditor = true;
-    public bool persistCoinsInEditor = false;
+    [SerializeField] private bool resetCoinsOnPlayInEditor = true;
+    [SerializeField] private bool persistCoinsInEditor = false;
+    #endregion
 
-    private const string PlayerCoinsKey = "PlayerCoins";
-
-    // ───────── Lifecycle ─────────
+    #region Lifecycle
     private void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
@@ -69,13 +77,15 @@ public class GameEconomyManager : MonoBehaviour
         currentPriceKnife = basePriceKnife;
         currentPriceGun = basePriceGun;
 
-        if (buyKnifeButton) buyKnifeButton.onClick.AddListener(BuyKnife);
-        if (buyGunButton) buyGunButton.onClick.AddListener(BuyGun);
+        if (buyKnifeButton != null) buyKnifeButton.onClick.AddListener(BuyKnife);
+        if (buyGunButton != null) buyGunButton.onClick.AddListener(BuyGun);
 
         UpdateAllShopUI();
     }
+    #endregion
 
-    // ───────── Public API ─────────
+    #region Public API
+    // Add coins to the player balance.
     public void AddCoin(int amount)
     {
         if (amount <= 0) return;
@@ -84,15 +94,53 @@ public class GameEconomyManager : MonoBehaviour
         UpdateAllShopUI();
     }
 
+    // Try to spend coins. Returns true if successful.
     public bool SpendCoin(int amount)
     {
         if (Coins < amount) return false;
+
         Coins -= amount;
         SaveCoins();
         UpdateAllShopUI();
         return true;
     }
 
+    // Reset coins and shop prices for a new game session.
+    public void ResetForNewGame()
+    {
+        Coins = defaultCoins;
+        currentPriceKnife = basePriceKnife;
+        currentPriceGun = basePriceGun;
+
+        SaveCoins();
+        UpdateAllShopUI();
+
+        Debug.Log("[Economy] ResetForNewGame -> Coins & shop reset to default");
+    }
+
+    public bool TryBuyKnife(UnitManager um)
+    {
+        if (!SpendCoin(currentPriceKnife)) return false;
+
+        currentPriceKnife = Mathf.CeilToInt(currentPriceKnife * priceScale);
+        if (um != null) um.PlaceKnife();
+
+        UpdateAllShopUI();
+        return true;
+    }
+
+    public bool TryBuyGun(UnitManager um)
+    {
+        if (!SpendCoin(currentPriceGun)) return false;
+
+        currentPriceGun = Mathf.CeilToInt(currentPriceGun * priceScale);
+        if (um != null) um.PlaceGun();
+
+        UpdateAllShopUI();
+        return true;
+    }
+
+    // Bind UI elements for interactive shop.
     public void BindUI(
         TMP_Text coinLabel,
         Button knifeBtn, TMP_Text knifePrice,
@@ -104,11 +152,24 @@ public class GameEconomyManager : MonoBehaviour
         knifePriceText = knifePrice;
         gunPriceText = gunPrice;
 
-     
         UpdateAllShopUI();
     }
 
-    // ───────── Buying Logic ─────────
+    // Bind UI elements only for displaying values (non-interactive).
+
+    public void BindDisplayOnly(
+        TMP_Text coinLabel,
+        TMP_Text knifePrice,
+        TMP_Text gunPrice)
+    {
+        coinText = coinLabel;
+        knifePriceText = knifePrice;
+        gunPriceText = gunPrice;
+        UpdateAllShopUI();
+    }
+    #endregion
+
+    #region Buying Logic
     private void BuyKnife()
     {
         if (!SpendCoin(currentPriceKnife)) return;
@@ -124,8 +185,9 @@ public class GameEconomyManager : MonoBehaviour
         currentPriceGun = Mathf.CeilToInt(currentPriceGun * priceScale);
         UpdateAllShopUI();
     }
+    #endregion
 
-    // ───────── UI Updates ─────────
+    #region UI Updates
     private void UpdateAllShopUI()
     {
         UpdateCoinUI();
@@ -135,37 +197,48 @@ public class GameEconomyManager : MonoBehaviour
 
     public void UpdateCoinUI()
     {
-        if (coinText) coinText.text = $"{Coins}";
+        if (coinText != null) coinText.text = Coins.ToString();
     }
 
     private void UpdatePriceUI()
     {
-        if (knifePriceText)
+        if (knifePriceText != null)
         {
             knifePriceText.text = FormatPrice(currentPriceKnife);
-            knifePriceText.color = Coins >= currentPriceKnife ? priceAffordable : priceNotEnough;
+            knifePriceText.color =
+                Coins >= currentPriceKnife ? priceAffordable : priceNotEnough;
         }
-        if (gunPriceText)
+
+        if (gunPriceText != null)
         {
             gunPriceText.text = FormatPrice(currentPriceGun);
-            gunPriceText.color = Coins >= currentPriceGun ? priceAffordable : priceNotEnough;
+            gunPriceText.color =
+                Coins >= currentPriceGun ? priceAffordable : priceNotEnough;
         }
     }
 
     private void UpdateButtonsInteractable()
     {
-        if (buyKnifeButton) buyKnifeButton.interactable = Coins >= currentPriceKnife;
-        if (buyGunButton) buyGunButton.interactable = Coins >= currentPriceGun;
+        if (buyKnifeButton != null)
+            buyKnifeButton.interactable = Coins >= currentPriceKnife;
+
+        if (buyGunButton != null)
+            buyGunButton.interactable = Coins >= currentPriceGun;
     }
 
     private string FormatPrice(int value)
     {
-        if (value >= 1_000_000) return (value / 1_000_000f).ToString("0.#") + "M";
-        if (value >= 1_000) return (value / 1_000f).ToString("0.#") + "K";
+        if (value >= 1_000_000)
+            return (value / 1_000_000f).ToString("0.#") + "M";
+
+        if (value >= 1_000)
+            return (value / 1_000f).ToString("0.#") + "K";
+
         return value.ToString();
     }
+    #endregion
 
-    // ───────── Persistence ─────────
+    #region Persistence
     private void SaveCoins()
     {
 #if UNITY_EDITOR
@@ -174,47 +247,5 @@ public class GameEconomyManager : MonoBehaviour
         PlayerPrefs.SetInt(PlayerCoinsKey, Coins);
         PlayerPrefs.Save();
     }
-
-    // ───────── Reset for new game ─────────
-    public void ResetForNewGame()
-    {
-        // reset coins
-        Coins = defaultCoins;
-
-        // reset giá Knife/Gun
-        currentPriceKnife = basePriceKnife;
-        currentPriceGun = basePriceGun;
-
-        SaveCoins();
-        UpdateAllShopUI();
-
-        Debug.Log("[Economy] ResetForNewGame -> Coins & shop reset về mặc định");
-    }
-
-    public bool TryBuyKnife(UnitManager um)
-    {
-        if (!SpendCoin(currentPriceKnife)) return false;
-        currentPriceKnife = Mathf.CeilToInt(currentPriceKnife * priceScale);
-        if (um != null) um.PlaceKnife();
-        UpdateAllShopUI();
-        return true;
-    }
-
-    public bool TryBuyGun(UnitManager um)
-    {
-        if (!SpendCoin(currentPriceGun)) return false;
-        currentPriceGun = Mathf.CeilToInt(currentPriceGun * priceScale);
-        if (um != null) um.PlaceGun();
-        UpdateAllShopUI();
-        return true;
-    }
-
-    public void BindDisplayOnly(TMP_Text coinLabel, TMP_Text knifePrice, TMP_Text gunPrice)
-    {
-        coinText = coinLabel;
-        knifePriceText = knifePrice;
-        gunPriceText = gunPrice;
-        UpdateAllShopUI();
-    }
-
+    #endregion
 }

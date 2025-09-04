@@ -28,12 +28,10 @@ public class MergeRevealListener : MonoBehaviour
 
         Debug.Log($"[Reveal] OnUnitMerged -> {u.unitType} L{u.level}");
 
-        // Nếu bạn chỉ muốn popup cho level >= 2:
         if (u.level <= 1) return;
 
         if (NewUnitRevealUI.Instance == null)
         {
-            Debug.LogWarning("[Reveal] NewUnitRevealUI.Instance is NULL. Check your UI prefab in scene!");
             return;
         }
 

@@ -678,6 +678,7 @@ GameObject:
   - component: {fileID: 8544620079394364843}
   - component: {fileID: 3459654197576780872}
   - component: {fileID: 8553443340530364894}
+  - component: {fileID: -8355781626451640930}
   m_Layer: 7
   m_Name: AI_Peon
   m_TagString: Enemy
@@ -757,11 +758,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unit: {fileID: 4042765928903906058}
+  agent: {fileID: 0}
   tileLayer:
     serializedVersion: 2
     m_Bits: 256
-  hoverColor: {r: 0.9, g: 0.8, b: 0.1, a: 1}
   raycastMaxDist: 200
+  hoverColor: {r: 0.9, g: 0.8, b: 0.1, a: 1}
 --- !u!114 &4042765928903906058
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -785,6 +787,11 @@ MonoBehaviour:
   anim: {fileID: 4468820813277755961}
   drag: {fileID: 8745835060726846598}
   gun: {fileID: 0}
+  mergeEffectPrefab: {fileID: 0}
+  mergeEffectDuration: 1.5
+  levelUpEffectPrefab: {fileID: 0}
+  levelUpEffectDuration: 1
+  rb: {fileID: -8355781626451640930}
 --- !u!114 &6635508854630223045
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -886,6 +893,33 @@ MonoBehaviour:
   table: []
   animator: {fileID: 4468820813277755961}
   dieTrigger: Die
+--- !u!54 &-8355781626451640930
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5808349704129935754}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &6183644258781516674
 GameObject:
   m_ObjectHideFlags: 0

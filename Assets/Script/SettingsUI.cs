@@ -4,83 +4,52 @@ using UnityEngine.SceneManagement;
 
 public class SettingsUI : MonoBehaviour
 {
-    [Header("Wiring")]
+    [Header("UI Wiring")]
     [SerializeField] private Button openButton;
-    [SerializeField] private GameObject panel;
     [SerializeField] private Button closeButton;
-    [SerializeField] private Toggle soundToggle;
     [SerializeField] private Button deleteDataButton;
+    [SerializeField] private GameObject panel;
 
-    [Header("Reset config")]
+    [Header("Reset Config")]
     [SerializeField] private string initialSceneName = "Level1";
-    [SerializeField] private int initialSceneBuildIndex = 0;    
-    // ───── lifecycle ─────
+    [SerializeField] private int initialSceneBuildIndex = 0;
+
     private void Awake()
     {
-        if (panel) panel.SetActive(false);
-        if (openButton) openButton.onClick.AddListener(ShowPanel);
-        if (closeButton) closeButton.onClick.AddListener(HidePanel);
-        if (deleteDataButton) deleteDataButton.onClick.AddListener(DeleteAllDataAndReload);
-        if (soundToggle)
-        {
-            soundToggle.onValueChanged.AddListener(OnSoundToggle);
-            LoadSoundPref();
-        }
+        if (panel != null) panel.SetActive(false);
+
+        if (openButton != null) openButton.onClick.AddListener(ShowPanel);
+        if (closeButton != null) closeButton.onClick.AddListener(HidePanel);
+        if (deleteDataButton != null) deleteDataButton.onClick.AddListener(OnDeleteClicked);
     }
 
     // ───── UI show/hide ─────
     private void ShowPanel()
     {
-        if (!panel) return;
+        if (panel == null) return;
         panel.SetActive(true);
-        panel.transform.SetAsLastSibling(); 
-        var cg = panel.GetComponentInParent<CanvasGroup>();
-        if (cg) { cg.alpha = 1; cg.interactable = true; cg.blocksRaycasts = true; }
+        panel.transform.SetAsLastSibling();
     }
 
     private void HidePanel()
     {
-        if (panel) panel.SetActive(false);
+        if (panel == null) return;
+        panel.SetActive(false);
     }
 
-    // ───── Sound toggle ─────
-    private const string SoundKey = "SND_ENABLED"; // 1:on, 0:off
-
-    private void LoadSoundPref()
+    // ───── Delete data / Reset game ─────
+    private void OnDeleteClicked()
     {
-        bool on = PlayerPrefs.GetInt(SoundKey, 1) == 1;
-        AudioListener.volume = on ? 1f : 0f;
-        if (soundToggle) soundToggle.isOn = on;
-    }
-
-    private void OnSoundToggle(bool on)
-    {
-        AudioListener.volume = on ? 1f : 0f;
-        PlayerPrefs.SetInt(SoundKey, on ? 1 : 0);
-        PlayerPrefs.Save();
-    }
-
-    // ───── Delete data ─────
-    private void DeleteAllDataAndReload()
-    {
-        PlayerPrefs.DeleteAll();
-        PlayerPrefs.Save();
-
-        GameEconomyManager.Instance?.ResetForNewGame();
-        CombatManager.Instance?.ForcePrepState();
-        GameManager.Instance?.SetGunsEnabled(false);
-
-        var tut = FindObjectOfType<TutorialManager>();
-        if (tut) tut.gameObject.SetActive(false);
-
         if (LevelController.Instance != null)
         {
             LevelController.Instance.LoadFirst();
         }
         else
         {
-            SceneManager.LoadScene(string.IsNullOrEmpty(initialSceneName) ? initialSceneBuildIndex : SceneUtility.GetBuildIndexByScenePath(initialSceneName));
+            if (!string.IsNullOrEmpty(initialSceneName))
+                SceneManager.LoadScene(initialSceneName);
+            else
+                SceneManager.LoadScene(initialSceneBuildIndex);
         }
     }
-
 }

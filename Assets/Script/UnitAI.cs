@@ -307,17 +307,18 @@ public class UnitTargeting : MonoBehaviour
 
     #endregion
     // ─────────────────────────────────────────────────────────────────────────────
-    #region Target Pick
-
-    Unit PickTarget()
+    #region Targeting
+    private Unit PickTarget()
     {
-        if (Grid == null) return null;
+        if (Grid == null)
+            return null;
 
-        var opp = (self.Board == GridManager.Board.Board1)
+        GridManager.Board opp = (self.Board == GridManager.Board.Board1)
             ? GridManager.Board.Board2
             : GridManager.Board.Board1;
 
         string tagNeed = (self.tag == "Player") ? "Enemy" : "Player";
+
         int tiles = (role == Role.Gun) ? gunDetectTiles : knifeDetectTiles;
         float allow = tiles * Grid.TileSize;
 
@@ -325,18 +326,30 @@ public class UnitTargeting : MonoBehaviour
         float bestD = float.MaxValue;
 
         for (int r = 0; r < Grid.Rows; r++)
+        {
             for (int c = 0; c < Grid.Cols; c++)
             {
-                var u = Grid.GetOccupantUnit(opp, r, c);
-                if (!u || !u.gameObject.activeInHierarchy || u.tag != tagNeed) continue;
+                Unit u = Grid.GetOccupantUnit(opp, r, c);
+                if (u == null)
+                    continue;
+
+                if (!u.gameObject.activeInHierarchy)
+                    continue;
+
+                if (u.tag != tagNeed)
+                    continue;
 
                 float d = Vector3.Distance(transform.position, u.transform.position);
-                if (d <= allow && d < bestD) { bestD = d; best = u; }
+                if (d <= allow && d < bestD)
+                {
+                    bestD = d;
+                    best = u;
+                }
             }
+        }
 
         return best;
     }
-
     #endregion
     // ─────────────────────────────────────────────────────────────────────────────
     #region Anim

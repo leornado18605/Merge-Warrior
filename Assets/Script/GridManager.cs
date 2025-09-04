@@ -93,10 +93,6 @@ public sealed class GridManager : MonoBehaviour
         PoolManager.CreatePool(tilePrefab, initialSize: totalTiles, maxSize: totalTiles, autoExpand: false);
     }
 
-    /// <summary>
-    /// Rebuild visuals & occupancy arrays (clears existing visuals).
-    /// Call after changing rows/cols/tileSize.
-    /// </summary>
     public void Rebuild()
     {
         IsReady = false;
@@ -143,7 +139,7 @@ public sealed class GridManager : MonoBehaviour
 
     private void ComputeOrigins()
     {
-        // By convention: non-swapped => Board2 at transform.position, Board1 below (-Z)
+
         float fullDepth = rows * tileSize;
 
         if (!boardsSwapped)
@@ -153,7 +149,6 @@ public sealed class GridManager : MonoBehaviour
         }
         else
         {
-            // swapped: Board1 at transform.position, Board2 below (-Z)
             board1Origin = transform.position;
             board2Origin = transform.position + new Vector3(0f, 0f, -(fullDepth + boardGap));
         }
@@ -177,9 +172,6 @@ public sealed class GridManager : MonoBehaviour
                 float x = c * tileSize;
                 Vector3 pos = origin + new Vector3(x, 0f, z);
                 buffer[r, c] = PoolManager.Spawn(tilePrefab, pos, Quaternion.identity, transform);
-
-                if(!tilePrefab.GetComponent<TileHighlight>())
-                    Debug.LogWarning($"[GridManager] Tile prefab '{tilePrefab.name}' does not have a TileHighlight component. Highlighting will not work.");
             }
         }
     }
@@ -191,19 +183,16 @@ public sealed class GridManager : MonoBehaviour
     // Board2 (default playboard) helper
     public Vector3 GridToWorldPosition(int row, int col)
     {
-        Debug.Log($"[GridToWorldPosition - DEFAULT] Called for Board2 | Row: {row}, Col: {col}");
         return board2Origin + new Vector3(col * tileSize, 0f, row * tileSize);
     }
 
     public Vector3 GridToWorldPositionBoard1(int row, int col)
     {
-        Debug.Log($"[GridToWorldPosition - Board1] Row: {row}, Col: {col}");
         return board1Origin + new Vector3(col * tileSize, 0f, row * tileSize);
     }
 
     public Vector3 GridToWorldPositionBoard2(int row, int col)
     {
-        Debug.Log($"[GridToWorldPosition - Board2] Row: {row}, Col: {col}");
         return board2Origin + new Vector3(col * tileSize, 0f, row * tileSize);
     }
 
@@ -367,22 +356,16 @@ public sealed class GridManager : MonoBehaviour
 
     #region Swap Boards (visual move without respawn)
 
-    /// <summary>
-    /// Toggle visual positions of Board1 and Board2. Moves tiles & occupant GameObjects to the swapped origins.
-    /// </summary>
+
     public void ToggleSwapBoards()
     {
-        // flip flag
         boardsSwapped = !boardsSwapped;
 
-        // recompute origins for new layout
         ComputeOrigins();
 
-        // reposition all tile visuals
         RepositionTiles(board2Tiles, board2Origin);
         RepositionTiles(board1Tiles, board1Origin);
 
-        // reposition occupant GameObjects (if any)
         RepositionOccupants(occupantsB2, board2Origin);
         RepositionOccupants(occupantsB1, board1Origin);
     }
@@ -453,7 +436,6 @@ public sealed class GridManager : MonoBehaviour
     {
         if (!drawGizmos || rows <= 0 || cols <= 0) return;
 
-        // preview origins when not playing use current transform arrangement
         float fullDepth = rows * tileSize;
         Vector3 previewB2 = boardsSwapped ? (transform.position + new Vector3(0f, 0f, -(fullDepth + boardGap))) : transform.position;
         Vector3 previewB1 = boardsSwapped ? transform.position : (transform.position + new Vector3(0f, 0f, -(fullDepth + boardGap)));
@@ -480,54 +462,79 @@ public sealed class GridManager : MonoBehaviour
     #endregion
 
     #region FindNearestUnit
-    public Unit FindNearestUnit(Board board, int row, int col,
-                                System.Predicate<Unit> filter,
-                                int maxRadiusTiles = 8,
-                                bool priorityAdjacency = false)
-    {
-        if (!IsValidGridPosition(row, col)) return null;
 
+    public Unit FindNearestUnit(
+        Board board,
+        int row,
+        int col,
+        System.Predicate<Unit> filter,
+        int maxRadiusTiles = 8,
+        bool priorityAdjacency = false)
+    {
+        if (!IsValidGridPosition(row, col))
+        {
+            return null;
+        }
+
+        // check adjacent tiles first
         if (priorityAdjacency)
         {
-            int[] ro = { -1, 1, 0, 0 };
-            int[] co = { 0, 0, -1, 1 };
+            int[] rowOffsets = { -1, 1, 0, 0 };
+            int[] colOffsets = { 0, 0, -1, 1 };
+
             for (int i = 0; i < 4; i++)
             {
-                int r = row + ro[i], c = col + co[i];
-                if (!IsValidGridPosition(r, c)) continue;
-                var u = GetOccupantUnit(board, r, c);
-                if (u != null && filter(u)) return u;
+                int adjRow = row + rowOffsets[i];
+                int adjCol = col + colOffsets[i];
+
+                if (!IsValidGridPosition(adjRow, adjCol)) continue;
+
+                Unit adjUnit = GetOccupantUnit(board, adjRow, adjCol);
+                if (adjUnit != null && filter(adjUnit))
+                {
+                    return adjUnit;
+                }
             }
         }
 
-        for (int d = 1; d <= maxRadiusTiles; d++)
+        // expand outward ring by ring
+        for (int dist = 1; dist <= maxRadiusTiles; dist++)
         {
-            for (int dr = -d; dr <= d; dr++)
+            for (int dRow = -dist; dRow <= dist; dRow++)
             {
-                int r = row + dr;
-                int dc = d - Mathf.Abs(dr);
+                int checkRow = row + dRow;
+                int dCol = dist - Mathf.Abs(dRow);
 
-                int c1 = col + dc;
-                if (IsValidGridPosition(r, c1))
+                int col1 = col + dCol;
+                if (IsValidGridPosition(checkRow, col1))
                 {
-                    var u1 = GetOccupantUnit(board, r, c1);
-                    if (u1 != null && filter(u1)) return u1;
+                    Unit unit1 = GetOccupantUnit(board, checkRow, col1);
+                    if (unit1 != null && filter(unit1))
+                    {
+                        return unit1;
+                    }
                 }
 
-                if (dc != 0)
+                if (dCol != 0)
                 {
-                    int c2 = col - dc;
-                    if (IsValidGridPosition(r, c2))
+                    int col2 = col - dCol;
+                    if (IsValidGridPosition(checkRow, col2))
                     {
-                        var u2 = GetOccupantUnit(board, r, c2);
-                        if (u2 != null && filter(u2)) return u2;
+                        Unit unit2 = GetOccupantUnit(board, checkRow, col2);
+                        if (unit2 != null && filter(unit2))
+                        {
+                            return unit2;
+                        }
                     }
                 }
             }
         }
+
         return null;
     }
+
     #endregion
+
 
     #region Input Lock
     public bool IsInputLocked(Board board)
@@ -537,7 +544,7 @@ public sealed class GridManager : MonoBehaviour
     }
     #endregion
 
-
+    #region Clear Units
     public void ClearUnitsOnly(Board board)
     {
         if (board == Board.Board1)
@@ -573,5 +580,5 @@ public sealed class GridManager : MonoBehaviour
         ClearUnitsOnly(Board.Board1);
         ClearUnitsOnly(Board.Board2);
     }
-
+    #endregion
 }

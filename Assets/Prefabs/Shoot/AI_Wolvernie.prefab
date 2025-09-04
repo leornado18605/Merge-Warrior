@@ -372,6 +372,7 @@ GameObject:
   - component: {fileID: 422036811025382282}
   - component: {fileID: 8532888112423784287}
   - component: {fileID: 8391661740919213071}
+  - component: {fileID: -7804157419982803669}
   m_Layer: 7
   m_Name: AI_Wolvernie
   m_TagString: Enemy
@@ -451,11 +452,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unit: {fileID: 2512795415608996291}
+  agent: {fileID: 0}
   tileLayer:
     serializedVersion: 2
     m_Bits: 0
-  hoverColor: {r: 0.9, g: 0.8, b: 0.1, a: 1}
   raycastMaxDist: 200
+  hoverColor: {r: 0.9, g: 0.8, b: 0.1, a: 1}
 --- !u!114 &2512795415608996291
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -479,6 +481,11 @@ MonoBehaviour:
   anim: {fileID: 2707530723347826691}
   drag: {fileID: 2186310684082314402}
   gun: {fileID: 8532888112423784287}
+  mergeEffectPrefab: {fileID: 0}
+  mergeEffectDuration: 1.5
+  levelUpEffectPrefab: {fileID: 0}
+  levelUpEffectDuration: 1
+  rb: {fileID: -7804157419982803669}
 --- !u!114 &6397041278680328080
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -585,6 +592,33 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   normalAvoidance: 4
+--- !u!54 &-7804157419982803669
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4830574070971071307}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &4993227482166693046
 GameObject:
   m_ObjectHideFlags: 0
