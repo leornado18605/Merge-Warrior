@@ -769,6 +769,18 @@ PrefabInstance:
       propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3011435561355818461, guid: b1bde893ea92e429c819a5680b791331, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: -83.3596
+      objectReference: {fileID: 0}
+    - target: {fileID: 3011435561355818461, guid: b1bde893ea92e429c819a5680b791331, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 250
+      objectReference: {fileID: 0}
+    - target: {fileID: 3011435561355818461, guid: b1bde893ea92e429c819a5680b791331, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 581
+      objectReference: {fileID: 0}
     - target: {fileID: 3011435561719848236, guid: b1bde893ea92e429c819a5680b791331, type: 3}
       propertyPath: m_Name
       value: Play_RouletteSpin
@@ -2404,6 +2416,7 @@ GameObject:
   - component: {fileID: 920209914}
   - component: {fileID: 920209913}
   - component: {fileID: 920209912}
+  - component: {fileID: 920209915}
   m_Layer: 5
   m_Name: Card
   m_TagString: Untagged
@@ -2475,6 +2488,24 @@ RectTransform:
   m_AnchoredPosition: {x: 6.558899, y: 176.18091}
   m_SizeDelta: {x: 1089.4673, y: 1405.1672}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &920209915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 920209911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03f390691ca8931429bd7e76572999a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  icon: {fileID: 920209912}
+  title: {fileID: 0}
+  rect: {fileID: 920209914}
+  flipDuration: 0.4
+  scalePunch: 0.2
+  punchDuration: 0.3
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -4834,6 +4865,7 @@ GameObject:
   - component: {fileID: 1604385118}
   - component: {fileID: 1604385117}
   - component: {fileID: 1604385116}
+  - component: {fileID: 1604385119}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -4899,6 +4931,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1604385119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1604385115}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34c4baf49e407b94398578fc45b758fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  card: {fileID: 920209915}
 --- !u!1 &1615424588
 GameObject:
   m_ObjectHideFlags: 0
@@ -6492,7 +6537,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2127179041
 RectTransform:
   m_ObjectHideFlags: 0
