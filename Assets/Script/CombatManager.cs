@@ -7,6 +7,8 @@ public class CombatManager : MonoBehaviour
     public enum State { Prep, Combat }
     public static CombatManager Instance { get; private set; }
 
+    public static event Action OnCombatStart;
+    public static event Action OnCombatEnd;
     #region References
     [Header("References")]
     [SerializeField] private GridManager grid;
@@ -66,6 +68,7 @@ public class CombatManager : MonoBehaviour
 
         ForEachUnit(HandleStartForUnit);
         if (game != null) game.SetGunsEnabled(true);
+
     }
 
     public void EndCombat()
@@ -74,6 +77,7 @@ public class CombatManager : MonoBehaviour
 
         CurrentState = State.Prep;
         ApplyPrepState();
+
     }
 
     public void ToggleFight()
@@ -142,6 +146,10 @@ public class CombatManager : MonoBehaviour
         EnsureAgentOnNavMesh(u);
 
         if (u.targeting != null) u.targeting.enabled = true;
+
+        var gun = u.GetComponent<GunController>();
+        if (gun != null) gun.enabled = true;
+
         if (disableDragDuringCombat && u.drag != null) u.drag.enabled = false;
 
         EnableAgentMovement(u);
