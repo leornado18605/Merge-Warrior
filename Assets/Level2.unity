@@ -3027,7 +3027,8 @@ MonoBehaviour:
   defeatPrefab: {fileID: 7216595549606336001, guid: 642c7baabff554d75a2a3e1a1a0c891e, type: 3}
   rewardText: {fileID: 1104164949}
   claimButton: {fileID: 1615424592}
-  noThanksButton: {fileID: 1615424592}
+  noThanksButton: {fileID: 973413206}
+  exitButton: {fileID: 1615424592}
   titleWinGO: {fileID: 599879741}
   titleLoseGO: {fileID: 1535801143}
 --- !u!4 &1039677584

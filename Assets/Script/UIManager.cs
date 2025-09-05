@@ -27,6 +27,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text rewardText;
     [SerializeField] private Button claimButton;
     [SerializeField] private Button noThanksButton;
+    [SerializeField] private Button exitButton;
 
     [SerializeField] private GameObject titleWinGO;   
     [SerializeField] private GameObject titleLoseGO;  
@@ -45,6 +46,7 @@ public class UIManager : MonoBehaviour
         if (startFightButton) startFightButton.onClick.AddListener(OnStartFightClicked);
         if (placeKnifeButton) placeKnifeButton.onClick.AddListener(OnPlaceKnifeClicked);
         if (placeGunButton) placeGunButton.onClick.AddListener(OnPlaceGunClicked);
+        if (exitButton) exitButton.onClick.AddListener(OnExitClicked);
 
         if (claimButton) claimButton.onClick.AddListener(OnClaimClicked);
         if (noThanksButton) noThanksButton.onClick.AddListener(OnNoThanksClicked);
@@ -114,6 +116,18 @@ public class UIManager : MonoBehaviour
 
         if (resultPanel) resultPanel.SetActive(true);
 
+        int currentLevel = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex;
+        if (currentLevel == 2) // Level2
+        {
+            if (noThanksButton) noThanksButton.gameObject.SetActive(false);
+            if (exitButton) exitButton.gameObject.SetActive(true);
+        }
+        else
+        {
+            if (noThanksButton) noThanksButton.gameObject.SetActive(true);
+            if (exitButton) exitButton.gameObject.SetActive(false);
+        }
+
         if (victoryPrefab) victoryPrefab.SetActive(false);
         if (defeatPrefab) defeatPrefab.SetActive(false);
         if (spinPrefab) spinPrefab.SetActive(false);
@@ -152,4 +166,15 @@ public class UIManager : MonoBehaviour
     {
         Debug.Log("Replay current level!");
     }
+
+    private void OnExitClicked()
+    {
+        Debug.Log("Exit game!");
+        Application.Quit();
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
+    }
+
 }
