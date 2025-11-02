@@ -5253,7 +5253,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34c4baf49e407b94398578fc45b758fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  card: {fileID: 920209915}
 --- !u!1 &1615424588
 GameObject:
   m_ObjectHideFlags: 0
@@ -6797,8 +6796,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03df8bc7f7330d345ad2a483818fbba2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultCoins: 399
-  Coins: 120
+  defaultCoins: 700
+  Coins: 100
   coinText: {fileID: 894726705}
   buyKnifeButton: {fileID: 571080059}
   buyGunButton: {fileID: 1450697944}

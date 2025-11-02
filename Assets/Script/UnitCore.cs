@@ -39,22 +39,6 @@ public class UnitCore : MonoBehaviour
     public event Action<UnitCore, int> onHit;
     [SerializeField] private Animator animator;
     [SerializeField] private string dieTrigger = "Die";
-    public void Init(
-        string t,
-        int lv,
-        Team tm,
-        int h,
-        int d)
-    {
-        typeName = t;
-        level = lv;
-        team = tm;
-
-        if (useTable)
-            Apply();
-        else
-            SetManual(h, d);
-    }
 
     public void Apply()
     {
@@ -62,14 +46,7 @@ public class UnitCore : MonoBehaviour
         var s = Pick(lv);
         SetFrom(s);
     }
-
-    public void Heal(int v)
-    {
-        if (v <= 0)
-            return;
-
-        hp = Mathf.Min(hp + v, hpMax);
-    }
+    
 
     public void Hit(DamageData d)
     {
@@ -98,24 +75,6 @@ public class UnitCore : MonoBehaviour
         return hp > 0;
     }
 
-    public void SetHpMax(int v)
-    {
-        hpMax = Mathf.Max(1, v);
-        hp = Mathf.Min(hp, hpMax);
-    }
-
-    public void SetDmg(int v)
-    {
-        dmg = Mathf.Max(1, v);
-    }
-
-    public void SetLevel(int lv)
-    {
-        level = Mathf.Max(1, lv);
-        if (useTable)
-            Apply();
-    }
-
     private void Die()
     {
         Debug.Log($"[UnitCore.Die] {name} hp->0");
@@ -123,13 +82,6 @@ public class UnitCore : MonoBehaviour
 
         onDead?.Invoke(this);
 
-    }
-
-    private void SetManual(int h, int d)
-    {
-        hpMax = Mathf.Max(1, h);
-        hp = hpMax;
-        dmg = Mathf.Max(1, d);
     }
 
     private StatRow Pick(int lv)
@@ -163,12 +115,6 @@ public class UnitCore : MonoBehaviour
         s.move = move;
         return s;
     }
-
-    public void ResetHP()
-    {
-        hp = hpMax;
-    }
-
 #if UNITY_EDITOR
     private void OnValidate()
     {

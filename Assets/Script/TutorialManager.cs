@@ -41,7 +41,14 @@ public class TutorialManager : MonoBehaviour
     {
         if (!rootToHide) rootToHide = gameObject; 
     }
+    
+    private void Start()
+    {
+        if (canvasRT == null && uiCanvas != null)
+            canvasRT = uiCanvas.GetComponent<RectTransform>();
 
+        ShowStep(0);
+    }
     private void OnEnable()
     {
         subRoutine = StartCoroutine(WaitAndSubscribe());
@@ -65,13 +72,7 @@ public class TutorialManager : MonoBehaviour
         GameManager.Instance.OnUnitMerged += HandleUnitMerged;
     }
 
-    private void Start()
-    {
-        if (canvasRT == null && uiCanvas != null)
-            canvasRT = uiCanvas.GetComponent<RectTransform>();
-
-        ShowStep(0);
-    }
+  
 
     #endregion
     // ─────────────────────────────────────────────────────────────────────────────
@@ -94,28 +95,29 @@ public class TutorialManager : MonoBehaviour
 
     private void ShowStepKnife()
     {
-        SetInteractable(placeKnifeButton, true);
-        SetInteractable(placeGunButton, false);
-        SetInteractable(startFightButton, false);
+        LockAllButtonsExcept(placeKnifeButton);
 
         SetTutorialRaycast(false);
         MoveHandTo(placeKnifeRT, new Vector2(0f, 50f));
 
-        BindOneShot(placeKnifeButton, () =>
-        {
-            if (useEconomyInTutorial && GameEconomyManager.Instance != null)
-                _ = GameEconomyManager.Instance.TryBuyKnife(unitManager);
-            else
-                unitManager?.PlaceKnife();
-
-            ShowStep(1);
-        });
+        BindRepeatable(
+            placeKnifeButton,
+            () =>
+            {
+                if (useEconomyInTutorial && GameEconomyManager.Instance != null)
+                    _ = GameEconomyManager.Instance.TryBuyKnife(unitManager);
+                else
+                    unitManager?.PlaceKnife();
+            },
+            2,
+            () => ShowStep(1)
+        );
     }
+
 
     private void ShowStepGun()
     {
-        SetInteractable(placeGunButton, true);
-        SetInteractable(startFightButton, false);
+        LockAllButtonsExcept(placeKnifeButton);
 
         SetTutorialRaycast(false);
         MoveHandTo(placeGunRT, new Vector2(0f, 50f));
@@ -358,6 +360,43 @@ public class TutorialManager : MonoBehaviour
             onClickOnce?.Invoke();
         });
     }
+    private void BindRepeatable(Button btn, UnityEngine.Events.UnityAction onClick, int clickNeeded, UnityEngine.Events.UnityAction onDone)
+    {
+        if (!btn) return;
+        int clickCount = 0;
+
+        btn.onClick.RemoveAllListeners();
+        btn.interactable = true;
+
+        btn.onClick.AddListener(() =>
+        {
+            if (!btn.interactable) return;
+
+            clickCount++;
+            onClick?.Invoke();
+
+            if (clickCount >= clickNeeded)
+            {
+                btn.interactable = false;
+                btn.onClick.RemoveAllListeners();
+                btn.gameObject.SetActive(false);
+                onDone?.Invoke();
+            }
+        });
+    }
 
     #endregion
+    
+    private void LockAllButtonsExcept(Button allowed)
+    {
+        Button[] all = { placeKnifeButton, placeGunButton, startFightButton };
+        foreach (var b in all)
+        {
+            if (b == null) continue;
+            bool enable = (b == allowed);
+            b.interactable = enable;
+            b.gameObject.GetComponent<Image>().raycastTarget = enable;
+        }
+    }
+
 }

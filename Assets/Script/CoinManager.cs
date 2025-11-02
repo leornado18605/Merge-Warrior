@@ -55,7 +55,6 @@ public class GameEconomyManager : MonoBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject);
 
 #if UNITY_EDITOR
         if (resetCoinsOnPlayInEditor)

@@ -15,6 +15,9 @@ public class Unit : MonoBehaviour
     public int row;
     public int col;
 
+    [Header("Flags")]
+    [SerializeField] private bool isOriginalUnit = false; 
+    
     [Header("Core Refs")]
     [SerializeField] public UnitCore core;
     [SerializeField] public UnitTargeting targeting;
@@ -77,7 +80,6 @@ public class Unit : MonoBehaviour
         gameObject.name = $"{unitType}_L{level}_R{row}C{col}";
     }
 
-    public Vector3 GetOriginalPosition() { return originalPosition; }
     public GridManager Grid { get { return gridManager; } }
     public GridManager.Board Board { get { return board; } }
 
@@ -90,11 +92,6 @@ public class Unit : MonoBehaviour
     }
 
     public bool IsMergeLocked() { return mergeLock; }
-
-    public void MergeIncrement()
-    {
-        level++;
-    }
 
     public void MergeLockTemporary(float seconds = -1f)
     {
@@ -116,10 +113,20 @@ public class Unit : MonoBehaviour
 
     private IEnumerator MergeEffectCoroutine(GameObject nextPrefab, int nextLevel)
     {
-        // shrink old unit
+        yield return StartCoroutine(PlayMergeShrinkEffect());
+
+        DespawnOldUnit();
+
+        GameObject newObj = SpawnMergedUnit(nextPrefab, nextLevel);
+
+        PlayLevelUpEffect(newObj);
+    }
+    private IEnumerator PlayMergeShrinkEffect()
+    {
+        // Shrink animation
         transform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack);
 
-        // spawn merge FX
+        // Spawn merge FX
         GameObject fx = null;
         if (mergeEffectPrefab != null)
         {
@@ -134,11 +141,17 @@ public class Unit : MonoBehaviour
         yield return new WaitForSeconds(mergeEffectDuration);
 
         if (fx != null) Destroy(fx);
+    }
+    private void DespawnOldUnit()
+    {
 
-        // despawn old unit
         PoolManager.Release(gameObject);
+    }
+    private GameObject SpawnMergedUnit(GameObject nextPrefab, int nextLevel)
+    {
+        if (Grid == null || GameManager.Instance == null)
+            return null;
 
-        // spawn new unit with scale animation
         Vector3 pos = Grid.GridToWorldPosition(Board, row, col, true);
         GameObject newObj = GameManager.Instance.CreateMergedUnit(
             nextPrefab, unitType, nextLevel, Board, row, col, pos);
@@ -149,16 +162,20 @@ public class Unit : MonoBehaviour
             newObj.transform.DOScale(Vector3.one * 300f, 0.4f).SetEase(Ease.OutBack);
         }
 
-        // spawn level-up FX
-        if (levelUpEffectPrefab != null && newObj != null)
-        {
-            GameObject levelFx = Instantiate(
-                levelUpEffectPrefab,
-                newObj.transform.position + Vector3.up,
-                Quaternion.identity,
-                newObj.transform);
-
-            Destroy(levelFx, levelUpEffectDuration);
-        }
+        return newObj;
     }
+    private void PlayLevelUpEffect(GameObject newObj)
+    {
+        if (newObj == null || levelUpEffectPrefab == null)
+            return;
+
+        GameObject fx = Instantiate(
+            levelUpEffectPrefab,
+            newObj.transform.position + Vector3.up,
+            Quaternion.identity,
+            newObj.transform);
+
+        Destroy(fx, levelUpEffectDuration);
+    }
+
 }

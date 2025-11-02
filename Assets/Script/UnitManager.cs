@@ -29,12 +29,7 @@ public class UnitManager : MonoBehaviour
     {
         TryAssignGrid();
     }
-
-    public void SetGrid(GridManager g)
-    {
-        if (g != null) gridManager = g;
-    }
-
+    
     private void TryAssignGrid()
     {
         gridManager = GridManager.Instance;  // fallback
@@ -44,94 +39,97 @@ public class UnitManager : MonoBehaviour
     {
         PoolManager.CreatePool(knifePrefab, initialSize: poolInitial, maxSize: poolMax, autoExpand: true);
         PoolManager.CreatePool(gunPrefab, initialSize: poolInitial, maxSize: poolMax, autoExpand: true);
-        PlaceKnife();
+       // PlaceKnife();
     }
 
+    
     public void PlaceKnife()
     {
-
         var board = GridManager.Board.Board1;
+        Vector2Int cell = FindEmptyCellForKnife(board);
 
+        if (cell.x < 0 || cell.y < 0)
+            return; 
+
+        Vector3 pos = gridManager.GridToWorldPosition(board, cell.x, cell.y, true);
+
+        GameObject knife = SpawnUnit(knifePrefab, pos, "Knife", 1, board, cell.x, cell.y);
+        SetupUnitTeam(knife, Team.Player);
+    }
+
+    private Vector2Int FindEmptyCellForKnife(GridManager.Board board)
+    {
         for (int row = gridManager.Rows - 1; row >= 0; row--)
         {
             for (int col = 0; col < gridManager.Cols; col++)
             {
-                if (!gridManager.IsEmptyCell(board, row, col))
-                    continue;
-
-                Vector3 worldPos = gridManager.GridToWorldPosition(board, row, col, true);
-
-                GameObject knife = PoolManager.Spawn(knifePrefab, worldPos, Quaternion.identity, gridManager.transform);
-                var u = knife.GetComponent<Unit>();
-                knife.SetActive(false);
-                
-                knife.GetComponent<Unit>().Initialize("Knife", 1, gridManager, board, row, col);
-
-                gridManager.SetCellOccupied(board, row, col, knife);
-                GameManager.Instance.HookUnit(u);
-
-                var core = u ? u.core : null;
-                if (core) core.team = Team.Player;
-
-                var team = knife.GetComponent<UnitTeam>();
-                if (team == null) team = knife.AddComponent<UnitTeam>();
-                team.team = Team.Player;
-
-                knife.tag = "Player";
-                knife.SetActive(true);
-                return;
+                if (gridManager.IsEmptyCell(board, row, col))
+                    return new Vector2Int(row, col);
             }
         }
-
+        return new Vector2Int(-1, -1);
     }
 
     public void PlaceGun()
     {
         var board = GridManager.Board.Board1;
+        Vector2Int cell = FindFirstEmptyCell(board);
 
+        if (cell.x < 0 || cell.y < 0)
+            return;
+
+        Vector3 pos = gridManager.GridToWorldPosition(board, cell.x, cell.y, true);
+
+        GameObject gun = SpawnUnit(gunPrefab, pos, "Gun", 1, board, cell.x, cell.y);
+        SetupUnitTeam(gun, Team.Player);
+    }
+    
+    private Vector2Int FindFirstEmptyCell(GridManager.Board board)
+    {
         for (int row = 0; row < gridManager.Rows; row++)
         {
             for (int col = gridManager.Cols - 1; col >= 0; col--)
             {
-                if (!gridManager.IsEmptyCell(board, row, col))
-                    continue;
-
-                Vector3 worldPos = gridManager.GridToWorldPosition(board, row, col, true);
-
-                GameObject gun = PoolManager.Spawn(gunPrefab, worldPos, Quaternion.identity, gridManager.transform);
-                var u = gun.GetComponent<Unit>();
-                gun.SetActive(false);
-
-                gun.GetComponent<Unit>().Initialize("Gun", 1, gridManager, board, row, col);
-
-                gridManager.SetCellOccupied(board, row, col, gun);
-                GameManager.Instance.HookUnit(u);
-
-                var core = u ? u.core : null;
-                if (core) core.team = Team.Player;
-
-                var team = gun.GetComponent<UnitTeam>();
-                if (team == null) team = gun.AddComponent<UnitTeam>();
-                team.team = Team.Player;
-
-                gun.tag = "Player";
-                gun.SetActive(true);
-                return;
+                if (gridManager.IsEmptyCell(board, row, col))
+                    return new Vector2Int(row, col);
             }
         }
+
+        return new Vector2Int(-1, -1);
     }
 
-    public bool IsBoardFull()
+    private GameObject SpawnUnit(GameObject prefab, Vector3 pos, string type, int level,
+        GridManager.Board board, int row, int col)
     {
-        var board = GridManager.Board.Board1; // Player board
-        for (int r = 0; r < gridManager.Rows; r++)
+        GameObject obj = PoolManager.Spawn(prefab, pos, Quaternion.identity, gridManager.transform);
+        if (!obj) return null;
+
+        obj.SetActive(false);
+
+        Unit u = obj.GetComponent<Unit>();
+        if (u)
         {
-            for (int c = 0; c < gridManager.Cols; c++)
-            {
-                if (gridManager.IsEmptyCell(board, r, c))
-                    return false;
-            }
+            u.Initialize(type, level, gridManager, board, row, col);
+            gridManager.SetCellOccupied(board, row, col, obj);
+            GameManager.Instance.HookUnit(u);
         }
-        return true;
+
+        obj.SetActive(true);
+        return obj;
     }
+
+    private void SetupUnitTeam(GameObject unitObj, Team team)
+    {
+        if (!unitObj) return;
+
+        var unit = unitObj.GetComponent<Unit>();
+        if (unit && unit.core)
+            unit.core.team = team;
+
+        var unitTeam = unitObj.GetComponent<UnitTeam>() ?? unitObj.AddComponent<UnitTeam>();
+        unitTeam.team = team;
+
+        unitObj.tag = team == Team.Player ? "Player" : "Enemy";
+    }
+
 }

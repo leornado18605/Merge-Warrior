@@ -281,38 +281,70 @@ public class GameManager : MonoBehaviour
     public bool TryMerge(GridManager.Board board, int targetRow, int targetCol, GameObject sourceObj)
     {
         GameObject targetObj = gridManager.GetOccupant(board, targetRow, targetCol);
-        if (targetObj == null || sourceObj == null) return false;
+        if (!ValidateMergeTargets(targetObj, sourceObj, out Unit targetUnit, out Unit sourceUnit))
+            return false;
 
-        Unit targetUnit;
-        Unit sourceUnit;
-        if (!ValidMerge(targetObj, sourceObj, out targetUnit, out sourceUnit)) return false;
-
-        int newLevel = targetUnit.level + 1;
-
-        GameObject[] prefabs;
-        if (!prefabMap.TryGetValue(targetUnit.unitType, out prefabs)) return false;
-        if (newLevel - 1 >= prefabs.Length || prefabs[newLevel - 1] == null) return false;
+        int newLevel = CalculateNewLevel(targetUnit);
+        if (!GetNextPrefab(targetUnit.unitType, newLevel, out GameObject nextPrefab, out GameObject[] prefabs))
+            return false;
 
         Vector3 pos = gridManager.GridToWorldPosition(board, targetRow, targetCol, true);
 
+        CleanupBeforeMerge(sourceUnit, sourceObj, targetObj);
+
+        ExecuteMergeEffect(board, targetRow, targetCol, pos, targetUnit, prefabs, newLevel);
+
+        return true;
+    }
+
+
+    private bool ValidateMergeTargets(GameObject targetObj, GameObject sourceObj, out Unit targetUnit, out Unit sourceUnit)
+    {
+        targetUnit = null;
+        sourceUnit = null;
+        if (targetObj == null || sourceObj == null) return false;
+
+        if (!ValidMerge(targetObj, sourceObj, out targetUnit, out sourceUnit)) return false;
+
+        return true;
+    }
+    private int CalculateNewLevel(Unit targetUnit)
+    {
+        return targetUnit.level + 1;
+    }
+
+    private bool GetNextPrefab(string unitType, int newLevel, out GameObject nextPrefab, out GameObject[] prefabs)
+    {
+        nextPrefab = null;
+        prefabs = null;
+
+        if (!prefabMap.TryGetValue(unitType, out prefabs)) return false;
+        if (newLevel - 1 >= prefabs.Length) return false;
+
+        nextPrefab = prefabs[newLevel - 1];
+        return nextPrefab != null;
+    }
+    private void CleanupBeforeMerge(Unit sourceUnit, GameObject sourceObj, GameObject targetObj)
+    {
         CleanupSource(sourceUnit, sourceObj);
         PoolManager.Release(targetObj);
-
+    }
+    private void ExecuteMergeEffect(GridManager.Board board, int targetRow, int targetCol, Vector3 pos, Unit targetUnit, GameObject[] prefabs, int newLevel)
+    {
         if (newLevel == 2)
         {
             GameObject dummy = CreateMergedUnit(prefabs[0], targetUnit.unitType, 1, board, targetRow, targetCol, pos);
             if (dummy != null)
             {
                 Unit unit = dummy.GetComponent<Unit>();
-                if (unit != null) unit.MergeWithEffect(prefabs[newLevel - 1], newLevel);
+                if (unit != null)
+                    unit.MergeWithEffect(prefabs[newLevel - 1], newLevel);
             }
         }
         else
         {
             CreateMergedUnit(prefabs[newLevel - 1], targetUnit.unitType, newLevel, board, targetRow, targetCol, pos);
         }
-
-        return true;
     }
 
     private bool ValidMerge(GameObject a, GameObject b, out Unit ua, out Unit ub)
@@ -350,40 +382,71 @@ public class GameManager : MonoBehaviour
         int col,
         Vector3 pos)
     {
-        GameObject obj = PoolManager.Spawn(prefab, pos, Quaternion.identity);
+        // 1️⃣ Spawn unit
+        GameObject obj = SpawnUnitFromPool(prefab, pos);
         Unit unit = obj != null ? obj.GetComponent<Unit>() : null;
         if (unit == null) return null;
 
-        // Destroy cached event systems if any
-        if (unit.eventSystems != null)
-        {
-            for (int i = 0; i < unit.eventSystems.Length; i++)
-            {
-                if (unit.eventSystems[i] != null)
-                    Destroy(unit.eventSystems[i].gameObject);
-            }
-        }
+        // 2️⃣ Cleanup event systems & raycasters
+        CleanupEventSystems(unit);
+        DisableRaycasters(unit);
 
-        // Disable cached raycasters if any
-        if (unit.raycasters != null)
-        {
-            for (int i = 0; i < unit.raycasters.Length; i++)
-            {
-                if (unit.raycasters[i] != null)
-                    unit.raycasters[i].enabled = false;
-            }
-        }
+        // 3️⃣ Initialize core data
+        InitializeUnitData(unit, type, level, board, row, col);
 
-        unit.Initialize(type, level, gridManager, board, row, col);
-        gridManager.SetCellOccupied(board, row, col, obj);
+        // 4️⃣ Register to grid
+        RegisterUnitToGrid(unit, board, row, col, obj);
 
-        unit.MergeLockTemporary(mergeLockSeconds);
+        // 5️⃣ Finalize setup (hook + events)
+        FinalizeUnitCreation(unit, row, col);
 
-        HookUnit(unit);
-        if (OnUnitMerged != null) OnUnitMerged.Invoke(unit, row, col);
-
-        EnsureEventSystemExists();
         return obj;
+    }
+
+    private GameObject SpawnUnitFromPool(GameObject prefab, Vector3 pos)
+    {
+        return PoolManager.Spawn(prefab, pos, Quaternion.identity);
+    }
+
+    private void CleanupEventSystems(Unit unit)
+    {
+        if (unit.eventSystems == null) return;
+
+        for (int i = 0; i < unit.eventSystems.Length; i++)
+        {
+            if (unit.eventSystems[i] != null)
+                Destroy(unit.eventSystems[i].gameObject);
+        }
+    }
+
+    private void DisableRaycasters(Unit unit)
+    {
+        if (unit.raycasters == null) return;
+
+        for (int i = 0; i < unit.raycasters.Length; i++)
+        {
+            if (unit.raycasters[i] != null)
+                unit.raycasters[i].enabled = false;
+        }
+    }
+
+    private void InitializeUnitData(Unit unit, string type, int level, GridManager.Board board, int row, int col)
+    {
+        unit.Initialize(type, level, gridManager, board, row, col);
+        unit.MergeLockTemporary(mergeLockSeconds);
+    }
+
+    private void RegisterUnitToGrid(Unit unit, GridManager.Board board, int row, int col, GameObject obj)
+    {
+        gridManager.SetCellOccupied(board, row, col, obj);
+    }
+
+    private void FinalizeUnitCreation(Unit unit, int row, int col)
+    {
+        HookUnit(unit);
+
+        OnUnitMerged?.Invoke(unit, row, col);
+        EnsureEventSystemExists();
     }
 
     private static void EnsureEventSystemExists()
@@ -672,8 +735,6 @@ public class GameManager : MonoBehaviour
 
     public void ResetBattle()
     {
-        Debug.Log("🔄 ResetBattle called!");
-
         // stop pending end routine
         if (endBattleRoutine != null)
         {
@@ -694,8 +755,13 @@ public class GameManager : MonoBehaviour
 
         if (unitManager != null)
         {
-            unitManager.PlaceKnife();
-            for (int i = 0; i < 3; i++) unitManager.PlaceGun();
+            int currentLevelIndex = SceneManager.GetActiveScene().buildIndex;
+
+            if (currentLevelIndex == 0) // level 1
+            {
+                unitManager.PlaceKnife();
+                for (int i = 0; i < 3; i++) unitManager.PlaceGun();
+            }
         }
 
         if (uiManager != null)
@@ -704,6 +770,7 @@ public class GameManager : MonoBehaviour
             uiManager.ShowPlacementButtons();
         }
     }
+
 
     #endregion
     // ─────────────

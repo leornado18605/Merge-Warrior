@@ -72,11 +72,17 @@ public class LevelController : MonoBehaviour
 
     private IEnumerator LoadAndInitIndex(int buildIndex)
     {
+        PreserveActiveUnits();
+        
         AsyncOperation op = SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Single);
         yield return op;
         yield return null;
         yield return null;
-
+        
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+        {
+            GameManager.Instance.ResetBattle(); 
+        }
         GameManager gm = GameManager.Instance;
         GridManager grid = GridManager.Instance;
         UnitManager um = UnitManager.Instance;
@@ -97,6 +103,42 @@ public class LevelController : MonoBehaviour
         if (CombatManager.Instance != null)
         {
             CombatManager.Instance.ForcePrepState();
+        }
+        
+        RestorePreservedUnitsToScene();
+        
+    }
+
+    private void PreserveActiveUnits()
+    {
+        var allUnits = FindObjectsOfType<Unit>();
+        foreach (var u in allUnits)
+        {
+            if (u == null) continue;
+
+            if (u.Grid == null) continue;
+
+            var occupant = u.Grid.GetOccupant(u.Board, u.row, u.col);
+            if (occupant == u.gameObject)
+            {
+                DontDestroyOnLoad(u.gameObject);
+            }
+            else
+            {
+                Destroy(u.gameObject);
+            }
+        }
+    }
+
+    private void RestorePreservedUnitsToScene()
+    {
+        Scene activeScene = SceneManager.GetActiveScene();
+
+        foreach (var u in FindObjectsOfType<Unit>())
+        {
+            if (u == null) continue;
+
+            SceneManager.MoveGameObjectToScene(u.gameObject, activeScene);
         }
     }
 
